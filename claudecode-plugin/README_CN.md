@@ -45,7 +45,7 @@ seekdb 技能为 Claude Code 设计，旨在增强 Claude 在 seekdb 数据库�
 
 - 添加 seekdb 的市场
 ```bash
-/plugin marketplace add oceanbase/ecology-plugins
+/plugin marketplace add oceanbase/seekdb-ecology-plugins
 ```
 - 在 Claude Code 中安装插件
 ```bash
@@ -79,7 +79,7 @@ Claude 会自动搜索文档库并提供准确的技术指导。
 ## 📂 项目结构
 
 ```
-seekdb-claudecode-plugin/
+claudecode-plugin/
 ├── README.md                           # 项目文档
 ├── README_CN.md                        # 中文文档
 ├── plugin.json                         # 插件配置
@@ -138,21 +138,21 @@ Agent Skills 是 Claude Code 的强大功能，允许将专业知识和工作流
 
 ### Q: 技能何时会被调用？
 
-A: Claude 会根据您的请求内容和技能的描述自动决定何时使用它们。当您询问与 seekdb 技术相关的问题时，相应的技能会自动被调用。
+A: Claude Code 会根据您的请求内容和技能的描述自动决定何时使用它们。当您询问与 seekdb 技术相关的问题时，相应的技能会自动被调用。
 
 ### Q: 可以同时使用多个技能吗？
 
-A: 可以。Claude 可以组合多个技能来完成复杂任务。
+A: 可以。Claude Code 可以组合多个技能来完成复杂任务。
 
 ### Q: 如何更新技能？
 
 A: 如果使用 git 管理，只需拉取最新代码。如果是手动复制，需要重新复制更新后的文件。
 
-### Q: 技能会影响 Claude 的其他功能吗？
+### Q: 技能会影响 Claude Code 的其他功能吗？
 
 A: 不会。技能是独立的模块，只在需要时被调用，不会影响 Claude 的其他功能。
 
 ---
 
-**祝您使用 seekdb 和 Claude 编码愉快！🎉**
+**祝您使用 seekdb 和 Claude Code 编码愉快！🎉**
 

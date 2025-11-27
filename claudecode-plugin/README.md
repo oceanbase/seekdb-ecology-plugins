@@ -45,7 +45,7 @@ Provides a complete seekdb database documentation knowledge base with document q
 
 - Add seekdb's marketplace
 ```bash
-/plugin marketplace add oceanbase/ecology-plugins
+/plugin marketplace add oceanbase/seekdb-ecology-plugins
 ```
 - Install plugins in Claude Code
 ```bash
@@ -79,7 +79,7 @@ Claude will automatically search the documentation library and provide accurate 
 ## 📂 Project Structure
 
 ```
-seekdb-claudecode-plugin/
+claudecode-plugin/
 ├── README.md                           # Project documentation
 ├── README_CN.md                        # Chinese documentation
 ├── plugin.json                         # Plugin configuration
@@ -139,11 +139,11 @@ Learn more about Agent Skills:
 
 ### Q: When will Skills be invoked?
 
-A: Claude will automatically decide when to use them based on your request content and the Skills' descriptions. When you ask questions related to seekdb technical issues, the corresponding skill will be automatically invoked.
+A: Claude Code will automatically decide when to use them based on your request content and the Skills' descriptions. When you ask questions related to seekdb technical issues, the corresponding skill will be automatically invoked.
 
 ### Q: Can I use multiple Skills at the same time?
 
-A: Yes. Claude can combine multiple Skills to complete complex tasks.
+A: Yes. Claude Code can combine multiple Skills to complete complex tasks.
 
 ### Q: How to update Skills?
 
@@ -151,9 +151,9 @@ A: If managed with git, simply pull the latest code. If manually copied, you nee
 
 ### Q: Will Skills affect Claude's other functionality?
 
-A: No. Skills are independent modules that are only invoked when needed and will not affect Claude's other functionality.
+A: No. Skills are independent modules that are only invoked when needed and will not affect Claude Code's other functionality.
 
 ---
 
-**Happy Coding with seekdb and Claude! 🎉**
+**Happy Coding with seekdb and Claude Code! 🎉**
 
