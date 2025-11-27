@@ -1,8 +1,8 @@
 English | [简体中文](README_CN.md)
 
-# SeekDB Ecosystem Plugins Collection
+# Seekdb Ecosystem Plugins Collection
 
-This repository includes multiple plugins designed to enhance **SeekDB** integration with various frameworks and tools. Each plugin is optimized for specific scenarios to ensure stable and efficient database operations.
+This repository includes multiple plugins designed to enhance **seekdb** integration with various frameworks and tools. Each plugin is optimized for specific scenarios to ensure stable and efficient database operations.
 
 ---
 
@@ -54,7 +54,7 @@ This project is licensed under the [Apache License 2.0](./LICENSE).
 
 - For detailed configuration and usage instructions, refer to the respective plugin documentation.
 
-- Ensure SeekDB version compatibility (recommended ≥ 1.0.0).
+- Ensure seekdb version compatibility (recommended ≥ 1.0.0).
 
-- Plugins are designed to work with SeekDB's latest features and capabilities.
+- Plugins are designed to work with seekdb's latest features and capabilities.
 
