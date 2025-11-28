@@ -41,16 +41,43 @@ Provides a complete seekdb database documentation knowledge base with document q
 - Claude Code 1.0 or higher
 - Basic understanding of Agent Skills
 
-### Installation
+### Installing Claude Code
 
-- Add seekdb's marketplace
+If you haven't installed Claude Code yet, install it using npm:
+
 ```bash
-/plugin marketplace add oceanbase/seekdb-ecology-plugins
+npm install -g @anthropic-ai/claude-code
 ```
-- Install plugins in Claude Code
-```bash
-/plugin install seekdb-plugin@seekdb
-```
+
+### Installing the seekdb Plugin
+
+Once Claude Code is installed, follow these steps to install the seekdb plugin:
+
+1. **Add the seekdb Marketplace**
+   
+   Open Claude Code's terminal or command interface and run:
+   ```bash
+   /plugin marketplace add oceanbase/seekdb-ecology-plugins
+   ```
+   
+   This command adds the seekdb plugin marketplace to your Claude Code instance.
+
+2. **Install the Plugin**
+   
+   After adding the marketplace, install the seekdb plugin:
+   ```bash
+   /plugin install seekdb-plugin@seekdb
+   ```
+   
+   This will download and install the seekdb plugin along with all its skills.
+
+3. **Restart Claude Code**
+   
+   After installing the plugin, restart Claude Code to ensure the plugin is fully loaded and ready to use.
+
+### Configuration
+
+The plugin is ready to use immediately after installation. No additional configuration is required. The skills will be automatically available to Claude when you ask seekdb-related questions.
 
 ## 💡 Usage Examples
 
@@ -75,6 +102,79 @@ Which AI framework integrations does seekdb support?
 ```
 
 Claude will automatically search the documentation library and provide accurate technical guidance.
+
+## 📖 Detailed Usage Guide
+
+### Getting Started with Claude Code
+
+1. **Open a New Conversation**
+   - Launch Claude Code
+   - Start a new conversation or open an existing project
+   - The seekdb skills are automatically available in all conversations
+
+2. **Ask seekdb Questions**
+   - Simply type your question about seekdb in natural language
+   - Claude will automatically detect when to use the seekdb-docs skill
+   - No need to explicitly mention the skill name
+
+3. **Example Interactions**
+
+   **Basic Query:**
+   ```
+   How do I get started with seekdb?
+   ```
+   
+   **Technical Question:**
+   ```
+   What are the best practices for vector search in seekdb?
+   ```
+   
+   **Code Example Request:**
+   ```
+   Show me an example of implementing hybrid search with seekdb Python SDK
+   ```
+
+### Using Skills Effectively
+
+- **Be Specific**: The more specific your question, the better Claude can search the documentation
+- **Ask Follow-ups**: You can ask follow-up questions based on Claude's responses
+- **Request Examples**: Ask for code examples, configuration samples, or step-by-step guides
+- **Combine Topics**: Ask questions that combine multiple seekdb features
+
+### Troubleshooting
+
+If the skills don't seem to be working:
+
+1. **Verify Plugin Installation**
+   
+   In Claude Code, run the `/plugin` command. This will open an interactive interface where you can browse and manage installed plugins.
+   
+   Select "Manage and uninstall plugins" to confirm that `seekdb-plugin` exists.
+
+2. **Restart Claude Code**
+   
+   After installing new plugins or updates, you may need to restart Claude Code to load the updates.
+   
+   Completely close and reopen the Claude Code terminal session.
+
+3. **Update the Plugin**
+   
+   You can update the plugin using either the interactive interface or command line:
+   
+   a. Open the plugin management interface:
+      ```bash
+      /plugin
+      ```
+   
+   b. Navigate to "Manage marketplaces" using the arrow keys (↑↓) and press Enter to select.
+   
+   c. In the marketplace list, select the marketplace you want to update (e.g., `seekdb`).
+   
+   d. Press `u` to update the marketplace and its plugins.
+   
+   e. Press `Esc` to go back when finished.
+   
+   Make sure to use the correct plugin name and marketplace name format.
 
 ## 📂 Project Structure
 
