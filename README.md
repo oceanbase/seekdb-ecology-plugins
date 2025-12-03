@@ -8,11 +8,12 @@ This repository includes multiple plugins designed to enhance **seekdb** integra
 
 ## 🧩 Project Overview
 
-SeekDB is a high-performance vector database that provides powerful capabilities for AI applications, including vector search, hybrid search, and AI functions. This repository provides the following plugins to help developers integrate SeekDB seamlessly into their development workflows:
+Seekdb is a high-performance vector database that provides powerful capabilities for AI applications, including vector search, hybrid search, and AI functions. This repository provides the following plugins to help developers integrate seekdb seamlessly into their development workflows:
 
 | Plugin Name                                                                             | Use Case                  | Key Features                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
 | [Seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             | Development Tools         | Provides seekdb database-related documentation support for Claude Code                 |
+| [Seekdb Cursor Extension](./cursor-extension/README.md)                            | Development Tools         | Adds seekdb database documentation to Cursor's `.cursor/rules` directory for AI assistant integration |
 
 ---
 
@@ -26,6 +27,14 @@ SeekDB is a high-performance vector database that provides powerful capabilities
 
 - **Documentation**: [Seekdb Claude Code Plugin](./claudecode-plugin/README.md)
 
+### ✅ Seekdb Cursor Extension
+
+- **Function**: Adds seekdb database documentation to the `.cursor/rules` directory in your workspace, enabling the Cursor AI assistant to understand Seekdb database knowledge. Supports version management and manual removal of documentation.
+
+- **Use Case**: When developing with seekdb database in Cursor editor, need the AI assistant to have access to seekdb documentation for better code suggestions and assistance.
+
+- **Documentation**: [Seekdb Cursor Extension](./cursor-extension/README.md)
+
 ---
 
 ## 📚 Full Documentation Links
@@ -33,6 +42,7 @@ SeekDB is a high-performance vector database that provides powerful capabilities
 | Plugin Name                           | Documentation Link                                                                      |
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
 | Seekdb Claude Code Plugin             | [Seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             |
+| Seekdb Cursor Extension          | [Seekdb Cursor Extension](./cursor-extension/README.md)                            |
 
 ---
 
@@ -53,8 +63,4 @@ This project is licensed under the [Apache License 2.0](./LICENSE).
 ## 📌 Notes
 
 - For detailed configuration and usage instructions, refer to the respective plugin documentation.
-
-- Ensure seekdb version compatibility (recommended ≥ 1.0.0).
-
-- Plugins are designed to work with seekdb's latest features and capabilities.
 

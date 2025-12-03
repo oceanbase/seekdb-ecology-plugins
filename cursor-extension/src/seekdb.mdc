@@ -1,0 +1,128 @@
+---
+description: SeekDB Seekdb OceanBase vector search hybrid search AI function database deployment pyseekdb embedding similarity index
+alwaysApply: true
+globs: '**/*'
+---
+# SeekDB Development Rules
+
+**CRITICAL WORKFLOW**: When ANY user question, code request, or context mentions SeekDB, seekdb, OceanBase, vector search, hybrid search, AI functions, embeddings, similarity search, or database operations, you MUST:
+
+1. **FIRST STEP**: Immediately use `codebase_search` to search for relevant documentation in `.cursor/rules/seekdb-docs/` directory
+2. **SECOND STEP**: Read the found documentation files using `read_file` 
+3. **THIRD STEP**: Base your answer entirely on the official documentation
+4. **NEVER** provide answers about SeekDB without first searching the documentation
+
+## Mandatory Documentation Reference
+
+- **REQUIRED**: Before answering ANY SeekDB-related question, you MUST use `codebase_search` with target_directories set to `['.cursor/rules/seekdb-docs']` or `['.cursor/rules/seekdb-docs/**']`
+- **REQUIRED**: Search queries should be specific, e.g., "How to use vector search in SeekDB", "SeekDB Python SDK API", "SeekDB hybrid search implementation"
+- **REQUIRED**: After finding relevant docs, read them using `read_file` before providing any answer
+- The documentation in `.cursor/rules/seekdb-docs/` is the ONLY authoritative source for SeekDB information
+- NEVER guess or use general database knowledge - ALWAYS reference the actual documentation files
+
+## Documentation Structure
+
+SeekDB documentation is located in the `.cursor/rules/seekdb-docs/` directory and includes the following main sections:
+
+1. **Getting Started** (`100.get-started/`): Quick start, deployment, basic operations
+2. **Development Documentation** (`200.develop/`): Vector search, hybrid search, AI functions, multi-model support, etc.
+3. **Integration Guides** (`300.integrations/`): Integration with various frameworks and tools
+4. **Usage Guides** (`400.guides/`): Deployment, configuration, monitoring, etc.
+5. **Tutorials** (`500.tutorials/`): Real-world application cases and examples
+
+## Code Generation Principles
+
+- When generating SeekDB-related code, it MUST comply with the API specifications and best practices in the documentation
+- ALWAYS use code examples provided in the documentation as reference templates
+- Ensure code consistency with the versions and features described in the documentation
+- For complex features like vector search and hybrid search, ALWAYS reference detailed explanations in the documentation first
+- Before generating code, search for relevant examples in `.cursor/rules/seekdb-docs/` directory
+
+## Problem Solving
+
+- When encountering SeekDB-related issues, FIRST consult the FAQ and troubleshooting documents in the `seekdb-docs` directory
+- ALWAYS reference example code and configuration instructions from the documentation
+- Ensure solutions align with recommended practices in the documentation
+- Use semantic search to find relevant documentation files when solving SeekDB problems
+
+## Important Notes
+
+- ALWAYS use the latest APIs and best practices recommended in the documentation
+- Pay attention to version compatibility and limitations mentioned in the documentation
+- Follow security recommendations and performance optimization tips in the documentation
+
+## Mandatory Workflow for SeekDB Questions
+
+**STEP-BY-STEP PROCESS** (MUST FOLLOW IN ORDER):
+
+1. **DETECT**: Identify if the question is about SeekDB, seekdb, OceanBase, vector search, hybrid search, AI functions, embeddings, or database operations
+
+2. **SEARCH**: Immediately execute `codebase_search` with:
+   - Query: A specific question about the SeekDB topic (e.g., "How to create vector index in SeekDB", "SeekDB Python SDK connection example")
+   - target_directories: `['.cursor/rules/seekdb-docs']` or specific subdirectories like `['.cursor/rules/seekdb-docs/200.develop/100.vector-search']`
+
+3. **READ**: Use `read_file` to read ALL relevant documentation files found in step 2
+
+4. **ANSWER**: Provide your answer based ONLY on the documentation you just read, including:
+   - Direct quotes or paraphrases from the documentation
+   - Code examples from the documentation
+   - References to specific documentation file paths
+
+5. **CITE**: Always mention which documentation file(s) you referenced, using the format: "According to `.cursor/rules/seekdb-docs/...`"
+
+## Example Search Queries
+
+When user asks about SeekDB topics, use these types of search queries:
+- "vector search implementation in SeekDB"
+- "SeekDB Python SDK connection and query examples"
+- "hybrid search configuration SeekDB"
+- "AI function usage in SeekDB"
+- "SeekDB deployment and configuration"
+- "SeekDB embedding functions and vector operations"
+
+## Example of Correct Behavior
+
+### Example 1: Python SDK Connection
+
+**User asks**: "How do I connect to SeekDB using Python?"
+
+**AI should execute**:
+1. `codebase_search("SeekDB Python SDK connection example", ['.cursor/rules/seekdb-docs'])`
+2. `read_file` on the found documentation files (e.g., `.cursor/rules/seekdb-docs/100.get-started/50.embedded-mode/25.using-seekdb-in-python-sdk.md`)
+3. Provide answer with code examples from the documentation
+4. Cite: "According to `.cursor/rules/seekdb-docs/100.get-started/50.embedded-mode/25.using-seekdb-in-python-sdk.md`..."
+
+**AI should NOT**:
+- Answer without searching the documentation first
+- Use generic Python database connection code
+- Guess the API without referencing documentation
+
+### Example 2: Vector Search
+
+**User asks**: "How to perform vector similarity search in SeekDB?"
+
+**AI should execute**:
+1. `codebase_search("vector similarity search SeekDB", ['.cursor/rules/seekdb-docs/200.develop/100.vector-search'])`
+2. `read_file` on relevant files (e.g., `.cursor/rules/seekdb-docs/200.develop/100.vector-search/300.vector-similarity-search.md`)
+3. Provide answer with SQL examples and API usage from documentation
+4. Cite the specific documentation files used
+
+### Example 3: Hybrid Search
+
+**User asks**: "What is hybrid search and how to use it in SeekDB?"
+
+**AI should execute**:
+1. `codebase_search("hybrid search SeekDB implementation", ['.cursor/rules/seekdb-docs'])`
+2. `read_file` on found files (e.g., `.cursor/rules/seekdb-docs/200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`)
+3. Explain based on documentation, include code examples
+4. Reference the documentation structure and related files
+
+### Example 4: AI Functions
+
+**User asks**: "How to use AI functions in SeekDB?"
+
+**AI should execute**:
+1. `codebase_search("AI function usage SeekDB", ['.cursor/rules/seekdb-docs/200.develop/300.ai-function'])`
+2. `read_file` on relevant documentation files
+3. Provide examples and usage patterns from the documentation
+4. Include permission and configuration details from the docs
