@@ -138,13 +138,13 @@ async function removeSeekdbDocsFromRules(silent: boolean = false) {
 
         if (removedItems.length === 0) {
             if (!silent) {
-                vscode.window.showInformationMessage('Seekdb documentation not found in .cursor/rules directory');
+                vscode.window.showInformationMessage('seekdb documentation not found in .cursor/rules directory');
             }
             return;
         }
 
         if (!silent) {
-            vscode.window.showInformationMessage(`Seekdb documentation successfully removed: ${removedItems.join(', ')}`);
+            vscode.window.showInformationMessage(`seekdb documentation successfully removed: ${removedItems.join(', ')}`);
         }
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
@@ -269,7 +269,7 @@ async function copyOfficialDocsToRules(context: vscode.ExtensionContext) {
         
         // Prompt user to reload window to ensure rules are loaded
         const reloadAction = await vscode.window.showInformationMessage(
-            'Seekdb documentation successfully added. Please reload the window to apply the changes.',
+            'seekdb documentation successfully added. Please reload the window to apply the changes.',
             'Reload Window'
         );
         if (reloadAction === 'Reload Window') {
@@ -283,7 +283,7 @@ async function copyOfficialDocsToRules(context: vscode.ExtensionContext) {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Seekdb Docs for Cursor extension is now active!');
+    console.log('seekdb Docs for Cursor extension is now active!');
 
     // Register command to copy documentation
     const copyCommand = vscode.commands.registerCommand('seekdb-docs.copyToRules', () => {

@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# Seekdb Claude Code 插件
+# seekdb Claude Code 插件
 
 > 本插件包含 seekdb 的 Claude Code 技能，提供 seekdb 数据库相关文档支持。
 

@@ -1,8 +1,8 @@
 {
   "name": "seekdb-for-cursor",
-  "displayName": "Seekdb",
-  "description": "Add seekdb database documentation to .cursor/rules directory, enabling Cursor AI assistant to understand Seekdb database knowledge",
-  "version": "0.0.1",
+  "displayName": "seekdb",
+  "description": "Add seekdb database documentation to .cursor/rules directory, enabling Cursor AI assistant to understand seekdb database knowledge",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -15,11 +15,11 @@
     "commands": [
       {
         "command": "seekdb-docs.copyToRules",
-        "title": "Add Seekdb Docs"
+        "title": "Add seekdb Docs"
       },
       {
         "command": "seekdb-docs.removeFromRules",
-        "title": "Remove Seekdb Docs"
+        "title": "Remove seekdb Docs"
       }
     ]
   },
