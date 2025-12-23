@@ -15,7 +15,7 @@ When ANY question mentions seekdb, vector search, hybrid search, AI functions, e
 
 1. **FIRST**: Use `run_terminal_cmd` with `curl` to fetch the catalog directly from GitHub Raw:
    ```bash
-   curl -s --connect-timeout 5 https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/400.guides/1200.reference/1600.seekdb-docs-catalog.md
+   curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md
    ```
 
 2. **SUCCESS CRITERIA**: Remote mode is considered successful ONLY when:
@@ -47,7 +47,7 @@ When GitHub Raw is accessible, use curl to fetch documentation:
 
 Use `run_terminal_cmd` to execute:
 ```bash
-curl -s --connect-timeout 5 https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/400.guides/1200.reference/1600.seekdb-docs-catalog.md
+curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md
 ```
 
 **CRITICAL**: Check the output:
@@ -66,19 +66,19 @@ Construct the GitHub Raw URL and fetch using curl:
 
 **GitHub Raw URL Format:**
 ```
-https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/{File Path}
+https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/{File Path}
 ```
 
 **Example:**
 - File Path from catalog: `200.develop/100.vector-search/300.vector-similarity-search.md`
-- Full Raw URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md`
-- Command: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md"`
+- Full Raw URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md`
+- Command: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md"`
 
 ### Step 4: Provide Answer with Citations
 
 When citing documentation, use the GitHub web URL format:
 ```
-https://github.com/davidzhangbj/seekdb-doc/blob/V1.0.0/en-US/{File Path}
+https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/{File Path}
 ```
 
 ---
@@ -157,19 +157,19 @@ START
 **User asks**: "How do I deploy seekdb?"
 
 **AI should execute**:
-1. `run_terminal_cmd`: `curl -s --connect-timeout 5 https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/400.guides/1200.reference/1600.seekdb-docs-catalog.md`
+1. `run_terminal_cmd`: `curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
 2. ✅ Output contains markdown content → Remote mode confirmed
 3. Find in catalog: `100.get-started/100.client-server-mode/10.deploy-seekdb-testing-environment.md`
-4. `run_terminal_cmd`: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/100.get-started/100.client-server-mode/10.deploy-seekdb-testing-environment.md"`
+4. `run_terminal_cmd`: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/100.get-started/100.use-seekdb-with-sql/10.deploy-seekdb-testing-environment.md"`
 5. Provide answer from fetched content
-6. Cite: `https://github.com/davidzhangbj/seekdb-doc/blob/V1.0.0/en-US/100.get-started/100.client-server-mode/10.deploy-seekdb-testing-environment.md`
+6. Cite: `https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/100.get-started/100.use-seekdb-with-sql/10.deploy-seekdb-testing-environment.md`
 
 ### Example 2: Remote Mode Fails → Local Fallback
 
 **User asks**: "How to use hybrid search?"
 
 **AI should execute**:
-1. `run_terminal_cmd`: `curl -s --connect-timeout 5 https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.0.0/en-US/400.guides/1200.reference/1600.seekdb-docs-catalog.md`
+1. `run_terminal_cmd`: `curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
 2. ❌ Output is empty or error (e.g., "curl: (28) Connection timed out")
 3. **IMMEDIATELY switch to Local Mode**
 4. `read_file` on `.cursor/rules/seekdb-docs/400.guides/1200.reference/1600.seekdb-docs-catalog.md`
