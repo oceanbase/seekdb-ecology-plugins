@@ -39,7 +39,7 @@ Provides a complete seekdb database documentation knowledge base with document q
 ### Prerequisites
 
 - Claude Code 1.0 or higher
-- Basic understanding of Agent Skills
+- Basic understanding of Claude Skills
 
 ### Installing Claude Code
 
@@ -48,6 +48,36 @@ If you haven't installed Claude Code yet, install it using npm:
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
+
+### Configure Environment Variables
+
+Claude Code requires an Anthropic API key to run. Please set the following environment variables:
+
+```bash
+# Set Anthropic API key (required)
+export ANTHROPIC_API_KEY="your-api-key-here"
+
+# Set API Base URL (if using a proxy or custom endpoint)
+export ANTHROPIC_BASE_URL="https://api.anthropic.com"
+```
+
+> **Tip**: You can add these environment variables to your `~/.bashrc`, `~/.zshrc`, or other shell configuration files to persist the configuration.
+
+### Configure Network Settings
+
+Since the seekdb skill plugin needs to fetch the latest documentation from GitHub, you need to configure Claude Code to allow network requests in your project directory.
+
+Create or edit the `.claude/settings.local.json` file in your project root directory:
+
+```json
+{
+  "skipWebFetchPreflight": true
+}
+```
+
+> **Important Notes**:
+> - Setting `skipWebFetchPreflight` to `true` skips the preflight check for network requests, allowing Claude to directly access remote documentation
+> - If GitHub is not accessible, the plugin will automatically fall back to local documentation
 
 ### Installing the seekdb Plugin
 

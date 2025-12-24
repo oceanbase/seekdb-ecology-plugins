@@ -41,16 +41,61 @@ seekdb 技能为 Claude Code 设计，旨在增强 Claude 在 seekdb 数据库�
 - Claude Code 1.0 或更高版本
 - 对 Agent Skills 的基本了解
 
-### 安装
+### 安装 Claude Code
 
-- 添加 seekdb 的市场
+如果你还没有安装 Claude Code，可以通过 npm 全局安装：
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+### 配置环境变量
+
+Claude Code 需要 Anthropic API 密钥才能运行。请设置以下环境变量：
+
+```bash
+# 设置 Anthropic API 密钥（必需）
+export ANTHROPIC_API_KEY="your-api-key-here"
+
+# 设置 API Base URL（如果使用代理或自定义端点）
+export ANTHROPIC_BASE_URL="https://api.anthropic.com"
+```
+
+> **提示**：你可以将这些环境变量添加到 `~/.bashrc`、`~/.zshrc` 或其他 shell 配置文件中，以便持久化配置。
+
+### 配置网络设置
+
+由于 seekdb 技能插件需要从 GitHub 获取最新文档，你需要在项目目录下配置 Claude Code 允许网络请求。
+
+在你的项目根目录下创建或编辑 `.claude/settings.local.json` 文件：
+
+```json
+{
+  "skipWebFetchPreflight": true
+}
+```
+
+> **重要说明**：
+> - `skipWebFetchPreflight` 设置为 `true` 可跳过网络请求的预检，允许 Claude 直接访问远程文档
+> - 如果无法访问 GitHub，插件会自动回退到本地文档
+
+### 安装 seekdb 插件
+
+1. **添加 seekdb 市场**
+
 ```bash
 /plugin marketplace add oceanbase/seekdb-ecology-plugins
 ```
-- 在 Claude Code 中安装插件
+
+2. **安装插件**
+
 ```bash
 /plugin install seekdb-plugin@seekdb
 ```
+
+3. **重启 Claude Code**
+
+安装完成后，需要重启 Claude Code 以确保插件正确加载。
 
 ## 💡 使用示例
 
