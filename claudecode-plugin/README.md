@@ -14,7 +14,7 @@ seekdb skill is designed specifically for Claude Code, aimed at enhancing Claude
 
 ## 📦 Included Skills
 
-### 1. seekdb-docs
+### 1. seekdb
 
 Provides a complete seekdb database documentation knowledge base with document query and retrieval support.
 
@@ -32,7 +32,7 @@ Provides a complete seekdb database documentation knowledge base with document q
   - Reference Documentation
 
 **Related Documentation:**
-- [SKILL.md](skills/seekdb-docs/SKILL.md)
+- [SKILL.md](skills/seekdb/SKILL.md)
 
 ## 🚀 Quick Start
 
@@ -184,20 +184,17 @@ claudecode-plugin/
 ├── README_CN.md                        # Chinese documentation
 ├── plugin.json                         # Plugin configuration
 └── skills/
-    └── seekdb-docs/                    # Document query skill
+    └── seekdb/                         # SeekDB skill
         ├── SKILL.md                    # Skill documentation
-        ├── get-started.md              # Quick start documentation index
-        ├── develop.md                  # Development guide documentation index
-        ├── integrations.md             # Integration guide documentation index
-        ├── guides.md                   # Operations guide documentation index
-        ├── tutorials.md                # Practice tutorials documentation index
-        └── official-docs/              # Official documentation library
+        └── seekdb-docs/                # Official documentation library
             ├── 10.doc-overview.md      # Documentation overview
             ├── 100.get-started/        # Quick start guide
             ├── 200.develop/            # Development guide
             ├── 300.integrations/       # Integration guide
             ├── 400.guides/             # Operations guide
-            └── 500.tutorials/          # Practice tutorials
+            ├── 450.reference/          # Reference documentation
+            ├── 500.tutorials/          # Practice tutorials
+            └── 600.demos/              # Demo projects
 ```
 
 ## 🔧 Development & Contribution
