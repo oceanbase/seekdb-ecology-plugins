@@ -7,7 +7,7 @@
       {
         "name": "seekdb-plugin",
         "source": "./claudecode-plugin",
-        "description": "Provide seekDB documentation to your project. Provides access to seekDB best practices, SQL syntax, Python SDK, vector search, hybrid search, and AI functions - enabling smarter AI assistance for seekDB development."
+        "description": "Provide seekdb documentation to your project. Provides access to seekdb best practices, SQL syntax, Python SDK, vector search, hybrid search, and AI functions - enabling smarter AI assistance for seekdb development."
       }
     ]
   }
