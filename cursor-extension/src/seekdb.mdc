@@ -91,7 +91,7 @@ When GitHub is NOT accessible, use local documentation:
 
 Use `read_file` to read the catalog file:
 ```
-.cursor/rules/seekdb-docs/400.guides/1200.reference/1600.seekdb-docs-catalog.md
+.cursor/rules/seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
 ```
 
 ### Step 2: Find Relevant Documentation from Catalog
@@ -183,25 +183,30 @@ START
 
 The documentation is organized into these main sections (both remote and local):
 
-1. **Get Started** (`100.get-started/`): Quick start, deployment, basic operations, feature experiences
-2. **Development Guide** (`200.develop/`): Vector search, hybrid search, AI functions, multi-model support, SDK
-3. **Integrations** (`300.integrations/`): Integration with models (Jina, OpenAI, Qwen) and frameworks (LangChain, LlamaIndex, Dify)
-4. **Guides** (`400.guides/`): Deployment, OBShell, configuration, monitoring
-5. **Tutorials** (`500.tutorials/`): Real-world application cases and examples
+1. **Get Started** (`100.get-started/`): Quick start tutorials, SDK usage (pyseekdb), SQL deployment guides
+2. **Development Guide** (`200.develop/`): Vector search, hybrid search, AI functions, MCP Server, multi-model data (JSON, Spatial, Text)
+3. **Integrations** (`300.integrations/`): Frameworks (LangChain, LlamaIndex, Spring AI), Model Platforms (Jina, OpenAI, Qwen, Ollama, Gemini), Developer Tools (Cursor, Cline, Continue), Workflows (Dify, n8n), MCP Clients (Augment Code, Claude Code, Kiro)
+4. **Guides** (`400.guides/`): Deployment, Configuration Management, High Availability, Security, OBShell Dashboard, Performance Testing
+5. **Reference** (`450.reference/`): MySQL compatibility, SQL syntax, PL reference, Error codes, SDK API reference, Telemetry
+6. **Tutorials** (`500.tutorials/`): AI application demos (MineKB, Image Search), Scenarios (Vector Search, Full-text Index, Hybrid Search, AI Functions, Vibe Coding)
+7. **Demos** (`600.demos/`): Live demos (AI Knowledge Base, Image Search)
 
 ## Quick Reference by Topic
 
 | User Topic | Catalog Section | Key Documents |
 |------------|-----------------|---------------|
 | Getting started | Get Started | `10.seekdb-overview.md`, `10.deploy-seekdb-testing-environment.md` |
-| Python SDK | Development Guide > SDK | `10.pyseekdb-sdk-get-started.md`, SDK samples |
-| Vector search | Development Guide > Vector Search | `100.vector-search-intro.md`, `300.vector-similarity-search.md` |
-| Full-text search | Get Started > Client-Server Mode | `40.experience-full-text-indexing.md` |
-| Hybrid search | Development Guide > Hybrid Search | `100.vector-index-hybrid-search.md` |
-| AI functions | Development Guide > AI Function | `200.ai-function.md` |
-| LangChain/LlamaIndex | Integrations > Framework | `100.langchain.md`, `200.llamaindex.md` |
-| MCP/Cursor | Integrations > MCP Client | `100.cursor.md`, MCP Server docs |
-| Deployment | Guides > Deployment | `50.deploy-overview.md` |
+| Python SDK | Reference > SDK | `10.pyseekdb-sdk-get-started.md`, `10.api-overview.md`, SDK samples |
+| Vector search | Development Guide > Vector Search | `100.vector-search-intro.md`, `200.dense-vector-index.md`, `300.vector-similarity-search.md` |
+| Full-text search | Tutorials > Scenarios | `40.experience-full-text-indexing.md`, `300.full-text-index.md` |
+| Hybrid search | Development Guide > Hybrid Search | `100.vector-index-hybrid-search.md`, `50.experience-hybrid-search.md` |
+| AI functions | Development Guide > AI Function | `200.ai-function.md`, `60.experience-ai-function.md` |
+| LangChain/LlamaIndex | Integrations > Frameworks | `100.langchain.md`, `200.llamaindex.md`, `300.springai.md` |
+| MCP/Cursor | Integrations > Developer Tools / MCP | `100.cursor.md`, `400.oceanbase-mcp-server-and-ai-tool-integration-guide.md` |
+| Deployment | Guides > Deployment | `50.deploy-overview.md`, `100.deploy-by-systemd.md`, `200.deploy-by-docker.md` |
+| Security | Guides > Security | `100.security-overview.md`, Access Control, Data Encryption |
+| Performance Testing | Guides > Performance Test | `100.ob-vector-search-bench-test.md`, Sysbench, VectorDBBench |
+| Embedding Functions | Reference > SDK > Embedding | `100.default-embedding-function-of-api.md`, Custom embedding functions |
 
 ---
 
