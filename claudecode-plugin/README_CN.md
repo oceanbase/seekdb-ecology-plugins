@@ -51,10 +51,10 @@ npm install -g @anthropic-ai/claude-code
 
 ### 配置环境变量
 
-Claude Code 需要 Anthropic API 密钥才能运行。请设置以下环境变量：
+Claude Code 需要 API 密钥才能运行。请设置以下环境变量：
 
 ```bash
-# 设置 Anthropic API 密钥（必需）
+# 设置 API 密钥（必需）
 export ANTHROPIC_API_KEY="your-api-key-here"
 
 # 设置 API Base URL（如果使用代理或自定义端点）
