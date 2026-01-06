@@ -51,10 +51,10 @@ npm install -g @anthropic-ai/claude-code
 
 ### Configure Environment Variables
 
-Claude Code requires an Anthropic API key to run. Please set the following environment variables:
+Claude Code requires an API key to run. Please set the following environment variables:
 
 ```bash
-# Set Anthropic API key (required)
+# Set API key (required)
 export ANTHROPIC_API_KEY="your-api-key-here"
 
 # Set API Base URL (if using a proxy or custom endpoint)
