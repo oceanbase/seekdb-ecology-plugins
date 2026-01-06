@@ -5,7 +5,7 @@
 
 ## 📖 项目概述
 
-seekdb 技能为 Claude Code 设计，旨在增强 Claude 在 seekdb 数据库场景下的能力。通过这些技能，Claude 可以查询完整的 seekdb 官方文档，获取技术指导和最佳实践。
+seekdb 技能为 Claude Code 设计，旨在增强 Claude Code 在 seekdb 数据库场景下的能力。通过这些技能，Claude 可以查询完整的 seekdb 官方文档，获取技术指导和最佳实践。
 
 ## ✨ 核心功能
 
@@ -76,7 +76,7 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 ```
 
 > **重要说明**：
-> - `skipWebFetchPreflight` 设置为 `true` 可跳过网络请求的预检，允许 Claude 直接访问远程文档
+> - `skipWebFetchPreflight` 设置为 `true` 可跳过网络请求的预检，允许 Claude Code 直接访问远程文档
 > - 如果无法访问 GitHub，插件会自动回退到本地文档
 
 ### 安装 seekdb 插件
@@ -101,7 +101,7 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 
 ### 使用 seekdb-docs
 
-向 Claude 询问 seekdb 相关的技术问题：
+向 Claude Code 询问 seekdb 相关的技术问题：
 
 ```
 如何部署 seekdb 测试环境？
@@ -119,7 +119,7 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 seekdb 支持哪些 AI 框架集成？
 ```
 
-Claude 会自动搜索文档库并提供准确的技术指导。
+Claude Code 会自动搜索文档库并提供准确的技术指导。
 
 ## 📖 详细使用指南
 
@@ -132,7 +132,7 @@ Claude 会自动搜索文档库并提供准确的技术指导。
 
 2. **询问 seekdb 问题**
    - 只需用自然语言输入关于 seekdb 的问题
-   - Claude 会自动检测何时使用 seekdb 技能
+   - Claude Code 会自动检测何时使用 seekdb 技能
    - 无需明确提及技能名称
 
 3. **示例交互**
@@ -155,7 +155,7 @@ Claude 会自动搜索文档库并提供准确的技术指导。
 ### 有效使用技能
 
 - **具体明确**：问题越具体，Claude 越能准确搜索文档
-- **追问跟进**：可以根据 Claude 的回答提出后续问题
+- **追问跟进**：可以根据 Claude Code 的回答提出后续问题
 - **请求示例**：可以要求代码示例、配置示例或分步指南
 - **组合主题**：可以提出结合多个 seekdb 功能的问题
 
@@ -232,7 +232,7 @@ seekdb-docs 的文档内容位于 `./skills/seekdb-docs/official-docs` 目录，
 
 Agent Skills 是 Claude Code 的强大功能，允许将专业知识和工作流程打包成可重用的模块：
 
-- **自动调用**：技能会根据上下文由 Claude 自动调用，无需手动触发
+- **自动调用**：技能会根据上下文由 Claude Code 自动调用，无需手动触发
 - **模块化设计**：每个技能独立维护，便于组织和管理
 - **团队共享**：通过 git 与团队共享专业知识和工作流程
 - **可组合性**：多个技能可以组合使用来解决复杂任务
@@ -263,9 +263,5 @@ A: 如果使用 git 管理，只需拉取最新代码。如果是手动复制，
 
 ### Q: 技能会影响 Claude Code 的其他功能吗？
 
-A: 不会。技能是独立的模块，只在需要时被调用，不会影响 Claude 的其他功能。
-
----
-
-**祝您使用 seekdb 和 Claude Code 编码愉快！🎉**
+A: 不会。技能是独立的模块，只在需要时被调用，不会影响 Claude Code 的其他功能。
 

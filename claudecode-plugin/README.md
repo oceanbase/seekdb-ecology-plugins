@@ -5,7 +5,7 @@ English | [简体中文](README_CN.md)
 
 ## 📖 Project Overview
 
-seekdb skill is designed specifically for Claude Code, aimed at enhancing Claude's capabilities in seekdb database scenarios. Through these Skills, Claude can query the complete seekdb official documentation and obtain technical guidance and best practices.
+seekdb skill is designed specifically for Claude Code, aimed at enhancing Claude's capabilities in seekdb database scenarios. Through these Skills, Claude Code can query the complete seekdb official documentation and obtain technical guidance and best practices.
 
 ## ✨ Key Features
 
@@ -107,13 +107,13 @@ Once Claude Code is installed, follow these steps to install the seekdb plugin:
 
 ### Configuration
 
-The plugin is ready to use immediately after installation. No additional configuration is required. The skills will be automatically available to Claude when you ask seekdb-related questions.
+The plugin is ready to use immediately after installation. No additional configuration is required. The skills will be automatically available to Claude Code when you ask seekdb-related questions.
 
 ## 💡 Usage Examples
 
 ### Using seekdb-docs
 
-Ask Claude seekdb-related technical questions:
+Ask Claude Code seekdb-related technical questions:
 
 ```
 How to deploy a seekdb test environment?
@@ -131,7 +131,7 @@ How to implement hybrid search in seekdb?
 Which AI framework integrations does seekdb support?
 ```
 
-Claude will automatically search the documentation library and provide accurate technical guidance.
+Claude Code will automatically search the documentation library and provide accurate technical guidance.
 
 ## 📖 Detailed Usage Guide
 
@@ -144,7 +144,7 @@ Claude will automatically search the documentation library and provide accurate 
 
 2. **Ask seekdb Questions**
    - Simply type your question about seekdb in natural language
-   - Claude will automatically detect when to use the seekdb-docs skill
+   - Claude Code will automatically detect when to use the seekdb-docs skill
    - No need to explicitly mention the skill name
 
 3. **Example Interactions**
@@ -166,8 +166,8 @@ Claude will automatically search the documentation library and provide accurate 
 
 ### Using Skills Effectively
 
-- **Be Specific**: The more specific your question, the better Claude can search the documentation
-- **Ask Follow-ups**: You can ask follow-up questions based on Claude's responses
+- **Be Specific**: The more specific your question, the better Claude Code can search the documentation
+- **Ask Follow-ups**: You can ask follow-up questions based on Claude Code's responses
 - **Request Examples**: Ask for code examples, configuration samples, or step-by-step guides
 - **Combine Topics**: Ask questions that combine multiple seekdb features
 
@@ -246,7 +246,7 @@ The documentation content for seekdb-docs is located in the `./skills/seekdb-doc
 
 Agent Skills is a powerful feature of Claude Code that allows packaging professional knowledge and workflows into reusable modules:
 
-- **Automatic Invocation**: Skills are automatically invoked by Claude based on context, no manual triggering required
+- **Automatic Invocation**: Skills are automatically invoked by Claude Code based on context, no manual triggering required
 - **Modular Design**: Each skill is independently maintained, making it easy to organize and manage
 - **Team Sharing**: Share professional knowledge and workflows with your team through git
 - **Composability**: Multiple Skills can be combined to solve complex tasks
@@ -279,8 +279,4 @@ A: If managed with git, simply pull the latest code. If manually copied, you nee
 ### Q: Will Skills affect Claude's other functionality?
 
 A: No. Skills are independent modules that are only invoked when needed and will not affect Claude Code's other functionality.
-
----
-
-**Happy Coding with seekdb and Claude Code! 🎉**
 
