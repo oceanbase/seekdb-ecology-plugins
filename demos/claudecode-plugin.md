@@ -1,80 +1,116 @@
-# seekdb + Claude Code：打造懂向量数据库的 AI 编程助手
-Claude Code 作为 Anthropic 推出的 AI 编程助手，凭借强大的代码理解和生成能力，正在成为越来越多开发者的得力工具。然而，当你在 Claude Code 中询问 seekdb 相关问题时，AI 可能无法给出准确的回答——因为它对 seekdb 这款新兴的 AI 原生搜索数据库了解有限。  
-本文将介绍如何通过 seekdb Claude Code 插件，让 Claude Code 拥有 seekdb 专业知识，从而在开发过程中获得精准的技术指导。
-## 什么是 seekdb？
-**seekdb** 是由 OceanBase 推出的一款 AI 原生搜索数据库。它在单一引擎中统一了关系型数据、向量、文本、JSON 和 GIS 等多种数据模型，支持混合搜索和数据库内的 AI 工作流。  
-seekdb 的典型应用场景包括：  
-- RAG 与知识检索：为大语言模型引入实时可信的外部知识，提升回答质量
-- AI 辅助编程：为代码仓库构建向量和全文索引，实现基于语义的代码搜索
-- 语义搜索引擎：捕捉用户搜索意图，实现跨模态精准检索
-- 智能体（Agent）应用：为 AI Agent 提供记忆、规划、感知和推理的统一基础
-## 什么是 seekdb Claude Code 插件？
-**seekdb Claude Code** 插件 是一款 Agent Skill 插件，通过 Skill 文件使 Claude Code 可以检索 seekdb 官方文档，从而理解 seekdb 数据库知识的上下文中，使其能够：  
-- ✅ 理解 seekdb 数据库概念：向量搜索、混合搜索、AI 函数等
-- ✅ 提供准确的代码建议：基于官方文档生成符合最佳实践的代码
-- ✅ 回答 seekdb 相关问题：直接在终端中获取技术支持
-- ✅ 加速开发流程：减少查阅文档的时间，专注于业务逻辑
-### 核心特性
-- 🚀 两条命令安装：通过 Claude Code 插件市场快速安装
-- 📚 完整文档：内置 seekdb 官方文档知识库，涵盖向量搜索、混合搜索、AI 函数等全面技术文档
-- 🌐 双模式支持：优先从 GitHub 获取最新文档，本地文档作为备份
-- 🔄 自动调用：Claude Code 会根据问题自动使用 seekdb 技能，无需手动触发
-## 快速开始
-### 前置要求
-在安装 seekdb 插件之前，请确保你已经安装了 Claude Code。如果还未安装，可以通过以下命令安装：
+English | [简体中文](claudecode-plugin_CN.md) 
+# seekdb + Claude Code: Build an AI Programming Assistant with Vector Database Expertise
+
+Claude Code, the AI programming assistant from Anthropic, is becoming an increasingly popular tool for developers thanks to its powerful code understanding and generation capabilities. However, when you ask Claude Code about seekdb-related questions, the AI may not provide accurate answers—because it has limited knowledge of seekdb, this emerging AI-native search database.
+
+This article introduces how to use the seekdb Claude Code plugin to give Claude Code professional seekdb knowledge, enabling you to receive precise technical guidance during development.
+
+## What is seekdb?
+
+**seekdb** is an AI-native search database developed by OceanBase. It unifies relational data, vectors, text, JSON, and GIS data models within a single engine, supporting hybrid search and in-database AI workflows.
+
+Typical use cases for seekdb include:
+- RAG and Knowledge Retrieval: Introducing real-time, trusted external knowledge to large language models to improve response quality
+- AI-Assisted Programming: Building vector and full-text indexes for code repositories to enable semantic-based code search
+- Semantic Search Engines: Capturing user search intent for precise cross-modal retrieval
+- Agent Applications: Providing a unified foundation for AI Agent memory, planning, perception, and reasoning
+
+## What is the seekdb Claude Code Plugin?
+
+The **seekdb Claude Code plugin** is an Agent Skill plugin that enables Claude Code to retrieve seekdb official documentation through Skill files, allowing it to understand seekdb database knowledge in context and:
+- ✅ Understand seekdb database concepts: vector search, hybrid search, AI functions, etc.
+- ✅ Provide accurate code suggestions: generate code following best practices based on official documentation
+- ✅ Answer seekdb-related questions: get technical support directly in the terminal
+- ✅ Accelerate development workflow: reduce time spent consulting documentation, focus on business logic
+
+### Core Features
+- 🚀 Two-command installation: Quick installation through the Claude Code plugin marketplace
+- 📚 Complete documentation: Built-in seekdb official documentation knowledge base, covering comprehensive technical documentation on vector search, hybrid search, AI functions, and more
+- 🌐 Dual-mode support: Prioritizes fetching latest documentation from GitHub, with local documentation as backup
+- 🔄 Automatic invocation: Claude Code automatically uses seekdb skills based on questions, no manual triggering required
+
+## Quick Start
+
+### Prerequisites
+
+Before installing the seekdb plugin, make sure you have Claude Code installed. If not, you can install it with the following command:
+
 ```bash  
 npm install -g @anthropic-ai/claude-code  
 ```
-然后配置你的 API 密钥：  
+
+Then configure your API key:
+
 ```bash
 export ANTHROPIC_API_KEY="your-api-key-here"
 
-# 设置 API Base URL（如果使用代理或自定义端点）
+# Set API Base URL (if using proxy or custom endpoint)
 export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 ```
-### 第一步：配置网络设置
-seekdb 技能插件需要从 GitHub 获取最新文档，因此需要配置 Claude Code 允许网络请求。  
-在你的项目根目录下创建或编辑 .claude/settings.local.json 文件：  
+
+### Step 1: Configure Network Settings
+
+The seekdb skill plugin needs to fetch the latest documentation from GitHub, so you need to configure Claude Code to allow network requests.
+
+Create or edit the `.claude/settings.local.json` file in your project root directory:
+
 ```bash
 {
   "skipWebFetchPreflight": true
 }
 ```
-**说明**：`skipWebFetchPreflight` 设置为 true 可跳过网络请求的预检，允许 Claude 直接访问远程文档。如果无法访问 GitHub，插件会自动回退到本地文档。
-### 第二步：安装 seekdb 插件
-只需两条命令即可完成安装：  
-**1. 添加 seekdb 市场**  
-在 Claude Code 中运行：
+
+**Note**: Setting `skipWebFetchPreflight` to true skips the preflight check for network requests, allowing Claude to directly access remote documentation. If GitHub is inaccessible, the plugin will automatically fall back to local documentation.
+
+### Step 2: Install the seekdb Plugin
+
+Installation requires just two commands:
+
+**1. Add the seekdb marketplace**
+
+Run in Claude Code:
+
 ```bash
 /plugin marketplace add oceanbase/seekdb-ecology-plugins
 ```
-**2. 安装插件**
+
+**2. Install the plugin**
+
 ```bash
 /plugin install seekdb-plugin@seekdb
 ```
-**3. 重启 Claude Code**  
-安装完成后，退出并重新启动 Claude Code 以确保插件正确加载。  
-现在你可以直接向 Claude Code 询问任何 seekdb 相关问题了。  
-## 实际效果演示
-让我们通过一个实际示例，看看 seekdb Claude Code 插件如何帮助你进行开发。  
-### 示例：使用 Claude Code 创建一个 seekdb 混合搜索应用
-安装插件后，在 Claude Code 中开始一个新对话，输入以下问题：  
-> 你：我想用 Python 创建一个简单的 seekdb 应用，实现文档的混合搜索功能，请帮我写代码
 
-**Claude Code 会给出准确的回答：**
+**3. Restart Claude Code**
+
+After installation, exit and restart Claude Code to ensure the plugin loads correctly.
+
+Now you can ask Claude Code any seekdb-related questions directly.
+
+## Demo
+
+Let's see how the seekdb Claude Code plugin helps you with development through a practical example.
+
+### Example: Creating a seekdb Hybrid Search Application with Claude Code
+
+After installing the plugin, start a new conversation in Claude Code and enter the following question:
+
+> You: I want to create a simple seekdb application in Python that implements hybrid search for documents, please help me write the code
+
+**Claude Code will provide an accurate response:**
+
 ```python
 import pyseekdb
 
-# ==================== 创建集合 ====================
-# 创建嵌入式客户端
+# ==================== Create Collection ====================
+# Create embedded client
 client = pyseekdb.Client(path="./seekdb.db")
-# 创建集合
+# Create collection
 collection = client.create_collection(
     name="hybrid_search_demo"
 )
 
-# ==================== 添加数据 ====================
-# 定义文档
+# ==================== Add Data ====================
+# Define documents
 documents = [
     "Machine learning is revolutionizing artificial intelligence and data science",
     "Python programming language is essential for machine learning developers",
@@ -88,7 +124,7 @@ documents = [
     "Neural networks mimic the structure of biological brain connections"
 ]
 
-# 定义元数据
+# Define metadata
 metadatas = [
     {"category": "AI", "topic": "machine learning", "year": 2023, "popularity": 95},
     {"category": "Programming", "topic": "python", "year": 2023, "popularity": 88},
@@ -103,11 +139,11 @@ metadatas = [
 ]
 
 ids = [f"doc_{i+1}" for i in range(len(documents))]
-# 插入数据
+# Insert data
 collection.add(ids=ids, documents=documents, metadatas=metadatas)
 
-# ==================== 执行混合搜索 ====================
-# 执行混合搜索
+# ==================== Execute Hybrid Search ====================
+# Execute hybrid search
 hybrid_result = collection.hybrid_search(
     query={"where_document": {"$contains": "machine learning"}, "n_results": 10},
     knn={"query_texts": ["AI research"], "n_results": 10},
@@ -115,74 +151,108 @@ hybrid_result = collection.hybrid_search(
     n_results=5
 )
 
-# ==================== 打印查询结果 ====================
-print("\n混合搜索结果:")
+# ==================== Print Query Results ====================
+print("\nHybrid Search Results:")
 print(f"  ids: {hybrid_result['ids'][0]}")
 print(f"  Document: {hybrid_result['documents'][0]}")
 ```
-### 运行示例
-**1. 安装 pyseekdb**
+
+### Running the Example
+
+**1. Install pyseekdb**
+
 ```bash
 pip install pyseekdb
 ```
-**2. 创建文件并运行**
-将上述代码保存为 `hybrid_search_demo.py`，然后运行：  
+
+**2. Create file and run**
+
+Save the above code as `hybrid_search_demo.py`, then run:
+
 ```bash
 python hybrid_search_demo.py
 ```
-**3. 查看结果**
+
+**3. View results**
+
 ```plaintext
-混合搜索结果:
+Hybrid Search Results:
   ids: ['doc_1', 'doc_5', 'doc_2', 'doc_8', 'doc_3']
   Document: ['Machine learning is revolutionizing artificial intelligence and data science', 'Natural language processing uses machine learning to understand text', 'Python programming language is essential for machine learning developers', 'Python libraries like TensorFlow and PyTorch simplify machine learning', 'Deep learning neural networks enable advanced AI applications']
 ```
-混合搜索结合了**关键词匹配**（包含 "machine learning" 的文档）和**语义搜索**（与 "AI research" 语义相近的文档），通过 RRF（Reciprocal Rank Fusion）算法融合两路检索结果，返回最相关的文档。  
-## 更多使用场景
-安装 seekdb Claude Code 插件后，你可以向 Claude Code 询问各种 seekdb 相关问题：
-### 基础查询
-> 如何开始使用 seekdb？
 
-> seekdb 支持哪些部署模式？
-### 技术问题
-> 如何在 seekdb 中创建向量索引？
+Hybrid search combines **keyword matching** (documents containing "machine learning") and **semantic search** (documents semantically similar to "AI research"), using the RRF (Reciprocal Rank Fusion) algorithm to merge the two retrieval results and return the most relevant documents.
 
-> seekdb 的 AI 函数有哪些？如何使用 AI_EMBED 函数？
+## More Use Cases
 
-### 代码示例
-> 展示一个使用 seekdb SQL 实现向量相似度搜索的示例
+After installing the seekdb Claude Code plugin, you can ask Claude Code various seekdb-related questions:
 
-> 如何将 seekdb 与 LangChain 集成？
+### Basic Queries
 
-### 集成相关
-> seekdb 如何配置 OpenAI 模型进行向量嵌入？
+> How do I get started with seekdb?
 
-## 插件管理
-### 验证安装
-在 Claude Code 中运行 `/plugin` 命令，这将打开一个交互式界面，你可以浏览和管理已安装的插件。选择 "Manage and uninstall plugins" 以确认 `seekdb-plugin` 存在。  
-### 更新插件
-1. 运行 `/plugin` 打开插件管理界面
-2. 使用方向键导航到 "Manage marketplaces"
-3. 选择 `seekdb` 市场
-4. 按 `u` 更新市场及其插件
-### 故障排除
-如果技能似乎无法正常工作：
-1. **验证插件安装**：运行 /plugin 确认 seekdb-plugin 已安装
-2. **重启 Claude Code**：完全关闭并重新打开 Claude Code 终端会话
-3. **检查网络设置**：确保 `.claude/settings.local.json` 中已配置 `skipWebFetchPreflight: true`
-## 工作原理
-seekdb Claude Code 插件基于 Agent Skills 功能：
-1. 技能注入：插件将 seekdb 官方文档和技能描述文件注入到 Claude Code
-2. 自动调用：当你询问 seekdb 相关问题时，Claude Code 会自动检测并使用 seekdb 技能
-3. 智能检索：Claude Code 会基于文档目录索引，精准定位相关文档并提供准确回答
-与传统的手动查阅文档相比，这种方式让你可以在编程过程中随时获取精准的技术指导，而无需中断工作流程。
-## 关于 Agent Skills
-Agent Skills 允许将专业知识和工作流程打包成可重用的模块：
-- 自动调用：技能会根据上下文由 Claude 自动调用，无需手动触发
-- 模块化设计：每个技能独立维护，便于组织和管理
-- 团队共享：通过 git 与团队共享专业知识和工作流程
-- 可组合性：多个技能可以组合使用来解决复杂任务
-了解更多关于 Agent Skills：
-- [Agent Skills 概述](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
-- [使用 Agent Skills 为智能体配备真实世界能力](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
-## 总结
-通过 **seekdb Claude Code 插件**，你可以在使用 Claude Code 进行开发时，随时获取 seekdb 的官方文档支持。无论是学习 seekdb 的新功能，还是解决开发中遇到的技术问题，Claude Code 都能基于最新的官方文档提供准确的指导。
+> What deployment modes does seekdb support?
+
+### Technical Questions
+
+> How do I create a vector index in seekdb?
+
+> What AI functions does seekdb have? How do I use the AI_EMBED function?
+
+### Code Examples
+
+> Show me an example of vector similarity search using seekdb SQL
+
+> How do I integrate seekdb with LangChain?
+
+### Integration Related
+
+> How do I configure OpenAI models for vector embedding in seekdb?
+
+## Plugin Management
+
+### Verify Installation
+
+Run the `/plugin` command in Claude Code. This will open an interactive interface where you can browse and manage installed plugins. Select "Manage and uninstall plugins" to confirm that `seekdb-plugin` exists.
+
+### Update Plugin
+
+1. Run `/plugin` to open the plugin management interface
+2. Use arrow keys to navigate to "Manage marketplaces"
+3. Select the `seekdb` marketplace
+4. Press `u` to update the marketplace and its plugins
+
+### Troubleshooting
+
+If the skill doesn't seem to work properly:
+
+1. **Verify plugin installation**: Run /plugin to confirm seekdb-plugin is installed
+2. **Restart Claude Code**: Completely close and reopen the Claude Code terminal session
+3. **Check network settings**: Ensure `skipWebFetchPreflight: true` is configured in `.claude/settings.local.json`
+
+## How It Works
+
+The seekdb Claude Code plugin is based on the Agent Skills feature:
+
+1. Skill Injection: The plugin injects seekdb official documentation and skill description files into Claude Code
+2. Automatic Invocation: When you ask seekdb-related questions, Claude Code automatically detects and uses the seekdb skill
+3. Intelligent Retrieval: Claude Code precisely locates relevant documentation based on the document index and provides accurate answers
+
+Compared to traditional manual documentation lookup, this approach allows you to get precise technical guidance anytime during programming without interrupting your workflow.
+
+## About Agent Skills
+
+Agent Skills allow packaging specialized knowledge and workflows into reusable modules:
+
+- Automatic Invocation: Skills are automatically invoked by Claude based on context, no manual triggering required
+- Modular Design: Each skill is independently maintained for easy organization and management
+- Team Sharing: Share specialized knowledge and workflows with your team via git
+- Composability: Multiple skills can be combined to solve complex tasks
+
+Learn more about Agent Skills:
+- [Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
+- [Equipping Agents for the Real World with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+
+## Summary
+
+With the **seekdb Claude Code plugin**, you can get seekdb official documentation support anytime while developing with Claude Code. Whether you're learning new seekdb features or solving technical problems during development, Claude Code can provide accurate guidance based on the latest official documentation.

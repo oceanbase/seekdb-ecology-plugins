@@ -1,70 +1,91 @@
-# 让 Cursor AI 助手秒懂 seekdb：seekdb Cursor Extension 使用指南
-在 AI 辅助编程时代，开发者越来越依赖智能工具来提升编码效率。然而，当你在 Cursor 中询问 seekdb 相关问题时，AI 可能无法给出准确的回答——因为它不了解 seekdb 这款新兴的 AI 原生搜索数据库。  
-本文将介绍如何通过 **seekdb Cursor Extension**，让 Cursor AI 助手拥有 seekdb 专业知识，从而在开发过程中获得精准的技术指导。
-## 什么是 seekdb？
-** seekdb ** 是由 OceanBase 推出的一款 AI 原生搜索数据库。它在单一引擎中统一了关系型数据、向量、文本、JSON 和 GIS 等多种数据模型，支持混合搜索和数据库内的 AI 工作流。  
-seekdb 的典型应用场景包括：
-- **RAG 与知识检索**：为大语言模型引入实时可信的外部知识，提升回答质量
-- **AI 辅助编程**：为代码仓库构建向量和全文索引，实现基于语义的代码搜索
-- **语义搜索引擎**：捕捉用户搜索意图，实现跨模态精准检索
-- **智能体（Agent）应用**：为 AI Agent 提供记忆、规划、感知和推理的统一基础
-## 什么是 seekdb Cursor Extension？
-**seekdb Cursor Extension** 是一款 Cursor 扩展，它通过在 `.cursor/rules` 目录下添加规则，使 Cursor AI 助手能够检索 seekdb 官方文档，从而理解 seekdb 数据库知识，使其能够：
-- ✅ 理解 seekdb 数据库概念：向量搜索、混合搜索、AI 函数等
-- ✅ 提供准确的代码建议：基于官方文档生成符合最佳实践的代码
-- ✅ 回答 seekdb 相关问题：直接在编辑器中获取技术支持
-- ✅ 加速开发流程：减少查阅文档的时间，专注于业务逻辑
-### 核心特性
-- 🚀 **一键安装**：通过 Cursor 扩展市场或命令面板快速安装
-- 📚 **完整文档**：检索 seekdb 官方文档知识库，涵盖向量搜索、混合搜索、AI 函数等全面技术文档
-- 🌐 **双模式支持**：优先从 GitHub 获取最新文档，本地文档作为备份
-## 快速开始
-### 第一步：安装扩展
-1. 在 Cursor 中打开扩展市场（`Ctrl+Shift+X` 或 `Cmd+Shift+X`）
-2. 搜索 "seekdb"
-3. 点击 **Install** 安装扩展
-### 第二步：添加 seekdb 文档
-1. 使用 Cursor 打开一个项目目录（文档将添加到该目录下）
-2. 打开命令面板：
-    - Windows/Linux: 按 `Ctrl+Shift+P`
-    - macOS: 按 `Cmd+Shift+P`
-3. 输入并选择命令：
-    - 输入 "**seekdb**" 或 "**Add seekdb Docs**"
-    - 选择 `Add seekdb Docs` 命令
-4. 文档将自动添加：
-    - `.cursor/rules/seekdb-docs` 目录（官方文档）
-    - `.cursor/rules/seekdb.mdc` 文件（规则文件）
-5. 重新加载窗口使规则生效
-安装完成！现在你可以直接向 Cursor AI 助手询问任何 seekdb 相关问题了。
-## 实际效果演示
-让我们通过一个实际示例，看看 seekdb Cursor Extension 如何帮助你进行开发。
-### 示例：使用 AI 助手创建一个 seekdb 混合搜索应用
-安装扩展并添加文档后，在 Cursor 中开始一个新对话，输入以下问题：
-> 你：我想用 Python 创建一个简单的 seekdb 应用，实现文档的混合搜索功能，请帮我写代码
+English | [简体中文](cursor-extension_CN.md) 
+# Make Cursor AI Assistant Understand seekdb: seekdb Cursor Extension User Guide
 
-**Cursor AI 助手会给出准确的回答**：
+In the era of AI-assisted programming, developers increasingly rely on intelligent tools to boost coding efficiency. However, when you ask Cursor about seekdb-related questions, the AI may not provide accurate answers—because it doesn't know about seekdb, this emerging AI-native search database.
+
+This article introduces how to use the **seekdb Cursor Extension** to give the Cursor AI assistant professional seekdb knowledge, enabling you to receive precise technical guidance during development.
+
+## What is seekdb?
+
+**seekdb** is an AI-native search database developed by OceanBase. It unifies relational data, vectors, text, JSON, and GIS data models within a single engine, supporting hybrid search and in-database AI workflows.
+
+Typical use cases for seekdb include:
+- **RAG and Knowledge Retrieval**: Introducing real-time, trusted external knowledge to large language models to improve response quality
+- **AI-Assisted Programming**: Building vector and full-text indexes for code repositories to enable semantic-based code search
+- **Semantic Search Engines**: Capturing user search intent for precise cross-modal retrieval
+- **Agent Applications**: Providing a unified foundation for AI Agent memory, planning, perception, and reasoning
+
+## What is seekdb Cursor Extension?
+
+**seekdb Cursor Extension** is a Cursor extension that adds rules to the `.cursor/rules` directory, enabling the Cursor AI assistant to retrieve seekdb official documentation and understand seekdb database knowledge, allowing it to:
+- ✅ Understand seekdb database concepts: vector search, hybrid search, AI functions, etc.
+- ✅ Provide accurate code suggestions: generate code following best practices based on official documentation
+- ✅ Answer seekdb-related questions: get technical support directly in the editor
+- ✅ Accelerate development workflow: reduce time spent consulting documentation, focus on business logic
+
+### Core Features
+- 🚀 **One-click installation**: Quick installation through Cursor extension marketplace or command palette
+- 📚 **Complete documentation**: Retrieve seekdb official documentation knowledge base, covering comprehensive technical documentation on vector search, hybrid search, AI functions, and more
+- 🌐 **Dual-mode support**: Prioritizes fetching latest documentation from GitHub, with local documentation as backup
+
+## Quick Start
+
+### Step 1: Install the Extension
+
+1. Open the extension marketplace in Cursor (`Ctrl+Shift+X` or `Cmd+Shift+X`)
+2. Search for "seekdb"
+3. Click **Install** to install the extension
+
+### Step 2: Add seekdb Documentation
+
+1. Open a project directory in Cursor (documentation will be added to this directory)
+2. Open the command palette:
+    - Windows/Linux: Press `Ctrl+Shift+P`
+    - macOS: Press `Cmd+Shift+P`
+3. Enter and select the command:
+    - Type "**seekdb**" or "**Add seekdb Docs**"
+    - Select the `Add seekdb Docs` command
+4. Documentation will be added automatically:
+    - `.cursor/rules/seekdb-docs` directory (official documentation)
+    - `.cursor/rules/seekdb.mdc` file (rules file)
+5. Reload the window for the rules to take effect
+
+Installation complete! Now you can ask the Cursor AI assistant any seekdb-related questions directly.
+
+## Demo
+
+Let's see how the seekdb Cursor Extension helps you with development through a practical example.
+
+### Example: Creating a seekdb Hybrid Search Application with AI Assistant
+
+After installing the extension and adding documentation, start a new conversation in Cursor and enter the following question:
+
+> You: I want to create a simple seekdb application in Python that implements hybrid search for documents, please help me write the code
+
+**Cursor AI assistant will provide an accurate response**:
+
 ```python
 """
-seekdb 混合搜索快速入门示例
+seekdb Hybrid Search Quick Start Example
 
-这是一个最简化的混合搜索示例，帮助你快速上手。
+This is a minimal hybrid search example to help you get started quickly.
 """
 
 import pyseekdb
 
-# 1. 创建客户端（嵌入式模式，无需部署数据库）
+# 1. Create client (embedded mode, no database deployment required)
 client = pyseekdb.Client()
 
-# 2. 创建集合
+# 2. Create collection
 collection = client.get_or_create_collection(name="my_docs")
 
-# 3. 添加文档
+# 3. Add documents
 documents = [
-    "机器学习是人工智能的核心技术",
-    "Python 是最流行的机器学习编程语言",
-    "深度学习需要大量的训练数据",
-    "自然语言处理让计算机理解人类语言",
-    "向量数据库用于存储和检索向量数据",
+    "Machine learning is the core technology of artificial intelligence",
+    "Python is the most popular programming language for machine learning",
+    "Deep learning requires large amounts of training data",
+    "Natural language processing enables computers to understand human language",
+    "Vector databases are used to store and retrieve vector data",
 ]
 
 metadatas = [
@@ -78,97 +99,126 @@ metadatas = [
 ids = [f"doc_{i}" for i in range(len(documents))]
 
 collection.add(ids=ids, documents=documents, metadatas=metadatas)
-print(f"✅ 已添加 {len(documents)} 个文档")
+print(f"✅ Added {len(documents)} documents")
 
-# 4. 执行混合搜索
-# 结合全文搜索（包含"机器学习"）和向量语义搜索（查找与"AI技术"相似的内容）
+# 4. Execute hybrid search
+# Combine full-text search (containing "machine learning") and vector semantic search (find content similar to "AI technology")
 results = collection.hybrid_search(
     query={
-        "where_document": {"$contains": "机器学习"},  # 全文搜索：包含关键词
+        "where_document": {"$contains": "machine learning"},  # Full-text search: contains keyword
         "n_results": 10,
     },
     knn={
-        "query_texts": ["AI技术"],  # 向量搜索：语义相似性
+        "query_texts": ["AI technology"],  # Vector search: semantic similarity
         "n_results": 10,
     },
-    rank={"rrf": {}},  # 使用 RRF 算法融合结果
+    rank={"rrf": {}},  # Use RRF algorithm to fuse results
     n_results=3,
     include=["documents", "metadatas"],
 )
 
-# 5. 打印结果
-print("\n🔍 混合搜索结果:")
+# 5. Print results
+print("\n🔍 Hybrid Search Results:")
 for i, (doc_id, doc, meta) in enumerate(
     zip(results["ids"][0], results["documents"][0], results["metadatas"][0]), 1
 ):
     print(f"  [{i}] {doc}")
-    print(f"      元数据: {meta}\n")
+    print(f"      Metadata: {meta}\n")
 
-# 6. 清理（可选）
+# 6. Cleanup (optional)
 # client.delete_collection("my_docs")
 ```
-### 运行示例
-1. **安装 pyseekdb**
+
+### Running the Example
+
+1. **Install pyseekdb**
+
 ```bash
 pip install pyseekdb
 ```
-2. **运行代码**
+
+2. **Run the code**
+
 ```bash
 python quick_start_hybrid_search.py
 ```
-3. **查看结果**
+
+3. **View results**
+
 ```bash
-✅ 已添加 5 个文档
+✅ Added 5 documents
 
-🔍 混合搜索结果:
-  [1] 机器学习是人工智能的核心技术
-      元数据: {'year': 2024, 'category': 'AI'}
+🔍 Hybrid Search Results:
+  [1] Machine learning is the core technology of artificial intelligence
+      Metadata: {'year': 2024, 'category': 'AI'}
 
-  [2] 深度学习需要大量的训练数据
-      元数据: {'year': 2023, 'category': 'AI'}
+  [2] Deep learning requires large amounts of training data
+      Metadata: {'year': 2023, 'category': 'AI'}
 
-  [3] Python 是最流行的机器学习编程语言
-      元数据: {'year': 2024, 'category': 'Programming'}
+  [3] Python is the most popular programming language for machine learning
+      Metadata: {'year': 2024, 'category': 'Programming'}
 ```
-混合搜索结合了**关键词匹配**（包含 "机器学习" 的文档）和**语义搜索**（与 "AI 技术" 语义相近的文档），通过 RRF（Reciprocal Rank Fusion）算法融合两路检索结果，返回最相关的文档。
-## 更多使用场景
-安装 seekdb Cursor Extension 后，你可以向 AI 助手询问各种 seekdb 相关问题：
-### 基础查询
-```plaintext
-如何开始使用 seekdb？
-```
-```plaintext
-seekdb 支持哪些部署模式？
-```
-### 技术问题
-```plaintext
-如何在 seekdb 中创建向量索引？
-```
-```plaintext
-seekdb 的 AI 函数有哪些？如何使用 AI_EMBED 函数？
-```
-### 代码示例
-```plaintext
-展示一个使用 seekdb SQL 实现向量相似度搜索的示例
-```
-```plaintext
-如何将 seekdb 与 LangChain 集成？
-```
-### 集成相关
-```plaintext
-seekdb 如何配置 OpenAI 模型进行向量嵌入？
-```
-## 工作原理
-seekdb Cursor Extension 的工作原理非常简单：  
-1. **规则文件注入**：扩展将 seekdb 官方文档和 .mdc 规则文件添加到 .cursor/rules 目录
-2. **AI 上下文增强**：Cursor 会自动读取 .cursor/rules 目录中的内容，作为 AI 助手的上下文知识
-3. **智能检索**：当你询问 seekdb 相关问题时，AI 助手会基于这些文档提供准确的回答
-## 移除文档
-如果你不再需要 seekdb 文档，可以轻松移除：
-1. 打开命令面板（`Ctrl+Shift+P` 或 `Cmd+Shift+P`）
-2. 输入 "**Remove seekdb Docs**"
-3. 选择该命令执行
-文档将从 `.cursor/rules` 目录中移除。
-## 总结
-通过 **seekdb Cursor Extension**，你可以在使用 Cursor 进行开发时，随时获取 seekdb 的官方文档支持。无论是学习 seekdb 的新功能，还是解决开发中遇到的技术问题，AI 助手都能基于最新的官方文档提供准确的指导。
 
+Hybrid search combines **keyword matching** (documents containing "machine learning") and **semantic search** (documents semantically similar to "AI technology"), using the RRF (Reciprocal Rank Fusion) algorithm to merge the two retrieval results and return the most relevant documents.
+
+## More Use Cases
+
+After installing the seekdb Cursor Extension, you can ask the AI assistant various seekdb-related questions:
+
+### Basic Queries
+
+```plaintext
+How do I get started with seekdb?
+```
+
+```plaintext
+What deployment modes does seekdb support?
+```
+
+### Technical Questions
+
+```plaintext
+How do I create a vector index in seekdb?
+```
+
+```plaintext
+What AI functions does seekdb have? How do I use the AI_EMBED function?
+```
+
+### Code Examples
+
+```plaintext
+Show me an example of vector similarity search using seekdb SQL
+```
+
+```plaintext
+How do I integrate seekdb with LangChain?
+```
+
+### Integration Related
+
+```plaintext
+How do I configure OpenAI models for vector embedding in seekdb?
+```
+
+## How It Works
+
+The seekdb Cursor Extension works in a straightforward way:
+
+1. **Rule File Injection**: The extension adds seekdb official documentation and .mdc rule files to the .cursor/rules directory
+2. **AI Context Enhancement**: Cursor automatically reads the contents of the .cursor/rules directory as context knowledge for the AI assistant
+3. **Intelligent Retrieval**: When you ask seekdb-related questions, the AI assistant provides accurate answers based on this documentation
+
+## Remove Documentation
+
+If you no longer need the seekdb documentation, you can easily remove it:
+
+1. Open the command palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+2. Type "**Remove seekdb Docs**"
+3. Select and execute the command
+
+The documentation will be removed from the `.cursor/rules` directory.
+
+## Summary
+
+With the **seekdb Cursor Extension**, you can get seekdb official documentation support anytime while developing with Cursor. Whether you're learning new seekdb features or solving technical problems during development, the AI assistant can provide accurate guidance based on the latest official documentation.
