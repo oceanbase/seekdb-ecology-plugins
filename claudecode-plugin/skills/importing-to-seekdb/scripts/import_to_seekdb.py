@@ -21,6 +21,7 @@ import os
 import uuid
 import sys
 from pathlib import Path
+from typing import Optional
 
 try:
     from dotenv import load_dotenv
@@ -36,11 +37,22 @@ except ImportError:
 
 try:
     import pyseekdb
-    from pyseekdb import HNSWConfiguration
 except ImportError:
     print("Error: pyseekdb is required. Install with: pip install pyseekdb")
     sys.exit(1)
-
+host = os.getenv("SEEKDB_HOST")
+if host:
+    # Server mode
+    client = pyseekdb.Client(
+        host=host,
+        port=int(os.getenv("SEEKDB_PORT", "2881")),
+        database=os.getenv("SEEKDB_DATABASE", "test"),
+        user=os.getenv("SEEKDB_USER", "root"),
+        password=os.getenv("SEEKDB_PASSWORD", "")
+    )
+else:
+    # Embedded mode
+    client = pyseekdb.Client()
 
 def read_file(file_path: str) -> pd.DataFrame:
     """Read CSV or Excel file into DataFrame."""
@@ -69,15 +81,15 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = df[col].astype(object).where(df[col].notna(), None)
     
     # Fill NaN with empty string for string columns
-    df = df.fillna('')
+    df.infer_objects(copy=False).fillna('')
     
     return df
 
 
 def import_to_seekdb(
     file_path: str,
-    vectorize_column: str = None,
-    collection_name: str = None,
+    vectorize_column: Optional[str] = None,
+    collection_name: Optional[str] = None,
     batch_size: int = 100
 ):
     """
@@ -108,19 +120,7 @@ def import_to_seekdb(
     
     # Step 2: Connect to seekdb (read connection params from environment)
     print("Connecting to seekdb...")
-    host = os.getenv("SEEKDB_HOST")
-    if host:
-        # Server mode
-        client = pyseekdb.Client(
-            host=host,
-            port=int(os.getenv("SEEKDB_PORT", "2881")),
-            database=os.getenv("SEEKDB_DATABASE", "test"),
-            user=os.getenv("SEEKDB_USER", "root"),
-            password=os.getenv("SEEKDB_PASSWORD", "")
-        )
-    else:
-        # Embedded mode
-        client = pyseekdb.Client()
+
     
     # Step 3: Determine collection name
     if not collection_name:
@@ -145,13 +145,15 @@ def import_to_seekdb(
     # Step 5: Prepare data
     ids = [str(uuid.uuid4()) for _ in range(len(df))]
     
+    documents: Optional[list[str]] = None
+    metadatas: list[dict]
+    
     if vectorize_column:
         documents = df[vectorize_column].astype(str).tolist()
-        metadata_columns = [col for col in df.columns if col != vectorize_column]
-        metadatas = df[metadata_columns].to_dict('records')
+        metadata_columns:list[str] = [col for col in df.columns if col != vectorize_column]
+        metadatas = df[metadata_columns].to_dict("records")  # type: ignore[call-overload]
     else:
-        documents = None
-        metadatas = df.to_dict('records')
+        metadatas = df.to_dict("records")  # type: ignore[call-overload]
     
     # Step 6: Import in batches
     print(f"Importing {len(ids)} records in batches of {batch_size}...")
@@ -161,7 +163,7 @@ def import_to_seekdb(
         batch_ids = ids[i:i+batch_size]
         batch_meta = metadatas[i:i+batch_size]
         
-        if vectorize_column:
+        if vectorize_column and documents is not None:
             batch_docs = documents[i:i+batch_size]
             collection.add(
                 ids=batch_ids,

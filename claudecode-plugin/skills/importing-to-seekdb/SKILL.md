@@ -1,5 +1,5 @@
 ---
-name: importing-data-files
+name: importing-data-files-to-seekdb
 description: "Import CSV or Excel files into seekdb vector database. Supports automatic vectorization of specified columns using embedding functions. When users need to: (1) Import CSV/Excel data into seekdb, (2) Create vector collections from tabular data, (3) Vectorize specific text columns for semantic search, or (4) Batch insert product/document data with embeddings."
 license: MIT
 ---

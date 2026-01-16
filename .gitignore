@@ -1,3 +1,5 @@
 # Cursor IDE
 .cursor/
 .env
+seekdb.db
+__pycache__
