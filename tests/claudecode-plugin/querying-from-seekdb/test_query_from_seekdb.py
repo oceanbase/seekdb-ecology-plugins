@@ -1,4 +1,4 @@
-"""Tests for query_in_seekdb module."""
+"""Tests for query_from_seekdb module."""
 import os
 import tempfile
 import pytest

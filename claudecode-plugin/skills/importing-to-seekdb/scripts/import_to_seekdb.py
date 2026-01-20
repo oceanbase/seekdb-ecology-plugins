@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 """
-Import CSV/Excel files to seekdb vector database.
+Import CSV/Excel files to seekdb vector database and manage collections.
 
 Usage:
-    python import_to_seekdb.py <file_path> [--vectorize-column <column_name>] [--collection <name>]
+    python import_to_seekdb.py import <file_path> [--vectorize-column <column_name>] [--collection <name>]
+    python import_to_seekdb.py delete <collection_name>
 
 Examples:
     # Import with vectorization on Details column
-    python import_to_seekdb.py products.csv --vectorize-column Details
+    python import_to_seekdb.py import products.csv --vectorize-column Details
     
     # Import without vectorization
-    python import_to_seekdb.py products.csv
+    python import_to_seekdb.py import products.csv
     
     # Import Excel file with custom collection name
-    python import_to_seekdb.py products.xlsx --vectorize-column Description --collection my_products
+    python import_to_seekdb.py import products.xlsx --vectorize-column Description --collection my_products
+    
+    # Delete a collection
+    python import_to_seekdb.py delete my_collection
+
+Note: To list all collections, use query_from_seekdb.py list command.
+
+This script is designed for use in Claude Code (non-interactive environment).
 """
 
 import argparse
@@ -203,31 +211,82 @@ def import_to_seekdb(
     return collection_name, count
 
 
+def delete_collection(collection_name: str):
+    """
+    Delete a collection from seekdb.
+    
+    Args:
+        collection_name: Name of the collection to delete
+    """
+    print("Connecting to seekdb...")
+    
+    # Check if collection exists
+    collections = client.list_collections()
+    collection_names = [c.name for c in collections]
+    
+    if collection_name not in collection_names:
+        print(f"Error: Collection '{collection_name}' not found.")
+        print(f"Available collections: {collection_names}")
+        return False
+    
+    # Delete collection
+    print(f"Deleting collection '{collection_name}'...")
+    client.delete_collection(collection_name)
+    print(f"Collection '{collection_name}' has been deleted successfully.")
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Import CSV/Excel files to seekdb vector database",
+        description="Import CSV/Excel files to seekdb vector database and manage collections",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__
     )
     
-    parser.add_argument("file_path", help="Path to CSV or Excel file")
-    parser.add_argument("--vectorize-column", "-v", 
-                        help="Column name to vectorize for semantic search")
-    parser.add_argument("--collection", "-c",
-                        help="Collection name (default: derived from filename)")
-    parser.add_argument("--batch-size", "-b", type=int, default=100,
-                        help="Batch size for import (default: 100)")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    
+    # Import subcommand
+    import_parser = subparsers.add_parser(
+        "import", 
+        help="Import CSV/Excel file to seekdb",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    import_parser.add_argument("file_path", help="Path to CSV or Excel file")
+    import_parser.add_argument("--vectorize-column", "-v", 
+                               help="Column name to vectorize for semantic search")
+    import_parser.add_argument("--collection", "-c",
+                               help="Collection name (default: derived from filename)")
+    import_parser.add_argument("--batch-size", "-b", type=int, default=100,
+                               help="Batch size for import (default: 100)")
+    
+    # Delete subcommand
+    delete_parser = subparsers.add_parser(
+        "delete",
+        help="Delete a collection from seekdb"
+    )
+    delete_parser.add_argument("collection_name", help="Name of the collection to delete")
     
     args = parser.parse_args()
     
+    if args.command is None:
+        parser.print_help()
+        sys.exit(1)
+    
     try:
-        collection_name, count = import_to_seekdb(
-            file_path=args.file_path,
-            vectorize_column=args.vectorize_column,
-            collection_name=args.collection,
-            batch_size=args.batch_size
-        )
-        print(f"\nSuccess! Collection '{collection_name}' now has {count} records.")
+        if args.command == "import":
+            collection_name, count = import_to_seekdb(
+                file_path=args.file_path,
+                vectorize_column=args.vectorize_column,
+                collection_name=args.collection,
+                batch_size=args.batch_size
+            )
+            print(f"\nSuccess! Collection '{collection_name}' now has {count} records.")
+        
+        elif args.command == "delete":
+            success = delete_collection(collection_name=args.collection_name)
+            if not success:
+                sys.exit(1)
+    
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)

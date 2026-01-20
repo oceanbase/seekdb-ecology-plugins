@@ -2,33 +2,51 @@
 """
 Query data from seekdb vector database and optionally export to CSV/Excel.
 
+Supports three search modes:
+    1. Scalar search: metadata filtering only (uses collection.get)
+    2. Fulltext + Semantic search: text query with document content filter (uses collection.query)
+    3. Scalar + Fulltext + Semantic search: all filters combined (uses collection.query)
+
 Usage:
-    python query_in_seekdb.py <collection_name> --query-text <text> [--n-results <n>]
-    python query_in_seekdb.py <collection_name> --get-all [--limit <n>]
-    python query_in_seekdb.py <collection_name> --get-ids <id1,id2,...>
-    python query_in_seekdb.py <collection_name> --query-text <text> --output results.csv
+    python query_from_seekdb.py <collection_name> --query-text <text> [--n-results <n>]
+    python query_from_seekdb.py <collection_name> --where <filter>
+    python query_from_seekdb.py <collection_name> --query-text <text> --output results.csv
+    python query_from_seekdb.py --list-collections
+    python query_from_seekdb.py <collection_name> --info
 
 Examples:
-    # Semantic search with text query
-    python query_in_seekdb.py mobiles --query-text "phone with good battery"
+    # 1. Scalar search (metadata filter only)
+    python query_from_seekdb.py mobiles --where '{"Brand": {"$eq": "SAMSUNG"}}'
     
-    # Get all records from collection
-    python query_in_seekdb.py mobiles --get-all --limit 10
+    # 2. Semantic search with text query
+    python query_from_seekdb.py mobiles --query-text "phone with good battery"
     
-    # Get specific records by IDs
-    python query_in_seekdb.py mobiles --get-ids "id1,id2,id3"
+    # 3. Fulltext + Semantic search (with document content filter)
+    python query_from_seekdb.py mobiles --query-text "phone" --contains "64 GB"
     
-    # Search with metadata filter
-    python query_in_seekdb.py mobiles --query-text "budget phone" --where '{"Brand": {"$eq": "SAMSUNG"}}'
+    # 4. Exclude documents containing specific text
+    python query_from_seekdb.py mobiles --query-text "phone" --not-contains "refurbished"
     
-    # Hybrid search (full-text + vector)
-    python query_in_seekdb.py mobiles --hybrid --query-text "gaming phone" --contains "64 GB"
+    # 5. Scalar + Semantic search (with metadata filter)
+    python query_from_seekdb.py mobiles --query-text "budget phone" --where '{"Brand": {"$eq": "SAMSUNG"}}'
+    
+    # 6. Scalar + Fulltext + Semantic search (all filters combined)
+    python query_from_seekdb.py mobiles --query-text "phone" --where '{"Brand": "SAMSUNG"}' --contains "64 GB"
+    
+    # 7. Combined contains and not-contains
+    python query_from_seekdb.py mobiles --query-text "phone" --contains "64 GB" --not-contains "refurbished"
     
     # Export query results to CSV
-    python query_in_seekdb.py mobiles --query-text "phone with good battery" --output results.csv
+    python query_from_seekdb.py mobiles --query-text "phone with good battery" --output results.csv
     
-    # Export all records to Excel
-    python query_in_seekdb.py mobiles --get-all --limit 1000 --output mobiles.xlsx
+    # Export query results to Excel
+    python query_from_seekdb.py mobiles --query-text "phone" --n-results 100 --output results.xlsx
+    
+    # List all collections
+    python query_from_seekdb.py --list-collections
+    
+    # Show collection info
+    python query_from_seekdb.py mobiles --info
 """
 
 import argparse
@@ -82,6 +100,49 @@ def get_collection(collection_name: str):
     return client.get_collection(name=collection_name)
 
 
+def get_by_filter(
+    collection_name: str,
+    where: Optional[dict] = None,
+    where_document: Optional[dict] = None,
+    include: Optional[list] = None
+) -> dict:
+    """
+    Perform scalar/metadata filter search using collection.get().
+    
+    Args:
+        collection_name: Name of the collection to query
+        where: Metadata filter conditions
+        where_document: Document filter conditions (fulltext search)
+        include: List of fields to include in results
+    
+    Returns:
+        Query results dictionary with ids, documents, metadatas
+    """
+    collection = get_collection(collection_name)
+    
+    get_params = {}
+    
+    if where:
+        get_params["where"] = where
+    if where_document:
+        get_params["where_document"] = where_document
+    if include:
+        get_params["include"] = include
+    else:
+        get_params["include"] = ["documents", "metadatas"]
+    
+    # collection.get() returns flat structure, convert to nested for consistency
+    result = collection.get(**get_params)
+    
+    # Convert flat structure to nested structure (same as query results)
+    return {
+        "ids": [result.get("ids", [])],
+        "documents": [result.get("documents", [])] if result.get("documents") else None,
+        "metadatas": [result.get("metadatas", [])] if result.get("metadatas") else None,
+        "distances": None  # get() doesn't return distances
+    }
+
+
 def query_by_text(
     collection_name: str,
     query_text: str,
@@ -122,133 +183,12 @@ def query_by_text(
     
     return collection.query(**query_params)
 
-
-def get_by_ids(
-    collection_name: str,
-    ids: list,
-    include: Optional[list] = None
-) -> dict:
+def results_to_dataframe(results: dict) -> "pd.DataFrame":
     """
-    Retrieve specific records by their IDs.
+    Convert query results to pandas DataFrame.
     
     Args:
-        collection_name: Name of the collection
-        ids: List of IDs to retrieve
-        include: List of fields to include
-    
-    Returns:
-        Get results dictionary
-    """
-    collection = get_collection(collection_name)
-    
-    get_params: dict = {"ids": ids}
-    if include:
-        get_params["include"] = include
-    else:
-        get_params["include"] = ["documents", "metadatas"]
-    
-    return collection.get(**get_params)
-
-
-def get_all(
-    collection_name: str,
-    limit: int = 10,
-    offset: int = 0,
-    where: Optional[dict] = None,
-    include: Optional[list] = None
-) -> dict:
-    """
-    Retrieve all records from collection with optional filtering.
-    
-    Args:
-        collection_name: Name of the collection
-        limit: Maximum number of records to return
-        offset: Number of records to skip (for pagination)
-        where: Metadata filter conditions
-        include: List of fields to include
-    
-    Returns:
-        Get results dictionary
-    """
-    collection = get_collection(collection_name)
-    
-    get_params: dict = {
-        "limit": limit,
-        "offset": offset
-    }
-    
-    if where:
-        get_params["where"] = where
-    if include:
-        get_params["include"] = include
-    else:
-        get_params["include"] = ["documents", "metadatas"]
-    
-    return collection.get(**get_params)
-
-
-def hybrid_search(
-    collection_name: str,
-    query_text: str,
-    contains: Optional[str] = None,
-    n_results: int = 5,
-    where: Optional[dict] = None,
-    include: Optional[list] = None
-) -> dict:
-    """
-    Perform hybrid search combining full-text and vector similarity search.
-    
-    Args:
-        collection_name: Name of the collection
-        query_text: Text to search for (will be embedded for vector search)
-        contains: Text substring for full-text search
-        n_results: Number of results to return
-        where: Metadata filter conditions
-        include: List of fields to include
-    
-    Returns:
-        Hybrid search results dictionary
-    """
-    collection = get_collection(collection_name)
-    
-    # Build query (full-text search) configuration
-    query_config: dict = {"n_results": n_results * 2}  # Get more for ranking
-    if contains:
-        query_config["where_document"] = {"$contains": contains}
-    if where:
-        query_config["where"] = where
-    
-    # Build knn (vector search) configuration
-    knn_config = {
-        "query_texts": [query_text],
-        "n_results": n_results * 2
-    }
-    if where:
-        knn_config["where"] = where
-    
-    search_params = {
-        "query": query_config,
-        "knn": knn_config,
-        "rank": {"rrf": {}},  # Reciprocal Rank Fusion
-        "n_results": n_results
-    }
-    
-    if include:
-        search_params["include"] = include
-    else:
-        search_params["include"] = ["documents", "metadatas"]
-    
-    return collection.hybrid_search(**search_params)
-
-
-def results_to_dataframe(results: dict, result_type: str = "query") -> "pd.DataFrame":
-    """
-    Convert query/get results to pandas DataFrame.
-    
-    Args:
-        results: Query or get results dictionary
-        result_type: "query" for query/hybrid_search results (nested lists),
-                    "get" for get results (flat lists)
+        results: Query results dictionary
     
     Returns:
         DataFrame with all data flattened
@@ -260,50 +200,29 @@ def results_to_dataframe(results: dict, result_type: str = "query") -> "pd.DataF
     
     rows = []
     
-    if result_type == "query":
-        # Query results have nested lists
-        if not results.get("ids") or not results["ids"][0]:
-            return pd.DataFrame()
+    # Query results have nested lists
+    if not results.get("ids") or not results["ids"][0]:
+        return pd.DataFrame()
+    
+    ids = results["ids"][0]
+    distances = results.get("distances", [[]])[0]
+    documents = results.get("documents", [[]])[0] if results.get("documents") else []
+    metadatas = results.get("metadatas", [[]])[0] if results.get("metadatas") else []
+    
+    for i, id_ in enumerate(ids):
+        row = {"id": id_}
         
-        ids = results["ids"][0]
-        distances = results.get("distances", [[]])[0]
-        documents = results.get("documents", [[]])[0] if results.get("documents") else []
-        metadatas = results.get("metadatas", [[]])[0] if results.get("metadatas") else []
+        if distances and i < len(distances):
+            row["distance"] = distances[i]
         
-        for i, id_ in enumerate(ids):
-            row = {"id": id_}
-            
-            if distances and i < len(distances):
-                row["distance"] = distances[i]
-            
-            if documents and i < len(documents) and documents[i]:
-                row["document"] = documents[i]
-            
-            if metadatas and i < len(metadatas) and metadatas[i]:
-                for key, value in metadatas[i].items():
-                    row[key] = value
-            
-            rows.append(row)
-    else:
-        # Get results have flat lists
-        if not results.get("ids"):
-            return pd.DataFrame()
+        if documents and i < len(documents) and documents[i]:
+            row["document"] = documents[i]
         
-        ids = results["ids"]
-        documents = results.get("documents", []) if results.get("documents") else []
-        metadatas = results.get("metadatas", []) if results.get("metadatas") else []
+        if metadatas and i < len(metadatas) and metadatas[i]:
+            for key, value in metadatas[i].items():
+                row[key] = value
         
-        for i, id_ in enumerate(ids):
-            row = {"id": id_}
-            
-            if documents and i < len(documents) and documents[i]:
-                row["document"] = documents[i]
-            
-            if metadatas and i < len(metadatas) and metadatas[i]:
-                for key, value in metadatas[i].items():
-                    row[key] = value
-            
-            rows.append(row)
+        rows.append(row)
     
     return pd.DataFrame(rows)
 
@@ -339,67 +258,38 @@ def export_to_file(df, output_path: str, sheet_name: str = "Data") -> str:
     return str(path.absolute())
 
 
-def print_results(results: dict, result_type: str = "query"):
+def print_results(results: dict):
     """Pretty print query results."""
-    if result_type == "query":
-        # Query results have nested lists
-        if not results.get("ids") or not results["ids"][0]:
-            print("No results found.")
-            return
-        
-        ids = results["ids"][0]
-        distances = results.get("distances", [[]])[0]
-        documents = results.get("documents", [[]])[0] if results.get("documents") else []
-        metadatas = results.get("metadatas", [[]])[0] if results.get("metadatas") else []
-        
-        print(f"\nFound {len(ids)} results:\n")
-        print("=" * 80)
-        
-        for i, id_ in enumerate(ids):
-            print(f"\n[Result {i + 1}]")
-            print(f"  ID: {id_}")
-            if distances and i < len(distances):
-                print(f"  Distance: {distances[i]:.4f}")
-            if documents and i < len(documents) and documents[i]:
-                doc = documents[i]
-                if len(doc) > 200:
-                    doc = doc[:200] + "..."
-                print(f"  Document: {doc}")
-            if metadatas and i < len(metadatas) and metadatas[i]:
-                print(f"  Metadata:")
-                for key, value in metadatas[i].items():
-                    val_str = str(value)
-                    if len(val_str) > 100:
-                        val_str = val_str[:100] + "..."
-                    print(f"    - {key}: {val_str}")
-    else:
-        # Get results have flat lists
-        if not results.get("ids"):
-            print("No results found.")
-            return
-        
-        ids = results["ids"]
-        documents = results.get("documents", []) if results.get("documents") else []
-        metadatas = results.get("metadatas", []) if results.get("metadatas") else []
-        
-        print(f"\nFound {len(ids)} records:\n")
-        print("=" * 80)
-        
-        for i, id_ in enumerate(ids):
-            print(f"\n[Record {i + 1}]")
-            print(f"  ID: {id_}")
-            if documents and i < len(documents) and documents[i]:
-                doc = documents[i]
-                if len(doc) > 200:
-                    doc = doc[:200] + "..."
-                print(f"  Document: {doc}")
-            if metadatas and i < len(metadatas) and metadatas[i]:
-                print(f"  Metadata:")
-                for key, value in metadatas[i].items():
-                    val_str = str(value)
-                    if len(val_str) > 100:
-                        val_str = val_str[:100] + "..."
-                    print(f"    - {key}: {val_str}")
+    # Query results have nested lists
+    if not results.get("ids") or not results["ids"][0]:
+        print("No results found.")
+        return
+    
+    ids = results["ids"][0]
+    distances = results.get("distances", [[]])[0]
+    documents = results.get("documents", [[]])[0] if results.get("documents") else []
+    metadatas = results.get("metadatas", [[]])[0] if results.get("metadatas") else []
+    
+    print(f"\nFound {len(ids)} results:\n")
+    print("=" * 80)
+    
+    for i, id_ in enumerate(ids):
+        print(f"\n[Result {i + 1}]")
+        print(f"  ID: {id_}")
+        if distances and i < len(distances):
+            print(f"  Distance: {distances[i]:.4f}")
+        if documents and i < len(documents) and documents[i]:
+            doc = documents[i]
+            if len(doc) > 200:
+                doc = doc[:200] + "..."
+            print(f"  Document: {doc}")
+        if metadatas and i < len(metadatas) and metadatas[i]:
+            print(f"  Metadata:")
+            for key, value in metadatas[i].items():
+                val_str = str(value)
+                if len(val_str) > 100:
+                    val_str = val_str[:100] + "..."
+                print(f"    - {key}: {val_str}")
 
 
 def list_collections():
@@ -438,21 +328,20 @@ def collection_info(collection_name: str):
                 print(f"    Metadata keys: {list(preview['metadatas'][i].keys())}")
 
 
-def output_results(results: dict, result_type: str, output_path: Optional[str], 
+def output_results(results: dict, output_path: Optional[str], 
                    as_json: bool, sheet_name: str = "Data"):
     """
     Output results to terminal, JSON, or file.
     
     Args:
-        results: Query or get results dictionary
-        result_type: "query" or "get"
+        results: Query results dictionary
         output_path: Optional file path for export (.csv or .xlsx)
         as_json: Output as JSON to terminal
         sheet_name: Sheet name for Excel export
     """
     if output_path:
         # Export to file
-        df = results_to_dataframe(results, result_type=result_type)
+        df = results_to_dataframe(results)
         if df.empty:
             print("No results found to export.")
             return
@@ -462,7 +351,7 @@ def output_results(results: dict, result_type: str, output_path: Optional[str],
     elif as_json:
         print(json.dumps(results, indent=2, default=str))
     else:
-        print_results(results, result_type=result_type)
+        print_results(results)
 
 
 def main():
@@ -476,31 +365,22 @@ def main():
     parser.add_argument("collection_name", nargs="?", help="Name of the collection to query")
     
     # Query modes
-    mode_group = parser.add_mutually_exclusive_group()
-    mode_group.add_argument("--query-text", "-q", 
-                           help="Text query for semantic similarity search")
-    mode_group.add_argument("--get-all", "-a", action="store_true",
-                           help="Get all records from collection")
-    mode_group.add_argument("--get-ids", "-i",
-                           help="Comma-separated list of IDs to retrieve")
-    mode_group.add_argument("--hybrid", action="store_true",
-                           help="Perform hybrid search (requires --query-text)")
-    mode_group.add_argument("--list-collections", "-l", action="store_true",
-                           help="List all available collections")
-    mode_group.add_argument("--info", action="store_true",
-                           help="Show collection info and preview")
+    parser.add_argument("--query-text", "-q", 
+                       help="Text query for semantic similarity search")
+    parser.add_argument("--list-collections", "-l", action="store_true",
+                       help="List all available collections")
+    parser.add_argument("--info", action="store_true",
+                       help="Show collection info and preview")
     
     # Common options
     parser.add_argument("--n-results", "-n", type=int, default=5,
                        help="Number of results to return (default: 5)")
-    parser.add_argument("--limit", type=int, default=10,
-                       help="Limit for get-all (default: 10)")
-    parser.add_argument("--offset", type=int, default=0,
-                       help="Offset for pagination (default: 0)")
     parser.add_argument("--where", "-w",
                        help="Metadata filter as JSON string, e.g., '{\"Brand\": {\"$eq\": \"SAMSUNG\"}}'")
     parser.add_argument("--contains", "-c",
-                       help="Text substring for document filter or hybrid search")
+                       help="Text substring that document must contain")
+    parser.add_argument("--not-contains",
+                       help="Text substring that document must NOT contain")
     parser.add_argument("--include", 
                        help="Comma-separated fields to include: documents,metadatas,embeddings")
     parser.add_argument("--json", "-j", action="store_true",
@@ -512,10 +392,6 @@ def main():
     parser.add_argument("--sheet-name", "-s", default="Data",
                        help="Sheet name for Excel export (default: Data)")
     
-    # Special case: hybrid requires query-text to be passed separately
-    parser.add_argument("--hybrid-query",
-                       help="Query text for hybrid search (use with --hybrid)")
-    
     args = parser.parse_args()
     
     # Handle list-collections (no collection_name required)
@@ -523,7 +399,7 @@ def main():
         list_collections()
         return
     
-    # All other modes require collection_name
+    # All other modes require collection_name (except --list-collections)
     if not args.collection_name:
         parser.error("collection_name is required (except for --list-collections)")
     
@@ -541,49 +417,19 @@ def main():
     if args.include:
         include_list = [f.strip() for f in args.include.split(",")]
     
-    # Handle hybrid search query text
-    query_text = args.query_text or args.hybrid_query
-    
     try:
         if args.info:
             collection_info(args.collection_name)
-        
-        elif args.get_all:
-            results = get_all(
-                collection_name=args.collection_name,
-                limit=args.limit,
-                offset=args.offset,
-                where=where_filter,
-                include=include_list
-            )
-            output_results(results, "get", args.output, args.json, args.sheet_name)
-        
-        elif args.get_ids:
-            ids = [id_.strip() for id_ in args.get_ids.split(",")]
-            results = get_by_ids(
-                collection_name=args.collection_name,
-                ids=ids,
-                include=include_list
-            )
-            output_results(results, "get", args.output, args.json, args.sheet_name)
-        
-        elif args.hybrid:
-            if not query_text:
-                parser.error("--hybrid requires --query-text or --hybrid-query")
-            results = hybrid_search(
-                collection_name=args.collection_name,
-                query_text=query_text,
-                contains=args.contains,
-                n_results=args.n_results,
-                where=where_filter,
-                include=include_list
-            )
-            output_results(results, "query", args.output, args.json, args.sheet_name)
-        
         elif args.query_text:
+            # Semantic search (with optional scalar filter and fulltext filter)
             where_document = None
-            if args.contains:
+            not_contains = getattr(args, 'not_contains', None)
+            if args.contains and not_contains:
+                where_document = {"$and": [{"$contains": args.contains}, {"$not_contains": not_contains}]}
+            elif args.contains:
                 where_document = {"$contains": args.contains}
+            elif not_contains:
+                where_document = {"$not_contains": not_contains}
             
             results = query_by_text(
                 collection_name=args.collection_name,
@@ -593,8 +439,15 @@ def main():
                 where_document=where_document,
                 include=include_list
             )
-            output_results(results, "query", args.output, args.json, args.sheet_name)
-        
+            output_results(results, args.output, args.json, args.sheet_name)
+        elif where_filter:
+            # Pure scalar search (no semantic search)
+            results = get_by_filter(
+                collection_name=args.collection_name,
+                where=where_filter,
+                include=include_list
+            )
+            output_results(results, args.output, args.json, args.sheet_name)
         else:
             # Default: show collection info
             collection_info(args.collection_name)

@@ -1,168 +1,255 @@
 ---
 name: querying-from-seekdb
-description: "Query and export data from seekdb vector database. Supports semantic similarity search, hybrid search, metadata filtering, direct retrieval, and export to CSV/Excel. When users need to: (1) Search imported data using natural language queries, (2) Perform semantic similarity search on vectorized data, (3) Combine full-text and vector search (hybrid search), (4) Retrieve records by ID or metadata filters, (5) Export query results to CSV or Excel files, or (6) Query data imported by importing-to-seekdb skill."
+description: "Query and export data from seekdb vector database. Supports three search modes: (1) Scalar search - metadata filtering only, (2) Fulltext + Semantic search - text query with document content filter, (3) Scalar + Fulltext + Semantic search - all filters combined. Can export results to CSV/Excel."
 license: MIT
 ---
 
 # Query and Export Data from seekdb
 
-Query data from seekdb vector database with support for semantic search, hybrid search, metadata filtering, and export to CSV/Excel files.
+Query data from seekdb vector database with support for scalar search, semantic search, fulltext search, and export to CSV/Excel files.
+
+## Path Convention
+
+> **Note**: All paths in this document (e.g., `scripts/`) are relative to THIS skill directory, not the project root.
 
 ## Prerequisites
 
 - Python 3.10+ installed
-- Data imported using the `importing-to-seekdb` skill
+- Data imported into seekdb collection
 - Required packages:
 
 ```bash
 pip install pyseekdb pandas openpyxl
 ```
 
-## Quick Start
+## ⚠️ CRITICAL: Execution Workflow
 
-Use the provided `scripts/query_in_seekdb.py` script:
+**MUST FOLLOW this workflow when handling user search requests:**
+
+### Step 1: Get Collection Information (If Not Already Known)
+
+Before constructing any query, you MUST understand the data structure. **However, you should cache this information within the conversation.**
+
+**Caching Rules:**
+- ✅ **First query for a collection**: Execute `--info` to get metadata structure
+- ✅ **Subsequent queries for the SAME collection**: Use cached info from earlier in conversation, skip `--info`
+- ✅ **Query for a DIFFERENT collection**: Execute `--info` for the new collection
+- ✅ **User explicitly asks for collection info**: Execute `--info`
 
 ```bash
-# Semantic search with text query
-python scripts/query_in_seekdb.py mobiles --query-text "phone with good battery"
+# Get collection info to see metadata fields (only if not already known)
+python scripts/query_from_seekdb.py <collection_name> --info
+```
 
-# Get all records from collection
-python scripts/query_in_seekdb.py mobiles --get-all --limit 10
+This shows:
+- Total record count
+- Available metadata field names (e.g., `source`, `year`, `category`)
+- Sample documents
 
-# Get specific records by IDs
-python scripts/query_in_seekdb.py mobiles --get-ids "id1,id2,id3"
+**Example conversation flow:**
+```
+User: "找 seekdb_demo 中 2023 年的教程"
+→ Claude Code: 执行 --info (第一次查询此 collection)
+→ 发现 metadata 有 source, year 字段
+→ 执行搜索
 
+User: "再找一下 notion 来源的"
+→ Claude Code: 不需要再执行 --info (同一 collection，结构已知)
+→ 直接执行搜索
+
+User: "查一下 another_collection 中的数据"
+→ Claude Code: 执行 --info (不同 collection)
+→ 了解新 collection 的结构
+→ 执行搜索
+```
+
+### Step 2: Analyze User Request
+
+Parse the user's natural language request to identify:
+
+| Component | Look For | Maps To |
+|-----------|----------|---------|
+| **Metadata conditions** | Field-value pairs like "2023年", "来自notion", "价格<100" | `--where` filter |
+| **Content keywords** | Specific terms that should appear in document | `--contains` filter |
+| **Semantic meaning** | Conceptual descriptions, questions, similarity | `--query-text` query |
+
+### Step 3: Choose Search Method
+
+```
+User Request Analysis
+       │
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│ Does the request involve ONLY metadata field conditions?    │
+│ (e.g., "year=2023", "source=notion", no content search)     │
+└─────────────────────────────────────────────────────────────┘
+       │
+       ├── YES ──► Scalar Search: --where only
+       │
+       └── NO ───► Does it involve document content or semantic meaning?
+                          │
+                          ├── Content keywords + Semantic ──► --query-text + --contains
+                          │                                   (Fulltext + Semantic)
+                          │
+                          ├── Semantic only ──► --query-text only
+                          │                     (Pure Semantic)
+                          │
+                          └── All three ──► --query-text + --where + --contains
+                                            (Scalar + Fulltext + Semantic)
+```
+
+## Three Search Modes
+
+### Mode 1: Scalar Search (Metadata Only)
+
+**When to use**: User wants to filter by metadata fields ONLY, no semantic similarity needed.
+
+```bash
+# Filter by metadata fields only
+python scripts/query_from_seekdb.py seekdb_demo --where '{"source": "notion", "year": 2023}'
+```
+
+**Example requests**:
+- "找出所有来自 notion 的文档"
+- "显示 2023 年的记录"
+- "source 是 google-docs 的数据"
+
+### Mode 2: Fulltext + Semantic Search
+
+**When to use**: User wants to find content containing specific keywords with semantic similarity.
+
+```bash
+# Semantic search with fulltext filter
+python scripts/query_from_seekdb.py seekdb_demo --query-text "教程" --contains "seekdb"
+```
+
+**Example requests**:
+- "找包含 seekdb 关键词的教程"
+- "搜索提到 python 的技术文档"
+- "找出内容中有 tutorial 的资料"
+
+### Mode 3: Scalar + Fulltext + Semantic Search
+
+**When to use**: User wants metadata filtering + content filtering + semantic similarity.
+
+```bash
+# All filters combined
+python scripts/query_from_seekdb.py seekdb_demo --query-text "教程" --where '{"year": 2023}' --contains "seekdb"
+```
+
+**Example requests**:
+- "请找出 seekdb_demo 集合中 2023 年写的 seekdb 教程" → scalar(year=2023) + fulltext(seekdb) + semantic(教程)
+- "找 notion 来源的、包含 python 关键词的编程指南" → scalar(source=notion) + fulltext(python) + semantic(编程指南)
+
+## 🎯 Real-World Example Analysis
+
+**User request**: "请找出 seekdb_demo 集合中 2023 年写的 seekdb 教程"
+
+**Step 1**: Run `--info` to get metadata structure:
+```bash
+python scripts/query_from_seekdb.py seekdb_demo --info
+# Output shows metadata fields: source, year
+```
+
+**Step 2**: Analyze request:
+| Part | Type | Filter |
+|------|------|--------|
+| "2023 年" | Metadata field `year` | `--where '{"year": 2023}'` |
+| "seekdb" | Content keyword | `--contains "seekdb"` |
+| "教程" | Semantic meaning | `--query-text "教程"` |
+
+**Step 3**: Execute:
+```bash
+python scripts/query_from_seekdb.py seekdb_demo \
+  --query-text "教程" \
+  --where '{"year": 2023}' \
+  --contains "seekdb"
+```
+
+## CLI Reference
+
+### Commands
+
+```bash
 # List all collections
-python scripts/query_in_seekdb.py --list-collections
+python scripts/query_from_seekdb.py --list-collections
 
-# Export search results to CSV
-python scripts/query_in_seekdb.py mobiles --query-text "phone with good battery" --output results.csv
+# Show collection info (ALWAYS run this first!)
+python scripts/query_from_seekdb.py <collection_name> --info
 
-# Export all records to Excel
-python scripts/query_in_seekdb.py mobiles --get-all --limit 1000 --output mobiles.xlsx
+# Scalar search (metadata filter only)
+python scripts/query_from_seekdb.py <collection_name> --where '<json_filter>'
+
+# Semantic search
+python scripts/query_from_seekdb.py <collection_name> --query-text "<text>" [-n <count>]
+
+# Fulltext + Semantic search
+python scripts/query_from_seekdb.py <collection_name> --query-text "<text>" --contains "<keyword>"
+
+# Scalar + Fulltext + Semantic search
+python scripts/query_from_seekdb.py <collection_name> --query-text "<text>" --where '<json>' --contains "<keyword>"
+
+# Export to CSV/Excel
+python scripts/query_from_seekdb.py <collection_name> <search_options> --output results.csv
+python scripts/query_from_seekdb.py <collection_name> <search_options> --output results.xlsx
 ```
 
-## Scripts
+### Options
 
-This skill provides the following scripts in the `scripts/` directory:
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--query-text` | `-q` | Text for semantic similarity search |
+| `--where` | `-w` | Metadata filter as JSON string |
+| `--contains` | `-c` | Keyword that document must contain |
+| `--not-contains` | | Keyword that document must NOT contain |
+| `--n-results` | `-n` | Number of results (default: 5) |
+| `--output` | `-o` | Export to file (.csv or .xlsx) |
+| `--json` | `-j` | Output as JSON |
+| `--info` | | Show collection info |
+| `--list-collections` | `-l` | List all collections |
+| `--include` | | Fields to include: documents,metadatas,embeddings |
+| `--sheet-name` | `-s` | Sheet name for Excel export |
 
-| Script | Description |
-|--------|-------------|
-| `query_in_seekdb.py` | Main query and export script with CLI interface |
+## Filter Operators
 
-## Query Methods
+### Metadata Filters (--where)
 
-### Method 1: Semantic Similarity Search (query)
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `$eq` | Equal to | `{"year": {"$eq": 2023}}` or `{"year": 2023}` |
+| `$ne` | Not equal to | `{"status": {"$ne": "deleted"}}` |
+| `$gt` | Greater than | `{"score": {"$gt": 90}}` |
+| `$gte` | Greater than or equal | `{"score": {"$gte": 90}}` |
+| `$lt` | Less than | `{"score": {"$lt": 50}}` |
+| `$lte` | Less than or equal | `{"score": {"$lte": 50}}` |
+| `$in` | In list | `{"tag": {"$in": ["ml", "ai"]}}` |
+| `$nin` | Not in list | `{"tag": {"$nin": ["old"]}}` |
+| `$and` | Logical AND | `{"$and": [{"year": 2023}, {"source": "notion"}]}` |
+| `$or` | Logical OR | `{"$or": [{"year": 2023}, {"year": 2024}]}` |
 
-Use natural language to find semantically similar documents:
+### Document Filters (--contains / --not-contains)
 
-```python
-from scripts.query_in_seekdb import query_by_text
+| Operator | Description | CLI Option |
+|----------|-------------|------------|
+| `$contains` | Contains substring | `--contains "keyword"` |
+| `$not_contains` | Does not contain substring | `--not-contains "keyword"` |
 
-# Simple semantic search
-results = query_by_text(
-    collection_name="mobiles",
-    query_text="phone with good camera and battery",
-    n_results=5
-)
-
-# Search with metadata filter
-results = query_by_text(
-    collection_name="mobiles",
-    query_text="budget smartphone",
-    where={"Brand": {"$eq": "SAMSUNG"}},
-    n_results=5
-)
-
-# Search with document filter
-results = query_by_text(
-    collection_name="mobiles",
-    query_text="gaming phone",
-    where_document={"$contains": "64 GB"},
-    n_results=5
-)
-```
-
-### Method 2: Hybrid Search
-
-Combine full-text search and vector similarity search:
-
-```python
-from scripts.query_in_seekdb import hybrid_search
-
-results = hybrid_search(
-    collection_name="mobiles",
-    query_text="smartphone with large battery",
-    contains="5000 mAh",  # Full-text filter
-    n_results=5,
-    where={"Brand": {"$eq": "REDMI"}}
-)
-```
-
-### Method 3: Direct Retrieval (get)
-
-Retrieve records without vector search:
-
-```python
-from scripts.query_in_seekdb import get_by_ids, get_all
-
-# Get by IDs
-results = get_by_ids(
-    collection_name="mobiles",
-    ids=["id1", "id2", "id3"]
-)
-
-# Get all with pagination
-results = get_all(
-    collection_name="mobiles",
-    limit=10,
-    offset=0
-)
-
-# Get with metadata filter
-results = get_all(
-    collection_name="mobiles",
-    where={"Brand": {"$eq": "SAMSUNG"}},
-    limit=10
-)
+**Combined usage**: Both can be used together to include one keyword while excluding another:
+```bash
+python scripts/query_from_seekdb.py mobiles --query-text "phone" --contains "64 GB" --not-contains "refurbished"
 ```
 
 ## Export to CSV/Excel
 
-Export query results to CSV or Excel files using the `--output` option:
-
 ```bash
-# Export semantic search results to CSV
-python scripts/query_in_seekdb.py mobiles -q "phone with good battery" --output results.csv
+# Export scalar search results to CSV
+python scripts/query_from_seekdb.py mobiles --where '{"Brand": "SAMSUNG"}' --output samsung.csv
 
-# Export all records to Excel
-python scripts/query_in_seekdb.py mobiles --get-all --limit 1000 --output mobiles.xlsx
+# Export semantic search results to Excel
+python scripts/query_from_seekdb.py mobiles --query-text "good camera" --output results.xlsx
 
-# Export filtered results to CSV
-python scripts/query_in_seekdb.py mobiles --get-all --where '{"Brand": {"$eq": "SAMSUNG"}}' --output samsung.csv
-
-# Export hybrid search results with custom sheet name
-python scripts/query_in_seekdb.py mobiles --hybrid --hybrid-query "gaming phone" --contains "64 GB" --output gaming.xlsx --sheet-name "Gaming Phones"
-```
-
-### Python API for Export
-
-```python
-from scripts.query_in_seekdb import query_by_text, results_to_dataframe, export_to_file
-
-# Query data
-results = query_by_text(
-    collection_name="mobiles",
-    query_text="phone with good camera",
-    n_results=100
-)
-
-# Convert to DataFrame
-df = results_to_dataframe(results, result_type="query")
-
-# Export to file
-export_to_file(df, "camera_phones.csv")
-export_to_file(df, "camera_phones.xlsx", sheet_name="Phones")
+# Export with custom sheet name
+python scripts/query_from_seekdb.py mobiles --query-text "phone" --output phones.xlsx --sheet-name "Search Results"
 ```
 
 ### Supported Export Formats
@@ -172,139 +259,14 @@ export_to_file(df, "camera_phones.xlsx", sheet_name="Phones")
 | CSV | `.csv` | Comma-separated values, UTF-8 encoded with BOM |
 | Excel | `.xlsx` | Excel workbook format |
 
-## Filter Operators
+## Data Structure in seekdb
 
-### Metadata Filters (where)
+seekdb stores data in two distinct locations:
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `$eq` | Equal to | `{"category": {"$eq": "AI"}}` |
-| `$ne` | Not equal to | `{"status": {"$ne": "deleted"}}` |
-| `$gt` | Greater than | `{"score": {"$gt": 90}}` |
-| `$gte` | Greater than or equal | `{"score": {"$gte": 90}}` |
-| `$lt` | Less than | `{"score": {"$lt": 50}}` |
-| `$lte` | Less than or equal | `{"score": {"$lte": 50}}` |
-| `$in` | In list | `{"tag": {"$in": ["ml", "ai"]}}` |
-| `$nin` | Not in list | `{"tag": {"$nin": ["old"]}}` |
-| `$or` | Logical OR | See below |
-| `$and` | Logical AND | See below |
-
-**Logical operators example:**
-
-```python
-where={
-    "$or": [
-        {"category": {"$eq": "AI"}},
-        {"tag": {"$eq": "python"}}
-    ]
-}
-```
-
-### Document Filters (where_document)
-
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `$contains` | Contains substring | `{"$contains": "machine learning"}` |
-| `$regex` | Regular expression | `{"$regex": "pattern.*"}` |
-
-## CLI Examples
-
-```bash
-# Semantic search
-python scripts/query_in_seekdb.py mobiles -q "phone with good battery" -n 5
-
-# Search with metadata filter
-python scripts/query_in_seekdb.py mobiles -q "budget phone" --where '{"Brand": {"$eq": "SAMSUNG"}}'
-
-# Search with document filter
-python scripts/query_in_seekdb.py mobiles -q "gaming phone" --contains "64 GB"
-
-# Hybrid search
-python scripts/query_in_seekdb.py mobiles --hybrid --hybrid-query "large screen phone" --contains "6.6 inch"
-
-# Get all records
-python scripts/query_in_seekdb.py mobiles --get-all --limit 20
-
-# Get by IDs
-python scripts/query_in_seekdb.py mobiles --get-ids "uuid1,uuid2"
-
-# Collection info
-python scripts/query_in_seekdb.py mobiles --info
-
-# Output as JSON
-python scripts/query_in_seekdb.py mobiles -q "smartphone" --json
-
-# Export to CSV
-python scripts/query_in_seekdb.py mobiles -q "smartphone" --output results.csv
-
-# Export to Excel with custom sheet name
-python scripts/query_in_seekdb.py mobiles --get-all --output data.xlsx --sheet-name "Mobile Data"
-```
-
-## Python API Examples
-
-### Connect to seekdb
-
-```python
-import pyseekdb
-
-# Embedded mode (local)
-client = pyseekdb.Client()
-
-# Server mode (remote)
-# client = pyseekdb.Client(host="127.0.0.1", port=2881, database="test", user="root", password="")
-```
-
-### Query Imported Data
-
-```python
-# Get collection
-collection = client.get_collection("mobiles")
-
-# Semantic search
-results = collection.query(
-    query_texts="phone with good camera",
-    n_results=5,
-    include=["documents", "metadatas"]
-)
-
-# Print results
-for i in range(len(results["ids"][0])):
-    print(f"ID: {results['ids'][0][i]}")
-    print(f"Distance: {results['distances'][0][i]:.4f}")
-    print(f"Document: {results['documents'][0][i][:100]}...")
-    print(f"Metadata: {results['metadatas'][0][i]}")
-    print()
-```
-
-### Hybrid Search
-
-```python
-results = collection.hybrid_search(
-    query={
-        "where_document": {"$contains": "64 GB"},
-        "n_results": 10
-    },
-    knn={
-        "query_texts": ["smartphone with large battery"],
-        "n_results": 10
-    },
-    rank={"rrf": {}},
-    n_results=5,
-    include=["documents", "metadatas"]
-)
-```
-
-## User Interaction Guide
-
-When user requests data query or export, ask:
-
-1. **Collection name**: "Which collection do you want to query? (Use --list-collections to see available)"
-2. **Query type**: "What type of query? (semantic search / hybrid search / get by ID / get all)"
-3. **Search text**: "What are you looking for? (natural language query)"
-4. **Filters**: "Any filters? (metadata or document content filters)"
-5. **Result count**: "How many results do you need?"
-6. **Export**: "Do you want to export the results? (CSV / Excel / terminal output)"
+| Storage | Description | Filter Method | Example |
+|---------|-------------|---------------|---------|
+| **Metadata** | Structured key-value fields | `--where` | `{"source": "notion", "year": 2023}` |
+| **Document** | Text content | `--contains` | Contains "seekdb", "tutorial" |
 
 ## Connection Configuration
 
@@ -323,5 +285,4 @@ Set environment variables for server mode:
 - [pyseekdb SDK Getting Started](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/10.pyseekdb-sdk-get-started.md)
 - [query API](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/50.apis/400.dql/200.query-interfaces-of-api.md)
 - [get API](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/50.apis/400.dql/300.get-interfaces-of-api.md)
-- [hybrid_search API](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/50.apis/400.dql/400.hybrid-search-of-api.md)
 - [Filter Operators](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/50.apis/400.dql/500.filter-operators-of-api.md)

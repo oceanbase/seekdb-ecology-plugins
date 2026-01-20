@@ -1,12 +1,16 @@
 ---
-name: importing-data-files-to-seekdb
-description: "Import CSV or Excel files into seekdb vector database. Supports automatic vectorization of specified columns using embedding functions. When users need to: (1) Import CSV/Excel data into seekdb, (2) Create vector collections from tabular data, (3) Vectorize specific text columns for semantic search, or (4) Batch insert product/document data with embeddings."
+name: importing-to-seekdb
+description: "Import CSV or Excel files into seekdb vector database and manage collections. Supports automatic vectorization of specified columns using embedding functions. When users need to: (1) Read and preview Excel files, (2) Import CSV/Excel data into seekdb, (3) Create vector collections from tabular data, (4) Vectorize specific text columns for semantic search, (5) Batch insert product/document data with embeddings, or (6) Delete collections."
 license: MIT
 ---
 
 # Import Data Files to seekdb
 
-Import CSV or Excel files into seekdb vector database with optional column vectorization for semantic search.
+Read, preview, and import CSV or Excel files into seekdb vector database with optional column vectorization for semantic search. Also provides collection delete functionality.
+
+## Path Convention
+
+> **Note**: All paths in this document (e.g., `scripts/`, `example-data/`) are relative to THIS skill directory, not the project root.
 
 ## Prerequisites
 
@@ -17,20 +21,34 @@ Import CSV or Excel files into seekdb vector database with optional column vecto
 pip install pyseekdb pandas openpyxl
 ```
 
+## Sample Data
+
+Sample data files are provided in the `example-data/` directory:
+
+| File | Description |
+|------|-------------|
+| `sample_products.csv` | Sample product data in CSV format |
+| `sample_products.xlsx` | Sample product data in Excel format |
+
 ## Quick Start
 
 Use the provided `scripts/import_to_seekdb.py` script:
 
 ```bash
 # Import with vectorization on Details column
-python scripts/import_to_seekdb.py products.csv --vectorize-column Details
+python scripts/import_to_seekdb.py import example-data/sample_products.csv --vectorize-column Details
 
 # Import without vectorization
-python scripts/import_to_seekdb.py products.csv
+python scripts/import_to_seekdb.py import example-data/sample_products.csv
 
 # Import Excel with custom collection name
-python scripts/import_to_seekdb.py products.xlsx -v Description -c my_products
+python scripts/import_to_seekdb.py import example-data/sample_products.xlsx -v Description -c my_products
+
+# Delete a collection
+python scripts/import_to_seekdb.py delete my_collection
 ```
+
+> **Note**: To list all collections, use `query_from_seekdb.py list` from the `querying-from-seekdb` skill.
 
 ## Scripts
 
@@ -38,116 +56,110 @@ This skill provides the following scripts in the `scripts/` directory:
 
 | Script | Description |
 |--------|-------------|
-| `import_to_seekdb.py` | Main import script with CLI interface |
-| `embedding_functions.py` | Custom embedding function classes |
-| `data_utils.py` | Data reading and cleaning utilities |
+| `import_to_seekdb.py` | Main script with CLI interface for importing data and managing collections |
+| `read_excel.py` | Read and preview Excel files with detailed information |
+
+### Available Commands
+
+#### import_to_seekdb.py
+
+| Command | Description |
+|---------|-------------|
+| `import <file>` | Import CSV/Excel file to seekdb with optional vectorization |
+| `delete <name>` | Delete a collection from seekdb |
+
+#### read_excel.py
+
+Read and preview Excel files before importing:
+
+```bash
+# Basic preview (show file info and first 5 rows)
+python scripts/read_excel.py example-data/sample_products.xlsx
+
+# List all sheets
+python scripts/read_excel.py example-data/sample_products.xlsx --list-sheets
+
+# Preview specific sheet with more rows
+python scripts/read_excel.py data.xlsx --sheet "Sheet2" --rows 20
+
+# Show column information and statistics
+python scripts/read_excel.py example-data/sample_products.xlsx --columns --stats
+
+# Export to CSV
+python scripts/read_excel.py example-data/sample_products.xlsx --to-csv output.csv
+```
+
+| Option | Description |
+|--------|-------------|
+| `--sheet, -s` | Sheet name to read (default: first sheet) |
+| `--rows, -r` | Number of rows to preview (default: 5) |
+| `--list-sheets, -l` | List all sheets and exit |
+| `--columns, -c` | Show detailed column information |
+| `--stats` | Show statistics for numeric columns |
+| `--to-csv` | Export sheet to CSV file |
+| `--all-rows, -a` | Display all rows |
 
 ## Workflow
 
-### Step 1: Read Data File
+The `import_to_seekdb.py` script automatically handles the following steps:
 
-Use `scripts/data_utils.py`:
-
-```python
-from scripts.data_utils import read_file, clean_dataframe
-
-df = read_file('products.csv')  # or .xlsx
-df = clean_dataframe(df)
-print(f"Columns: {df.columns.tolist()}")
-```
-
-### Step 2: Connect to seekdb
-
-```python
-import pyseekdb
-
-# Embedded mode (local)
-client = pyseekdb.Client()
-
-# Server mode (remote)
-# client = pyseekdb.Client(host="127.0.0.1", port=2881, database="test", user="root", password="")
-```
-
-### Step 3: Create Collection
-
-**With vectorization** (default embedding function):
-
-```python
-collection = client.get_or_create_collection(name="products")
-```
-
-**With custom embedding function** (see `scripts/embedding_functions.py`):
-
-```python
-from scripts.embedding_functions import OllamaEmbeddingFunction
-from pyseekdb import HNSWConfiguration
-
-ef = OllamaEmbeddingFunction(model="bge-m3")
-config = HNSWConfiguration(dimension=ef.dimension, distance='cosine')
-collection = client.get_or_create_collection(name="products", configuration=config, embedding_function=ef)
-```
-
-**Without vectorization**:
-
-```python
-from pyseekdb import HNSWConfiguration
-
-config = HNSWConfiguration(dimension=384, distance='cosine')
-collection = client.get_or_create_collection(name="products", configuration=config, embedding_function=None)
-```
-
-### Step 4: Import Data
-
-```python
-from scripts.data_utils import prepare_import_data
-
-ids, documents, metadatas = prepare_import_data(df, vectorize_column='Details')
-
-# With vectorization
-collection.add(ids=ids, documents=documents, metadatas=metadatas)
-
-# Without vectorization (must provide embeddings)
-# collection.add(ids=ids, embeddings=your_embeddings, metadatas=metadatas)
-```
-
-### Step 5: Verify
-
-```python
-print(f"Total records: {collection.count()}")
-preview = collection.peek(limit=3)
-```
+1. **Read Data File** - Supports CSV (.csv) and Excel (.xlsx, .xls) formats
+2. **Connect to seekdb** - Uses environment variables for server mode, or embedded mode by default
+3. **Create Collection** - With optional vectorization using default embedding function (all-MiniLM-L6-v2, 384 dimensions)
+4. **Import Data** - Batch processing with configurable batch size
+5. **Verify** - Displays record count and data preview after import
 
 ## User Interaction Guide
+
+### For Reading Excel Files
+
+When user wants to preview or inspect an Excel file before importing:
+
+```bash
+# Preview file structure and data
+python scripts/read_excel.py <file_path>
+
+# With column details and statistics
+python scripts/read_excel.py <file_path> --columns --stats
+```
+
+This helps users:
+- Understand the file structure (sheets, columns, row count)
+- Identify which column to vectorize
+- Check data quality before importing
+
+### For Data Import
 
 When user requests data import, ask:
 
 1. **File path**: "Please provide the path to your CSV or Excel file."
+   - If user needs sample data, use files from the `example-data/` directory
+   - Suggest using `read_excel.py` to preview the file first
 2. **Vectorization**: "Would you like to enable vector search by vectorizing a column? (yes/no)"
 3. **Column selection** (if yes): "Which column to vectorize? (e.g., 'Details', 'Description')"
 4. **Collection name**: "Collection name? (default: derived from filename)"
 5. **Connection mode**: "Embedded (local) or server mode?"
 
+### For Collection Management
+
+- **List collections**: Use `query_from_seekdb.py list` from the `querying-from-seekdb` skill
+- **Delete collection**: Run `python scripts/import_to_seekdb.py delete <collection_name>`
+
 ## Embedding Functions
 
-Available in `scripts/embedding_functions.py`:
-
-| Class | Model | Dimension | Requirements |
-|-------|-------|-----------|--------------|
-| `DefaultEmbeddingFunction` | all-MiniLM-L6-v2 | 384 | Built-in |
-| `CustomEmbeddingFunction` | BAAI/bge-m3 | 1024 | sentence-transformers |
-| `OllamaEmbeddingFunction` | bge-m3 | 1024 | Ollama |
-| `RemoteEmbeddingFunction` | Any OpenAI-compatible | Configurable | requests |
+The script uses the default embedding function (all-MiniLM-L6-v2, 384 dimensions) when vectorization is enabled via `--vectorize-column`.
 
 ## Handling Large Files
 
 For files with >10,000 rows, the `import_to_seekdb.py` script uses batch processing automatically. You can configure batch size:
 
 ```bash
-python scripts/import_to_seekdb.py large_file.csv -v Details --batch-size 500
+python scripts/import_to_seekdb.py import large_file.csv -v Details --batch-size 500
 ```
 
 ## References
 
 - [pyseekdb SDK Getting Started](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/10.pyseekdb-sdk-get-started.md)
 - [create_collection API](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/50.apis/200.collection/100.create-collection-of-api.md)
+- [delete_collection API](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/50.apis/200.collection/400.delete-collection-of-api.md)
 - [add API](https://github.com/oceanbase/seekdb-doc/blob/V1.0.0/en-US/450.reference/900.sdk/10.pyseekdb-sdk/50.apis/300.dml/200.add-data-of-api.md)
