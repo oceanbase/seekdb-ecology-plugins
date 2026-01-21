@@ -96,6 +96,36 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 
 > **提示**：你可以将这些环境变量添加到 `~/.bashrc`、`~/.zshrc` 或其他 shell 配置文件中，以便持久化配置。
 
+### 配置 seekdb 连接模式
+
+`importing-to-seekdb` 和 `querying-from-seekdb` 技能支持两种 seekdb 连接模式：
+
+**1. 嵌入式模式（默认）**
+- 无需额外配置
+- 数据存储在本地
+- 直接运行脚本，无需设置任何 seekdb 环境变量
+
+**2. 服务器模式**
+- 连接到远程 seekdb 服务器
+- 配置以下环境变量：
+  ```bash
+  export SEEKDB_HOST=127.0.0.1
+  export SEEKDB_PORT=2881
+  export SEEKDB_USER=root
+  export SEEKDB_PASSWORD=""
+  export SEEKDB_DATABASE=test
+  ```
+
+| 环境变量 | 说明 | 默认值 |
+|---------|------|-------|
+| `SEEKDB_HOST` | 服务器地址（设置后启用服务器模式） | - |
+| `SEEKDB_PORT` | 服务器端口 | 2881 |
+| `SEEKDB_USER` | 用户名 | root |
+| `SEEKDB_PASSWORD` | 密码 | （空） |
+| `SEEKDB_DATABASE` | 数据库名称 | test |
+
+> **注意**：如果未设置 `SEEKDB_HOST`，脚本将自动使用嵌入式模式。
+
 ### 配置网络设置
 
 由于 seekdb 技能插件需要从 GitHub 获取最新文档，你需要在项目目录下配置 Claude Code 允许网络请求。

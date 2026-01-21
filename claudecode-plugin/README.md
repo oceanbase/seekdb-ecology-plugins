@@ -96,6 +96,36 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 
 > **Tip**: You can add these environment variables to your `~/.bashrc`, `~/.zshrc`, or other shell configuration files to persist the configuration.
 
+### Configure seekdb Connection Mode
+
+The `importing-to-seekdb` and `querying-from-seekdb` skills support two connection modes for seekdb:
+
+**1. Embedded Mode (Default)**
+- No additional configuration required
+- Data is stored locally
+- Simply run the scripts without setting any seekdb environment variables
+
+**2. Server Mode**
+- Connect to a remote seekdb server
+- Configure the following environment variables:
+  ```bash
+  export SEEKDB_HOST=127.0.0.1
+  export SEEKDB_PORT=2881
+  export SEEKDB_USER=root
+  export SEEKDB_PASSWORD=""
+  export SEEKDB_DATABASE=test
+  ```
+
+| Environment Variable | Description | Default |
+|---------------------|-------------|---------|
+| `SEEKDB_HOST` | Server host address (if set, enables server mode) | - |
+| `SEEKDB_PORT` | Server port | 2881 |
+| `SEEKDB_USER` | Username | root |
+| `SEEKDB_PASSWORD` | Password | (empty) |
+| `SEEKDB_DATABASE` | Database name | test |
+
+> **Note**: If `SEEKDB_HOST` is not set, the scripts will automatically use embedded mode.
+
 ### Configure Network Settings
 
 Since the seekdb skill plugin needs to fetch the latest documentation from GitHub, you need to configure Claude Code to allow network requests in your project directory.
