@@ -231,7 +231,7 @@ Found 2 results:
 
 **Example 2: Query and export to Excel**
 ```
-Recommend 2 phones with rating above 4.3 and AMOLED screen, export name and price to Excel
+Recommend 2 phones with rating above 4.3 and AMOLED screen, export to Excel
 ```
 
 Claude Code will execute the search and export specified fields to an Excel file:

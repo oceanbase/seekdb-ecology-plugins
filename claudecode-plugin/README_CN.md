@@ -219,7 +219,7 @@ Claude Code 会：
 
 **示例 2：查询并导出到 Excel**
 ```
-推荐 2 款评分 4.3 以上，有 AMOLED 屏幕的手机，并将名称、价格导出为 Excel 文件
+推荐 2 款评分 4.3 以上，有 AMOLED 屏幕的手机，并导出为 Excel 文件
 ```
 
 Claude Code 会执行搜索并将指定字段导出到 Excel 文件：
