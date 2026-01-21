@@ -268,10 +268,13 @@ Claude Code will execute the search and export specified fields to an Excel file
 ```
 Exported 2 records to: amoled_phones.xlsx
 
-| Name                             | Selling Price |
-|----------------------------------|---------------|
-| POCO M4 Pro (Power Black 64 GB)  | 10999         |
-| POCO M4 Pro (Power Black 128 GB) | 11999         |
+┌─────┬──────────────────────────────────┬───────┬─────────┬─────────┬──────────┐
+│  #  │               Name               │ Brand │ Ratings │  Price  │ Discount │
+├─────┼──────────────────────────────────┼───────┼─────────┼─────────┼──────────┤
+│ 1   │ POCO M4 Pro (Power Black 64 GB)  │ POCO  │   4.3   │ ₹10,999 │  38% off │
+├─────┼──────────────────────────────────┼───────┼─────────┼─────────┼──────────┤
+│ 2   │ POCO M4 Pro (Power Black 128 GB) │ POCO  │   4.3   │ ₹11,999 │  40% off │
+└─────┴──────────────────────────────────┴───────┴─────────┴─────────┴──────────┘
 ```
 
 ### Complete Workflow Example
