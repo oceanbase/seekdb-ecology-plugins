@@ -12,7 +12,8 @@ seekdb is a high-performance vector database that provides powerful capabilities
 
 | Plugin Name                                                                             | Use Case                  | Key Features                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| [seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             | Development Tools         | This plugin contains seekdb skill that is designed specifically for Claude Code, aimed at enhancing Claude's capabilities in seekdb database scenarios.                 |
+| [seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             | Development Tools/Data Analysis         | This plugin contains seekdb skill that is designed specifically for Claude Code, aimed at 
+enhancing Claude's capabilities in seekdb database scenarios. data import (CSV/Excel with vectorization), and hybrid search with export |
 | [seekdb Cursor Extension](./cursor-extension/README.md)                            | Development Tools         | Adds seekdb database documentation to Cursor's `.cursor/rules` directory for AI assistant integration |
 
 ---
@@ -21,9 +22,22 @@ seekdb is a high-performance vector database that provides powerful capabilities
 
 ### ✅ seekdb Claude Code Plugin
 
-- **Function**: Provides seekdb database-related documentation support for Claude Code, with built-in complete seekdb official documentation knowledge base supporting document query and retrieval.
+- **Function**: Provides comprehensive seekdb capabilities for Claude Code through three integrated skills:
+  - **seekdb**: Complete official documentation knowledge base with semantic search
+  - **importing-to-seekdb**: Import CSV/Excel files with automatic column vectorization for semantic search
+  - **querying-from-seekdb**: Hybrid search (fulltext + semantic) with metadata filtering and CSV/Excel export
 
-- **Use Case**: When using seekdb database in Claude Code, need to query technical documentation and obtain best practices.
+- **Use Case**: 
+  - Query seekdb technical documentation and best practices
+  - Import product catalogs, documents, or any tabular data into seekdb with vector embeddings
+  - Perform semantic search with metadata filters and export results
+
+- **Example Workflow**:
+  ```
+  1. "How to create a vector collection in seekdb?" → Documentation query
+  2. "Import sample_products.xlsx, vectorize the Details column" → Data import
+  3. "Find phones with rating >= 4.3 and AMOLED screen, export to Excel" → Hybrid search + export
+  ```
 
 - **Documentation**: [seekdb Claude Code Plugin](./claudecode-plugin/README.md)
 
