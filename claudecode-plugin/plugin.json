@@ -1,8 +1,25 @@
 {
-    "name": "seekdb-plugin",
-    "description": "A Claude skill plugin that adds seekdb documentation references to your project's AI documentation files. Enables AI assistants to access seekdb best practices, SQL syntax, Python SDK patterns, vector search, and hybrid search guidelines without cluttering your project with large documentation files.",
-    "version": "0.0.1",
-    "author": {
-      "name": "David Zhang"
+  "name": "seekdb-plugin",
+  "description": "An Agent Skill plugin for seekdb vector database. Provides three skills: (1) Documentation - access seekdb best practices, SQL syntax, Python SDK patterns, vector search and hybrid search guidelines; (2) Import - import CSV/Excel files into seekdb with automatic vectorization; (3) Query - perform semantic search, hybrid search, metadata filtering, and export results to CSV/Excel.",
+  "version": "0.0.1",
+  "author": {
+    "name": "David Zhang"
+  },
+  "skills": [
+    {
+      "name": "seekdb-docs",
+      "path": "skills/seekdb",
+      "description": "Provides documentation and knowledge for seekdb database. When users ask about seekdb topics, automatically locate relevant documentation through the catalog file (remote-first with local fallback)."
+    },
+    {
+      "name": "importing-to-seekdb",
+      "path": "skills/importing-to-seekdb",
+      "description": "Import CSV or Excel files into seekdb vector database and manage collections. Supports automatic vectorization of specified columns using embedding functions. When users need to: (1) Read and preview Excel files, (2) Import CSV/Excel data into seekdb, (3) Create vector collections from tabular data, (4) Vectorize specific text columns for semantic search, (5) Batch insert product/document data with embeddings, or (6) Delete collections."
+    },
+    {
+      "name": "querying-from-seekdb",
+      "path": "skills/querying-from-seekdb",
+      "description": "Query and export data from seekdb vector database. Supports semantic similarity search, hybrid search, metadata filtering, direct retrieval, and export to CSV/Excel. When users need to: (1) Search imported data using natural language queries, (2) Perform semantic similarity search on vectorized data, (3) Combine full-text and vector search (hybrid search), (4) Retrieve records by ID or metadata filters, (5) Export query results to CSV or Excel files, or (6) Query data imported by importing-to-seekdb skill."
     }
-  }
+  ]
+}

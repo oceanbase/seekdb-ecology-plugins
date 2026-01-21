@@ -34,12 +34,45 @@ Provides a complete seekdb database documentation knowledge base with document q
 **Related Documentation:**
 - [SKILL.md](skills/seekdb/SKILL.md)
 
+### 2. importing-to-seekdb
+
+Import CSV or Excel files into seekdb vector database with optional column vectorization for semantic search.
+
+**Features:**
+- Read and preview Excel/CSV files before importing
+- Import data to seekdb collections
+- Automatic vectorization of specified columns using embedding functions (all-MiniLM-L6-v2, 384 dimensions)
+- Batch processing for large files
+- Collection management (create/delete)
+
+**Related Documentation:**
+- [SKILL.md](skills/importing-to-seekdb/SKILL.md)
+
+### 3. querying-from-seekdb
+
+Query and export data from seekdb vector database with support for scalar search, hybrid search, and export to CSV/Excel.
+
+**Features:**
+- Scalar search with metadata filtering
+- Hybrid search combining fulltext and semantic search
+- RRF (Reciprocal Rank Fusion) result ranking
+- Export results to CSV or Excel format
+- Collection information display
+
+**Related Documentation:**
+- [SKILL.md](skills/querying-from-seekdb/SKILL.md)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - Claude Code 1.0 or higher
 - Basic understanding of Claude Skills
+- Python 3.10+ (for importing-to-seekdb and querying-from-seekdb skills)
+- Required Python packages (for data import/query skills):
+  ```bash
+  pip install pyseekdb pandas openpyxl
+  ```
 
 ### Installing Claude Code
 
@@ -62,6 +95,36 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.com"
 ```
 
 > **Tip**: You can add these environment variables to your `~/.bashrc`, `~/.zshrc`, or other shell configuration files to persist the configuration.
+
+### Configure seekdb Connection Mode
+
+The `importing-to-seekdb` and `querying-from-seekdb` skills support two connection modes for seekdb:
+
+**1. Embedded Mode (Default)**
+- No additional configuration required
+- Data is stored locally
+- Simply run the scripts without setting any seekdb environment variables
+
+**2. Server Mode**
+- Connect to a remote seekdb server
+- Configure the following environment variables:
+  ```bash
+  export SEEKDB_HOST=127.0.0.1
+  export SEEKDB_PORT=2881
+  export SEEKDB_USER=root
+  export SEEKDB_PASSWORD=""
+  export SEEKDB_DATABASE=test
+  ```
+
+| Environment Variable | Description | Default |
+|---------------------|-------------|---------|
+| `SEEKDB_HOST` | Server host address (if set, enables server mode) | - |
+| `SEEKDB_PORT` | Server port | 2881 |
+| `SEEKDB_USER` | Username | root |
+| `SEEKDB_PASSWORD` | Password | (empty) |
+| `SEEKDB_DATABASE` | Database name | test |
+
+> **Note**: If `SEEKDB_HOST` is not set, the scripts will automatically use embedded mode.
 
 ### Configure Network Settings
 
@@ -132,6 +195,106 @@ Which AI framework integrations does seekdb support?
 ```
 
 Claude Code will automatically search the documentation library and provide accurate technical guidance.
+
+### Using importing-to-seekdb
+
+Import data files into seekdb with optional vectorization:
+
+**Example 1: Preview Excel file before importing**
+```
+View the sample Excel data in the importing-to-seekdb skill
+```
+
+Claude Code will use `read_excel.py` to display the file structure and preview data:
+```
+File: sample_products.xlsx (11.5 KB)
+Columns: Name, Brand, Selling Price, MRP, Discount, Ratings, No_of_ratings, Details
+Records: 9 mobile phone products
+```
+
+**Example 2: Import Excel data with vectorization**
+```
+Import sample_products.xlsx into seekdb database, vectorize the Details column
+```
+
+Claude Code will:
+1. Ask which column to vectorize (e.g., Details for semantic search)
+2. Ask for collection name (default: derived from filename)
+3. Execute the import with automatic embedding generation
+
+```
+Import Result:
+- Collection: sample_products
+- Records: 9
+- Vectorized column: Details (all-MiniLM-L6-v2, 384 dimensions)
+- Metadata fields: MRP, Name, Brand, Ratings, Discount, No_of_ratings, Selling Price
+```
+
+### Using querying-from-seekdb
+
+Query data from seekdb with hybrid search and export capabilities:
+
+**Example 1: Semantic search with metadata filtering**
+```
+Recommend 2 phones with rating above 4.3 and AMOLED screen
+```
+
+Claude Code will:
+1. First run `--info` to understand the collection structure
+2. Construct a query combining metadata filter (`Ratings >= 4.3`) and semantic search (`AMOLED screen`)
+3. Return matching results ranked by relevance
+
+```
+Found 2 results:
+1. POCO M4 Pro (Power Black 64 GB)
+   - Brand: POCO
+   - Rating: 4.3
+   - Price: 10,999
+   - Screen: 16.33 cm Full HD+ AMOLED Display
+
+2. POCO M4 Pro (Power Black 128 GB)
+   - Brand: POCO
+   - Rating: 4.3
+   - Price: 11,999
+   - Screen: 16.33 cm Full HD+ AMOLED Display
+```
+
+**Example 2: Query and export to Excel**
+```
+Recommend 2 phones with rating above 4.3 and AMOLED screen, export to Excel
+```
+
+Claude Code will execute the search and export specified fields to an Excel file:
+```
+Exported 2 records to: amoled_phones.xlsx
+
+┌─────┬──────────────────────────────────┬───────┬─────────┬─────────┬──────────┐
+│  #  │               Name               │ Brand │ Ratings │  Price  │ Discount │
+├─────┼──────────────────────────────────┼───────┼─────────┼─────────┼──────────┤
+│ 1   │ POCO M4 Pro (Power Black 64 GB)  │ POCO  │   4.3   │ ₹10,999 │  38% off │
+├─────┼──────────────────────────────────┼───────┼─────────┼─────────┼──────────┤
+│ 2   │ POCO M4 Pro (Power Black 128 GB) │ POCO  │   4.3   │ ₹11,999 │  40% off │
+└─────┴──────────────────────────────────┴───────┴─────────┴─────────┴──────────┘
+```
+
+### Complete Workflow Example
+
+Here's a complete workflow demonstrating all three skills together:
+
+1. **Ask about seekdb** (seekdb skill):
+   ```
+   How to create a vector collection in seekdb?
+   ```
+
+2. **Import data** (importing-to-seekdb skill):
+   ```
+   Import the sample_products.xlsx file, vectorize the Details column
+   ```
+
+3. **Query and export** (querying-from-seekdb skill):
+   ```
+   Find all Samsung phones with rating >= 4.4, export to CSV
+   ```
 
 ## 📖 Detailed Usage Guide
 
@@ -214,17 +377,31 @@ claudecode-plugin/
 ├── README_CN.md                        # Chinese documentation
 ├── plugin.json                         # Plugin configuration
 └── skills/
-    └── seekdb/                         # SeekDB skill
+    ├── seekdb/                         # SeekDB documentation skill
+    │   ├── SKILL.md                    # Skill documentation
+    │   └── seekdb-docs/                # Official documentation library
+    │       ├── 10.doc-overview.md      # Documentation overview
+    │       ├── 100.get-started/        # Quick start guide
+    │       ├── 200.develop/            # Development guide
+    │       ├── 300.integrations/       # Integration guide
+    │       ├── 400.guides/             # Operations guide
+    │       ├── 450.reference/          # Reference documentation
+    │       ├── 500.tutorials/          # Practice tutorials
+    │       └── 600.demos/              # Demo projects
+    │
+    ├── importing-to-seekdb/            # Data import skill
+    │   ├── SKILL.md                    # Skill documentation
+    │   ├── scripts/
+    │   │   ├── import_to_seekdb.py     # Main import script
+    │   │   └── read_excel.py           # Excel preview script
+    │   └── example-data/
+    │       ├── sample_products.csv     # Sample CSV data
+    │       └── sample_products.xlsx    # Sample Excel data
+    │
+    └── querying-from-seekdb/           # Data query skill
         ├── SKILL.md                    # Skill documentation
-        └── seekdb-docs/                # Official documentation library
-            ├── 10.doc-overview.md      # Documentation overview
-            ├── 100.get-started/        # Quick start guide
-            ├── 200.develop/            # Development guide
-            ├── 300.integrations/       # Integration guide
-            ├── 400.guides/             # Operations guide
-            ├── 450.reference/          # Reference documentation
-            ├── 500.tutorials/          # Practice tutorials
-            └── 600.demos/              # Demo projects
+        └── scripts/
+            └── query_from_seekdb.py    # Main query script
 ```
 
 ## 🔧 Development & Contribution

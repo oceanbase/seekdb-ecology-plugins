@@ -12,7 +12,7 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
 
 | 插件名称                                                                             | 使用场景                  | 核心功能                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| [seekdb Claude Code Plugin](./claudecode-plugin/README_CN.md)                             | 开发工具         | 为 Claude Code 提供 seekdb 数据库相关文档支持                 |
+| [seekdb Claude Code Plugin](./claudecode-plugin/README_CN.md)                             | 开发工具、数据分析         | Claude Code 技能集：文档查询、数据导入（CSV/Excel 向量化）、混合搜索与导出 |
 | [seekdb Cursor Extension](./cursor-extension/README_CN.md)                            | 开发工具         | 将 seekdb 数据库文档添加到 Cursor 的 `.cursor/rules` 目录，实现 AI 助手集成 |
 
 ---
@@ -21,9 +21,22 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
 
 ### ✅ seekdb Claude Code Plugin
 
-- **功能**：为 Claude Code 提供 seekdb 数据库相关文档支持，内置完整的 seekdb 官方文档知识库，支持文档查询和检索。
+- **功能**：通过三个集成技能为 Claude Code 提供全面的 seekdb 能力：
+  - **seekdb**：完整的官方文档知识库，支持语义搜索
+  - **importing-to-seekdb**：导入 CSV/Excel 文件，自动向量化指定列以支持语义搜索
+  - **querying-from-seekdb**：混合搜索（全文 + 语义），支持元数据过滤和 CSV/Excel 导出
 
-- **使用场景**：在 Claude Code 中使用 seekdb 数据库时，需要查询技术文档和获取最佳实践。
+- **使用场景**：
+  - 查询 seekdb 技术文档和最佳实践
+  - 将产品目录、文档或任何表格数据导入 seekdb 并生成向量嵌入
+  - 执行带元数据过滤的语义搜索并导出结果
+
+- **示例工作流程**：
+  ```
+  1. "如何在 seekdb 中创建向量集合？" → 文档查询
+  2. "将 sample_products.xlsx 导入，向量化 Details 列" → 数据导入
+  3. "找出评分 >= 4.3 且有 AMOLED 屏幕的手机，导出为 Excel" → 混合搜索 + 导出
+  ```
 
 - **文档**：[seekdb Claude Code Plugin](./claudecode-plugin/README_CN.md)
 
