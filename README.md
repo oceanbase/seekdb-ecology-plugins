@@ -12,8 +12,7 @@ seekdb is a high-performance vector database that provides powerful capabilities
 
 | Plugin Name                                                                             | Use Case                  | Key Features                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| [seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             | Development Tools/Data Analysis         | This plugin contains seekdb skill that is designed specifically for Claude Code, aimed at 
-enhancing Claude's capabilities in seekdb database scenarios. data import (CSV/Excel with vectorization), and hybrid search with export |
+| [seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             | Development Tools/Data Analysis         | This plugin contains seekdb skill that is designed specifically for Claude Code, aimed at enhancing Claude's capabilities in seekdb database scenarios. data import (CSV/Excel with vectorization), and hybrid search with export |
 | [seekdb Cursor Extension](./cursor-extension/README.md)                            | Development Tools         | Adds seekdb database documentation to Cursor's `.cursor/rules` directory for AI assistant integration |
 
 ---
