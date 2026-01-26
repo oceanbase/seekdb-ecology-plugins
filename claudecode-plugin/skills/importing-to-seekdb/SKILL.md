@@ -1,6 +1,6 @@
 ---
 name: importing-to-seekdb
-description: "Import CSV or Excel files into seekdb vector database and manage collections. Supports automatic vectorization of specified columns using embedding functions. When users need to: (1) Read and preview Excel files, (2) Import CSV/Excel data into seekdb, (3) Create vector collections from tabular data, (4) Vectorize specific text columns for semantic search, (5) Batch insert product/document data with embeddings, (6) Delete collections, or (7) Access sample data files (sample_products.csv/xlsx) for testing - IMPORTANT: sample files are located in this skill's example-data/ directory, you MUST read this skill file first to get the correct path."
+description: "Import CSV or Excel files into seekdb vector database and manage collections. Supports automatic vectorization of specified columns using embedding functions. When users need to: (1) Read and preview Excel files, (2) Import CSV/Excel data into seekdb, (3) Create vector collections from tabular data, (4) Vectorize specific text columns for semantic search, (5) Batch insert product/document data with embeddings, (6) Delete collections, or (7) Access sample data files (sample_products.csv/xlsx) for testing"
 license: MIT
 ---
 
