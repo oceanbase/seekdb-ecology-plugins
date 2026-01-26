@@ -78,7 +78,10 @@ if host:
     )
 else:
     # Embedded mode
-    client = pyseekdb.Client()
+    seekdb_path = os.path.expanduser("~/.seekdb")
+    # Ensure directory exists
+    os.makedirs(seekdb_path, exist_ok=True)
+    client = pyseekdb.Client(path=seekdb_path)
 
 
 def get_collection(collection_name: str):

@@ -60,7 +60,10 @@ if host:
     )
 else:
     # Embedded mode
-    client = pyseekdb.Client()
+    seekdb_path = os.path.expanduser("~/.seekdb")
+    # Ensure directory exists
+    os.makedirs(seekdb_path, exist_ok=True)
+    client = pyseekdb.Client(path=seekdb_path)
 
 def read_file(file_path: str) -> pd.DataFrame:
     """Read CSV or Excel file into DataFrame."""
