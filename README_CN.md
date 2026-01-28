@@ -12,16 +12,16 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
 
 | 插件名称                                                                             | 使用场景                  | 核心功能                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| [seekdb Agent Skills](./agent-skills/README_CN.md)                             | 开发工具、数据分析         | Claude Code 技能集：文档查询、数据导入（CSV/Excel 向量化）、混合搜索与导出 |
+| [seekdb Agent Skills](./agent-skills/README_CN.md)                             | 开发工具、数据分析         | 为 AI 智能体提供 seekdb 技能：文档知识库、数据导入（CSV/Excel 向量化）、混合搜索与导出 |
 | [seekdb Cursor Extension](./cursor-extension/README_CN.md)                            | 开发工具         | 将 seekdb 数据库文档添加到 Cursor 的 `.cursor/rules` 目录，实现 AI 助手集成 |
 
 ---
 
 ## 📁 插件详情
 
-### ✅ seekdb Claude Code Plugin
+### ✅ seekdb Agent Skills
 
-- **功能**：通过三个集成技能为 Claude Code 提供全面的 seekdb 能力：
+- **技能**：
   - **seekdb**：完整的官方文档知识库，支持语义搜索
   - **importing-to-seekdb**：导入 CSV/Excel 文件，自动向量化指定列以支持语义搜索
   - **querying-from-seekdb**：混合搜索（全文 + 语义），支持元数据过滤和 CSV/Excel 导出
@@ -38,7 +38,7 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
   3. "找出评分 >= 4.3 且有 AMOLED 屏幕的手机，导出为 Excel" → 混合搜索 + 导出
   ```
 
-- **文档**：[seekdb Claude Code Plugin](./agent-skills/README_CN.md)
+- **文档**：[seekdb Agent Skills](./agent-skills/README_CN.md)
 
 ### ✅ seekdb Cursor Extension
 
@@ -54,7 +54,7 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
 
 | 插件名称                           | 文档链接                                                                      |
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
-| seekdb Claude Code Plugin             | [seekdb Claude Code Plugin](./agent-skills/README_CN.md)                             |
+| seekdb Agent Skills             | [seekdb Agent Skills](./agent-skills/README_CN.md)                             |
 | seekdb Cursor Extension          | [seekdb Cursor Extension](./cursor-extension/README_CN.md)                            |
 
 ---
