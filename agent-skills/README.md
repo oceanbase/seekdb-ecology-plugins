@@ -64,11 +64,56 @@ Query and export data from seekdb vector database with support for scalar search
 
 ## 🚀 Quick Start
 
+### Installation Methods
+
+#### Method 1: Using PyPI Installer (Recommended for Multiple Tools)
+
+This package can be installed from PyPI and provides an interactive command-line installer that supports multiple AI coding tools:
+
+```bash
+# Install from PyPI
+pip install seekdb-agent-skills
+
+# Run the interactive installer
+seekdb-agent-skills
+```
+
+The interactive installer will guide you through the installation process:
+
+1. **Project Root Confirmation**: The installer detects your current directory as the project root and asks for confirmation
+2. **Tool Selection**: Choose one tool from the supported list (Claude Code, GitHub Copilot, Codex, Cursor, etc.)
+3. **Skill Selection**: Select which skills to install (you can select multiple skills using Space key)
+4. **Automatic Installation**: The installer automatically copies the selected skills to the correct directories for your chosen tool
+
+**Supported Tools:**
+- Claude Code (`.claude/skills`)
+- Cursor (`.cursor/skills`)
+- Codex (`.codex/skills`)
+- OpenCode (`.opencode/skills`)
+- GitHub Copilot (`.github/skills`)
+- Qoder (`.qoder/skills`)
+- Trae (`.trae/skills`)
+
+**Interactive Features:**
+- Navigate with arrow keys (↑↓)
+- Select multiple skills with Space key
+- Confirm with Enter
+- Cancel anytime with Ctrl+C
+
+#### Method 2: Manual Installation (Claude Code Only)
+
+For Claude Code users who prefer manual installation:
+
+```bash
+git clone https://github.com/oceanbase/seekdb-ecology-plugins.git
+cp -r seekdb-ecology-plugins/agent-skills/skills/* ~/.claude/skills/
+```
+
 ### Prerequisites
 
-- Claude Code 1.0 or higher
-- Basic understanding of Claude Skills
-- Python 3.10+ (for importing-to-seekdb and querying-from-seekdb skills)
+- Claude Code 1.0 or higher (for Claude Code)
+- Python 3.10+ (required for the installer and all skills)
+- Basic understanding of Agent Skills
 - Required Python packages (for data import/query skills):
   ```bash
   pip install pyseekdb pandas openpyxl
@@ -372,36 +417,47 @@ If the skills don't seem to be working:
 ## 📂 Project Structure
 
 ```
-claudecode-plugin/
+agent-skills/
 ├── README.md                           # Project documentation
 ├── README_CN.md                        # Chinese documentation
 ├── plugin.json                         # Plugin configuration
-└── skills/
-    ├── seekdb/                         # SeekDB documentation skill
-    │   ├── SKILL.md                    # Skill documentation
-    │   └── seekdb-docs/                # Official documentation library
-    │       ├── 10.doc-overview.md      # Documentation overview
-    │       ├── 100.get-started/        # Quick start guide
-    │       ├── 200.develop/            # Development guide
-    │       ├── 300.integrations/       # Integration guide
-    │       ├── 400.guides/             # Operations guide
-    │       ├── 450.reference/          # Reference documentation
-    │       ├── 500.tutorials/          # Practice tutorials
-    │       └── 600.demos/              # Demo projects
-    │
-    ├── importing-to-seekdb/            # Data import skill
-    │   ├── SKILL.md                    # Skill documentation
-    │   ├── scripts/
-    │   │   ├── import_to_seekdb.py     # Main import script
-    │   │   └── read_excel.py           # Excel preview script
-    │   └── example-data/
-    │       ├── sample_products.csv     # Sample CSV data
-    │       └── sample_products.xlsx    # Sample Excel data
-    │
-    └── querying-from-seekdb/           # Data query skill
-        ├── SKILL.md                    # Skill documentation
-        └── scripts/
-            └── query_from_seekdb.py    # Main query script
+├── pyproject.toml                      # Python package configuration
+├── MANIFEST.in                         # Package data manifest
+├── upload_to_pypi.py                   # Build and package script
+├── .gitignore                          # Git ignore rules
+├── skills/                             # Skills directory (source)
+│   ├── seekdb/                         # SeekDB documentation skill
+│   │   ├── SKILL.md                    # Skill documentation
+│   │   └── seekdb-docs/                # Official documentation library
+│   │       ├── 10.doc-overview.md      # Documentation overview
+│   │       ├── 100.get-started/        # Quick start guide
+│   │       ├── 200.develop/            # Development guide
+│   │       ├── 300.integrations/       # Integration guide
+│   │       ├── 400.guides/             # Operations guide
+│   │       ├── 450.reference/          # Reference documentation
+│   │       ├── 500.tutorials/          # Practice tutorials
+│   │       └── 600.demos/              # Demo projects
+│   │
+│   ├── importing-to-seekdb/            # Data import skill
+│   │   ├── SKILL.md                    # Skill documentation
+│   │   ├── scripts/
+│   │   │   ├── import_to_seekdb.py     # Main import script
+│   │   │   └── read_excel.py           # Excel preview script
+│   │   └── example-data/
+│   │       ├── sample_products.csv     # Sample CSV data
+│   │       └── sample_products.xlsx    # Sample Excel data
+│   │
+│   └── querying-from-seekdb/           # Data query skill
+│       ├── SKILL.md                    # Skill documentation
+│       └── scripts/
+│           └── query_from_seekdb.py    # Main query script
+│
+└── src/                                # Python package source
+    └── seekdb_plugin_installer/        # Package directory
+        ├── __init__.py
+        ├── main.py                     # CLI entry point (interactive installer)
+        └── skills/                     # Skills (synced during build)
+            └── ...                     # Same structure as root skills/
 ```
 
 ## 🔧 Development & Contribution
@@ -418,6 +474,56 @@ To add a new skill for seekdb:
 ### Updating Documentation
 
 The documentation content for seekdb-docs is located in the `./skills/seekdb-docs/official-docs` directory and can be synchronized based on updates to the seekdb official documentation.
+
+### Building and Publishing to PyPI
+
+This project is packaged as a Python package and can be published to PyPI for easy distribution.
+
+**Package Configuration:**
+- Package name: `seekdb-agent-skills`
+- Entry point: `seekdb-agent-skills` command (defined in `pyproject.toml`)
+- Dependencies: `questionary>=1.10.0` (for interactive CLI)
+
+**Building the Package:**
+
+Use the provided build script to package the project:
+
+```bash
+# Run the build script (syncs skills, builds wheel, cleans up)
+python upload_to_pypi.py
+```
+
+This script will:
+1. Sync the `skills/` directory to `src/seekdb_plugin_installer/skills/`
+2. Build the wheel package using `python -m build`
+3. Clean up by removing the skills from the package directory
+4. Output the built artifacts in the `dist/` directory
+
+**Manual Build Steps:**
+
+If you prefer to build manually:
+
+```bash
+# 1. Sync skills to package directory
+cp -r skills src/seekdb_plugin_installer/
+
+# 2. Build the package
+python -m build
+
+# 3. Clean up (optional)
+rm -rf src/seekdb_plugin_installer/skills
+```
+
+**Publishing to PyPI:**
+
+After building, you can upload to PyPI:
+
+```bash
+# Upload to PyPI (requires authentication)
+python -m twine upload dist/*
+```
+
+**Note:** Make sure to update the version number in `pyproject.toml` before publishing a new release.
 
 ## 📋 About Agent Skills
 

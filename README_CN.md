@@ -12,7 +12,7 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
 
 | 插件名称                                                                             | 使用场景                  | 核心功能                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| [seekdb Claude Code Plugin](./claudecode-plugin/README_CN.md)                             | 开发工具、数据分析         | Claude Code 技能集：文档查询、数据导入（CSV/Excel 向量化）、混合搜索与导出 |
+| [seekdb Agent Skills](./agent-skills/README_CN.md)                             | 开发工具、数据分析         | Claude Code 技能集：文档查询、数据导入（CSV/Excel 向量化）、混合搜索与导出 |
 | [seekdb Cursor Extension](./cursor-extension/README_CN.md)                            | 开发工具         | 将 seekdb 数据库文档添加到 Cursor 的 `.cursor/rules` 目录，实现 AI 助手集成 |
 
 ---
@@ -38,7 +38,7 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
   3. "找出评分 >= 4.3 且有 AMOLED 屏幕的手机，导出为 Excel" → 混合搜索 + 导出
   ```
 
-- **文档**：[seekdb Claude Code Plugin](./claudecode-plugin/README_CN.md)
+- **文档**：[seekdb Claude Code Plugin](./agent-skills/README_CN.md)
 
 ### ✅ seekdb Cursor Extension
 
@@ -54,7 +54,7 @@ seekdb 是一个高性能向量数据库，为 AI 应用提供强大的能力，
 
 | 插件名称                           | 文档链接                                                                      |
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
-| seekdb Claude Code Plugin             | [seekdb Claude Code Plugin](./claudecode-plugin/README_CN.md)                             |
+| seekdb Claude Code Plugin             | [seekdb Claude Code Plugin](./agent-skills/README_CN.md)                             |
 | seekdb Cursor Extension          | [seekdb Cursor Extension](./cursor-extension/README_CN.md)                            |
 
 ---
