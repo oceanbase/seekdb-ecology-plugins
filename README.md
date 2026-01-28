@@ -12,7 +12,7 @@ seekdb is a high-performance vector database that provides powerful capabilities
 
 | Plugin Name                                                                             | Use Case                  | Key Features                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| [seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             | Development Tools/Data Analysis         | This plugin contains seekdb skill that is designed specifically for Claude Code, aimed at enhancing Claude's capabilities in seekdb database scenarios. data import (CSV/Excel with vectorization), and hybrid search with export |
+| [seekdb Agent Skills](./agent-skills/README.md)                             | Development Tools/Data Analysis         | This plugin contains seekdb skill that is designed specifically for Claude Code, aimed at enhancing Claude's capabilities in seekdb database scenarios. data import (CSV/Excel with vectorization), and hybrid search with export |
 | [seekdb Cursor Extension](./cursor-extension/README.md)                            | Development Tools         | Adds seekdb database documentation to Cursor's `.cursor/rules` directory for AI assistant integration |
 
 ---
@@ -38,7 +38,7 @@ seekdb is a high-performance vector database that provides powerful capabilities
   3. "Find phones with rating >= 4.3 and AMOLED screen, export to Excel" → Hybrid search + export
   ```
 
-- **Documentation**: [seekdb Claude Code Plugin](./claudecode-plugin/README.md)
+- **Documentation**: [seekdb Claude Code Plugin](./agent-skills/README.md)
 
 ### ✅ seekdb Cursor Extension
 
@@ -54,7 +54,7 @@ seekdb is a high-performance vector database that provides powerful capabilities
 
 | Plugin Name                           | Documentation Link                                                                      |
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
-| seekdb Claude Code Plugin             | [seekdb Claude Code Plugin](./claudecode-plugin/README.md)                             |
+| seekdb Claude Code Plugin             | [seekdb Claude Code Plugin](./agent-skills/README.md)                             |
 | seekdb Cursor Extension          | [seekdb Cursor Extension](./cursor-extension/README.md)                            |
 
 ---

@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seekdb-agent-skills"
+version = "0.0.1"
+description = "Install seekdb Agent Skills to various AI coding tools (Claude Code, GitHub Copilot, Codex, Cursor, etc.)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "David Zhang"}
+]
+keywords = ["seekdb", "vector-database", "ai", "agent-skills", "claude-code", "copilot", "codex", "cursor"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Database",
+]
+
+dependencies = [
+    "questionary>=1.10.0",
+]
+
+[project.scripts]
+seekdb-agent-skills = "seekdb_plugin_installer.main:main"
+
+[project.urls]
+Homepage = "https://github.com/oceanbase/seekdb-ecology-plugins"
+Documentation = "https://github.com/oceanbase/seekdb-ecology-plugins/tree/main/claudecode-plugin"
+Repository = "https://github.com/oceanbase/seekdb-ecology-plugins"
+Issues = "https://github.com/oceanbase/seekdb-ecology-plugins/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+# Include package data (e.g. skills dir); MANIFEST.in controls what gets included
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+seekdb_plugin_installer = ["skills/**/*"]
