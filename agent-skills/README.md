@@ -1,16 +1,16 @@
 English | [简体中文](README_CN.md)  
-# seekdb Plugin for Claude Code
+# seekdb Agent Skills
 
-> This plugin contains seekdb skill for Claude Code that provides seekdb database-related documents.
+> Contains seekdb Agent Skills, providing seekdb database documentation support and Excel/CSV import and export.
 
 ## 📖 Project Overview
 
-seekdb skill is designed specifically for Claude Code, aimed at enhancing Claude's capabilities in seekdb database scenarios. Through these Skills, Claude Code can query the complete seekdb official documentation and obtain technical guidance and best practices.
+This repository provides seekdb-related Agent Skills to enhance the capabilities of various AI coding assistants (e.g., Cursor, Claude Code) in seekdb database scenarios. Through documentation, import, and query skills, assistants can access seekdb official documentation, import Excel/CSV into seekdb, and perform scalar/hybrid search with result export.
 
 ## ✨ Key Features
 
 - **Complete Documentation Support**: Built-in seekdb official documentation knowledge base covering comprehensive technical documentation
-- **Ready to Use**: Simple configuration to use in Claude Code
+- **Ready to Use**: Simple configuration to use in supported AI coding tools
 
 ## 📦 Included Skills
 
@@ -100,32 +100,38 @@ The interactive installer will guide you through the installation process:
 - Confirm with Enter
 - Cancel anytime with Ctrl+C
 
-#### Method 2: Manual Installation (Claude Code Only)
+#### Method 2: Through Marketplace (Claude Code)
 
-For Claude Code users who prefer manual installation:
+Install with just two commands:
 
-```bash
-git clone https://github.com/oceanbase/seekdb-ecology-plugins.git
-cp -r seekdb-ecology-plugins/agent-skills/skills/* ~/.claude/skills/
-```
+1. **Add the seekdb marketplace**  
+   In Claude Code, run:  
+   `/plugin marketplace add oceanbase/seekdb-ecology-plugins`
+
+2. **Install the plugin**  
+   `/plugin install seekdb-plugin@seekdb`
+
+3. **Restart Claude Code**  
+   After installation, exit and restart Claude Code to ensure the plugin loads correctly.
 
 ### Prerequisites
 
-- Claude Code 1.0 or higher (for Claude Code)
-- Python 3.10+ (required for the installer and all skills)
-- Basic understanding of Agent Skills
-- Required Python packages (for data import/query skills):
+- **Python 3.10+**: Required for the installer and when using the data import/query skills
+- **Basic understanding of Agent Skills**: When using an AI coding tool that supports skills/plugins
+- **Data import/query skills** also require the following Python packages:
   ```bash
   pip install pyseekdb pandas openpyxl
   ```
 
 ### Installing Claude Code
 
-If you haven't installed Claude Code yet, install it using npm:
+If you haven't installed Claude Code yet, install it globally with npm:
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
+
+For other AI coding tools, please refer to their respective official documentation.
 
 ### Configure Environment Variables
 

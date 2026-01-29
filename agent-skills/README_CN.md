@@ -1,16 +1,16 @@
 [English](README.md) | 简体中文
-# seekdb Claude Code 插件
+# seekdb Agent Skills
 
-> 本插件包含 seekdb 的 Claude Code 技能，提供 seekdb 数据库相关文档支持。
+> 包含 seekdb 的 Agent Skills，提供 seekdb 数据库相关文档支持和 Excel/CSV 文件的导入导出。
 
 ## 📖 项目概述
 
-seekdb 技能为 Claude Code 设计，旨在增强 Claude Code 在 seekdb 数据库场景下的能力。通过这些技能，Claude 可以查询完整的 seekdb 官方文档，获取技术指导和最佳实践。
+本仓库提供 seekdb 相关的 Agent Skills，用于增强各类 AI 编程助手（如 Cursor、Claude Code 等）在 seekdb 数据库场景下的能力。通过文档、导入与查询等技能，助手可查阅 seekdb 官方文档、将 Excel/CSV 导入 seekdb，以及进行标量/混合搜索并导出结果。
 
 ## ✨ 核心功能
 
 - **完整文档支持**：内置 seekdb 官方文档知识库，涵盖全面的技术文档
-- **开箱即用**：简单配置即可在 Claude Code 中使用
+- **开箱即用**：简单配置即可在支持的 AI 编程工具中使用
 
 ## 📦 包含的技能
 
@@ -100,18 +100,21 @@ seekdb-agent-skills
 - 使用 Enter 确认
 - 随时可使用 Ctrl+C 取消
 
-#### 方法 2：手动安装（仅限 Claude Code）
+#### 方法 2：通过市场安装（Claude Code）
 
-对于偏好手动安装的 Claude Code 用户：
+只需两条命令即可完成安装：
 
-```bash
-git clone https://github.com/oceanbase/seekdb-ecology-plugins.git
-cp -r seekdb-ecology-plugins/agent-skills/skills/* ~/.claude/skills/
-```
+1. **添加 seekdb 市场**  
+   在 Claude Code 中运行：  
+   `/plugin marketplace add oceanbase/seekdb-ecology-plugins`
+
+2. **安装插件**  
+   `/plugin install seekdb-plugin@seekdb`
+
+3. **重启 Claude Code**  
+   安装完成后，退出并重新启动 Claude Code 以确保插件正确加载。
 
 ### 前置要求
-
-- Claude Code 1.0 或更高版本（用于 Claude Code）
 - Python 3.10+（安装器及所有技能均需要）
 - 对 Agent Skills 的基本了解
 - 数据导入/查询技能所需的 Python 包：
@@ -126,6 +129,8 @@ cp -r seekdb-ecology-plugins/agent-skills/skills/* ~/.claude/skills/
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
+
+其他 AI 编程工具的安装请参照各自的官方文档。
 
 ### 配置环境变量
 
