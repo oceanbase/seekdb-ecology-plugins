@@ -5,12 +5,12 @@
 
 ## 📖 项目概述
 
-本仓库提供 seekdb 相关的 Agent Skills，用于增强各类 AI 编程助手（如 Cursor、Claude Code 等）在 seekdb 数据库场景下的能力。通过文档、导入与查询等技能，助手可查阅 seekdb 官方文档、将 Excel/CSV 导入 seekdb，以及进行标量/混合搜索并导出结果。
+本仓库提供 seekdb 相关的 Agent Skills，用于增强各类 AI 助手（如 Claude Code、OpenClaw 等）在 seekdb 数据库场景下的能力。通过文档、导入与查询等技能，助手可查阅 seekdb 官方文档、将 Excel/CSV 导入 seekdb，以及进行标量/混合搜索并导出结果。
 
 ## ✨ 核心功能
 
 - **完整文档支持**：内置 seekdb 官方文档知识库，涵盖全面的技术文档
-- **开箱即用**：简单配置即可在支持的 AI 编程工具中使用
+- **开箱即用**：简单配置即可在支持的 AI 工具中使用
 
 ## 📦 包含的技能
 
@@ -81,12 +81,13 @@ seekdb-agent-skills
 交互式安装器将引导你完成安装流程：
 
 1. **确认项目根目录**：安装器会检测当前目录作为项目根目录并请你确认
-2. **选择工具**：从支持列表中选择一个工具（Claude Code、GitHub Copilot、Codex、Cursor 等）
+2. **选择工具**：从支持列表中选择一个工具（Claude Code、OpenClaw、Cursor、Codex 等）
 3. **选择技能**：选择要安装的技能（可使用 Space 键多选）
 4. **自动安装**：安装器会将所选技能复制到所选工具对应的目录
 
 **支持的工具：**
 - Claude Code (`.claude/skills`)
+- OpenClaw (`.openclaw/skills`)
 - Cursor (`.cursor/skills`)
 - Codex (`.codex/skills`)
 - OpenCode (`.opencode/skills`)

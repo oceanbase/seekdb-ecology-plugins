@@ -5,12 +5,12 @@ English | [简体中文](README_CN.md)
 
 ## 📖 Project Overview
 
-This repository provides seekdb-related Agent Skills to enhance the capabilities of various AI coding assistants (e.g., Cursor, Claude Code) in seekdb database scenarios. Through documentation, import, and query skills, assistants can access seekdb official documentation, import Excel/CSV into seekdb, and perform scalar/hybrid search with result export.
+This repository provides seekdb-related Agent Skills to enhance the capabilities of various AI assistants (e.g., Claude Code, OpenClaw) in seekdb database scenarios. Through documentation, import, and query skills, assistants can access seekdb official documentation, import Excel/CSV into seekdb, and perform scalar/hybrid search with result export.
 
 ## ✨ Key Features
 
 - **Complete Documentation Support**: Built-in seekdb official documentation knowledge base covering comprehensive technical documentation
-- **Ready to Use**: Simple configuration to use in supported AI coding tools
+- **Ready to Use**: Simple configuration to use in supported AI tools
 
 ## 📦 Included Skills
 
@@ -81,12 +81,13 @@ seekdb-agent-skills
 The interactive installer will guide you through the installation process:
 
 1. **Project Root Confirmation**: The installer detects your current directory as the project root and asks for confirmation
-2. **Tool Selection**: Choose one tool from the supported list (Claude Code, GitHub Copilot, Codex, Cursor, etc.)
+2. **Tool Selection**: Choose one tool from the supported list (Claude Code, OpenClaw, Cursor, Codex, etc.)
 3. **Skill Selection**: Select which skills to install (you can select multiple skills using Space key)
 4. **Automatic Installation**: The installer automatically copies the selected skills to the correct directories for your chosen tool
 
 **Supported Tools:**
 - Claude Code (`.claude/skills`)
+- OpenClaw (`.openclaw/skills`)
 - Cursor (`.cursor/skills`)
 - Codex (`.codex/skills`)
 - OpenCode (`.opencode/skills`)

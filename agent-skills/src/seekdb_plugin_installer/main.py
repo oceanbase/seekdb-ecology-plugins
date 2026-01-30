@@ -16,6 +16,7 @@ except ImportError:
 # Tool configurations: tool name -> skills directory path
 TOOL_CONFIGS: Dict[str, str] = {
     "Claude Code": ".claude/skills",
+    "OpenClaw": ".openclaw/skills",
     "Cursor": ".cursor/skills",
     "Codex": ".codex/skills",
     "OpenCode": ".opencode/skills",
