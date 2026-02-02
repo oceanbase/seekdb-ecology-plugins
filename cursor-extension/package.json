@@ -2,7 +2,7 @@
   "name": "seekdb-for-cursor",
   "displayName": "seekdb",
   "description": "Add seekdb database documentation to .cursor/rules directory, enabling Cursor AI assistant to understand seekdb database knowledge",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.74.0"
   },
