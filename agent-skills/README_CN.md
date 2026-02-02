@@ -87,7 +87,7 @@ seekdb-agent-skills
 
 **支持的工具：**
 - Claude Code (`.claude/skills`)
-- OpenClaw (`.openclaw/skills`)
+- OpenClaw (`~/.openclaw/workspace/skills`)
 - Cursor (`.cursor/skills`)
 - Codex (`.codex/skills`)
 - OpenCode (`.opencode/skills`)

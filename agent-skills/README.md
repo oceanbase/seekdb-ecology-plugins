@@ -87,7 +87,7 @@ The interactive installer will guide you through the installation process:
 
 **Supported Tools:**
 - Claude Code (`.claude/skills`)
-- OpenClaw (`.openclaw/skills`)
+- OpenClaw (`~/.openclaw/workspace/skills`)
 - Cursor (`.cursor/skills`)
 - Codex (`.codex/skills`)
 - OpenCode (`.opencode/skills`)

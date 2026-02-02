@@ -16,7 +16,7 @@ except ImportError:
 # Tool configurations: tool name -> skills directory path
 TOOL_CONFIGS: Dict[str, str] = {
     "Claude Code": ".claude/skills",
-    "OpenClaw": ".openclaw/skills",
+    "OpenClaw": "~/.openclaw/workspace/skills",
     "Cursor": ".cursor/skills",
     "Codex": ".codex/skills",
     "OpenCode": ".opencode/skills",
@@ -50,7 +50,9 @@ def get_tool_skills_path(tool_name: str, project_root: Path) -> Path:
     skills_dir_name = TOOL_CONFIGS.get(tool_name)
     if not skills_dir_name:
         raise ValueError(f"Unknown tool: {tool_name}")
-    
+    path = Path(skills_dir_name)
+    if skills_dir_name.startswith("~"):
+        return path.expanduser()
     return project_root / skills_dir_name
 
 
