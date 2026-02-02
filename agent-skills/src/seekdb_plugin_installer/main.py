@@ -93,7 +93,9 @@ def install_skills(tools: List[str], skills: List[str], project_root: Path) -> N
         sys.exit(1)
     
     print(f"\n📦 Skills source: {package_skills_dir}")
-    print(f"📁 Project root: {project_root}\n")
+    if any(not is_global_tool_path(t) for t in tools):
+        print(f"📁 Project root: {project_root}")
+    print()
     
     for tool in tools:
         tool_skills_path = get_tool_skills_path(tool, project_root)
@@ -184,7 +186,8 @@ def main():
         print("\n📝 Installation Summary:")
         print(f"  Tools: {', '.join(selected_tools)}")
         print(f"  Skills: {', '.join(selected_skills)}")
-        print(f"  Project root: {project_root}")
+        if not all(is_global_tool_path(t) for t in selected_tools):
+            print(f"  Project root: {project_root}")
         
         # Install skills
         install_skills(selected_tools, selected_skills, project_root)
