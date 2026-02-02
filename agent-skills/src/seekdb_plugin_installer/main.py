@@ -56,6 +56,12 @@ def get_tool_skills_path(tool_name: str, project_root: Path) -> Path:
     return project_root / skills_dir_name
 
 
+def is_global_tool_path(tool_name: str) -> bool:
+    """True if this tool uses a global/user path (e.g. ~/.openclaw/...) instead of project-relative path."""
+    path = TOOL_CONFIGS.get(tool_name, "")
+    return path.startswith("~")
+
+
 def copy_skill(source_skill_dir: Path, target_skills_dir: Path, skill_name: str) -> bool:
     """Copy a skill directory to the target location."""
     target_skill_dir = target_skills_dir / skill_name
@@ -113,25 +119,7 @@ def main():
         print("🚀 seekdb Agent Skills Installer")
         print("=" * 50)
         
-        # Find project root
-        project_root = Path.cwd()
-        print(f"📁 project root: {project_root}")
-        
-        # Ask user to confirm or change project root
-        try:
-            confirm_root = questionary.confirm(
-                f"Install skills to this directory?",
-                default=True
-            ).ask()
-        except KeyboardInterrupt:
-            print("\n\nInstallation cancelled by user.")
-            sys.exit(0)
-        
-        if not confirm_root:
-            print("Installation cancelled.")
-            sys.exit(0)
-        
-        # Select tools
+        # Select tool first (path type affects project root prompt)
         print("\n📋 Select tool to install to:")
         try:
             selected_tool = questionary.select(
@@ -146,6 +134,34 @@ def main():
             print("No tool selected. Exiting.")
             sys.exit(0)
         selected_tools = [selected_tool]
+        
+        # Confirm install path: project-relative vs global (e.g. OpenClaw)
+        project_root = Path.cwd()
+        if is_global_tool_path(selected_tool):
+            install_path = get_tool_skills_path(selected_tool, project_root)
+            print(f"\n📁 Skills will be installed to: {install_path}")
+            try:
+                confirm = questionary.confirm("Continue?", default=True).ask()
+            except KeyboardInterrupt:
+                print("\n\nInstallation cancelled by user.")
+                sys.exit(0)
+            if not confirm:
+                print("Installation cancelled.")
+                sys.exit(0)
+        else:
+            print(f"\n📁 Project root: {project_root}")
+            print(f"   (Skills will be installed under {TOOL_CONFIGS[selected_tool]})")
+            try:
+                confirm_root = questionary.confirm(
+                    "Install skills to this directory?",
+                    default=True
+                ).ask()
+            except KeyboardInterrupt:
+                print("\n\nInstallation cancelled by user.")
+                sys.exit(0)
+            if not confirm_root:
+                print("Installation cancelled.")
+                sys.exit(0)
         
         # Select skills
         print("\n📦 Select skills to install:")
