@@ -52,7 +52,7 @@ The catalog is organized into these main categories:
 Once you've identified the matching entry, construct the full URL and fetch the document:
 
 - Full URL = `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/` + File Path
-- Example: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md`
+- Example: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
 
 Fetch the document content from this URL to answer the user.
 
@@ -64,7 +64,7 @@ Fetch the document content from this URL to answer the user.
 **Process**:
 1. Fetch remote catalog: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
 2. Find entries under "Vector Search" section
-3. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/100.vector-search-overview/100.vector-search-intro.md`
+3. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/300.vector-search/100.vector-search-intro.md`
 
 ### Example 2: Overview Query
 **User**: "What is seekdb?"
@@ -81,7 +81,7 @@ Fetch the document content from this URL to answer the user.
 **Process**:
 1. Already have the catalog from previous fetch
 2. Find entries under "Hybrid Search" section from the catalog
-3. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`
+3. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/500.hybrid-search.md`
 
 ### Example 4: Integration Query
 **User**: "I want to integrate seekdb with jina"

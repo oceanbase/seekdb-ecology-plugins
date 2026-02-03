@@ -66,11 +66,11 @@ Once you've identified the matching entry, construct the full URL or path based 
 
 **If using remote (preferred):**
 - Full URL = `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/` + File Path
-- Example: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md`
+- Example: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
 
 **If using local (fallback):**
 - Local path = `seekdb-docs/` + File Path
-- Example: `seekdb-docs/200.develop/100.vector-search/300.vector-similarity-search.md`
+- Example: `seekdb-docs/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
 
 ## Examples
 
@@ -81,7 +81,7 @@ Once you've identified the matching entry, construct the full URL or path based 
 1. Fetch remote catalog: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
 2. Remote access succeeds → mark conversation as "remote mode"
 3. Find entries under "Vector Search" section
-4. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/100.vector-search/100.vector-search-overview/100.vector-search-intro.md`
+4. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/300.vector-search/100.vector-search-intro.md`
 
 ### Example 2: Local Fallback
 **User**: "What is seekdb?"
@@ -100,7 +100,7 @@ Once you've identified the matching entry, construct the full URL or path based 
 1. Already in "remote mode" for this conversation
 2. No need to re-check catalog source
 3. Find entries under "Hybrid Search" section from previously fetched catalog
-4. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`
+4. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/500.hybrid-search.md`
 
 ### Example 4: Integration Query
 **User**: "I want to integrate seekdb with jina"
