@@ -435,7 +435,13 @@ agent-skills/
 ├── skills/                             # Skills directory (source)
 │   ├── seekdb/                         # SeekDB documentation skill
 │   │   ├── SKILL.md                    # Skill documentation
-│   │   └── seekdb-docs/                # Official documentation library
+│   │   ├── references/                 # Quick index and metadata
+│   │   │   ├── quick-index.md          # Quick search index (383 lines)
+│   │   │   ├── examples.md             # Usage examples
+│   │   │   └── catalog-index.json      # JSON catalog
+│   │   ├── scripts/                    # Utility scripts
+│   │   │   └── update_docs.sh          # Update documentation from GitHub
+│   │   └── seekdb-docs/                # Official documentation library (local-first)
 │   │       ├── 10.doc-overview.md      # Documentation overview
 │   │       ├── 100.get-started/        # Quick start guide
 │   │       ├── 200.develop/            # Development guide
