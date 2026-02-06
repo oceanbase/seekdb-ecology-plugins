@@ -1,6 +1,8 @@
 ---
 name: seekdb-docs
 description: seekdb database documentation lookup. Use when users ask about seekdb features, SQL syntax, vector search, hybrid search, integrations, deployment, or any seekdb-related topics. Automatically locates relevant docs via catalog-based semantic search.
+version: "V1.1.0"
+docs_repo: "https://github.com/davidzhangbj/seekdb-doc.git"
 ---
 
 # seekdb Documentation
