@@ -40,8 +40,6 @@ Provides comprehensive access to seekdb database documentation through a central
    Docs base =: <skill directory>seekdb-docs/
    ```
 
-**Why this works**: The `read` tool returns the absolute path, giving you a reliable anchor regardless of where the agent was invoked.
-
 ## Documentation Sources
 
 ### Full Catalog
@@ -82,7 +80,7 @@ read("SKILL.md")
 
 ### Step 1: Search Catalog
 
-**IMPORTANT**: Always start with grep for keyword searches. Only load full catalog when necessary.
+Start with grep for keyword searches. Only load full catalog when necessary.
 
 #### Method 1: Grep Search (Preferred for 90% of queries)
 
