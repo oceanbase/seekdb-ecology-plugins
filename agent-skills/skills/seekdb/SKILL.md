@@ -80,9 +80,36 @@ read("SKILL.md")
 # Example: /root/.claude/skills/seekdb/SKILL.md → /root/.claude/skills/seekdb/
 ```
 
-### Step 1: Load Full Catalog
+### Step 1: Search Catalog
 
-Load the complete documentation catalog:
+**IMPORTANT**: Always start with grep for keyword searches. Only load full catalog when necessary.
+
+#### Method 1: Grep Search (Preferred for 90% of queries)
+
+Use grep to search for keywords in the catalog:
+```bash
+grep -i "keyword" <skill directory>references/seekdb-docs-catalog.jsonl
+```
+
+**Examples**:
+```bash
+# Find macOS deployment docs
+grep -i "mac" references/seekdb-docs-catalog.jsonl
+
+# Find Docker deployment docs
+grep -i "docker\|container" references/seekdb-docs-catalog.jsonl
+
+# Find vector search docs
+grep -i "vector" references/seekdb-docs-catalog.jsonl
+```
+
+#### Method 2: Load Full Catalog (Only when necessary)
+
+Load the complete catalog only when:
+- Grep returns no results
+- Complex semantic matching is required
+- No specific keyword to search
+
 ```
 Local: <skill directory>references/seekdb-docs-catalog.jsonl
 Remote: https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl (fallback)
@@ -101,12 +128,21 @@ Entries: 1015 documentation files
 
 ### Step 2: Match Query
 
-Search the full catalog for semantic matches:
-- **Search descriptions**: Match against detailed document descriptions
-- **Extract context**: Description contains topic and feature keywords
-- **Multiple results**: Return all relevant entries for comprehensive answers
+Analyze search results to identify the most relevant documents:
 
-Note: The catalog contains `path` and `description` fields. Semantic matching is performed on the description text, which includes relevant keywords and context.
+**For grep results**:
+- Review matched lines from grep output
+- Extract `path` and `description` from each match
+- Select documents whose descriptions best match the query
+- Consider multiple matches for comprehensive answers
+
+**For full catalog**:
+- Parse each line as JSON to extract path and description
+- Perform semantic matching on description text
+- Match by meaning, not just keywords
+- Return all relevant entries for comprehensive answers
+
+Note: The catalog contains `path` and `description` fields. The `description` field contains topic and feature keywords, making it suitable for both keyword and semantic matching.
 
 ### Step 3: Read Document
 
@@ -126,11 +162,13 @@ Query: "How to integrate with Claude Code?"
 1. Resolve path: read(SKILL.md) → /root/.claude/skills/seekdb/SKILL.md
    Skill directory =: /root/.claude/skills/seekdb/
 
-2. Load catalog: /root/.claude/skills/seekdb/references/seekdb-docs-catalog.jsonl
+2. Search catalog with grep:
+   grep -i "claude code" references/seekdb-docs-catalog.jsonl
 
-3. Search catalog → Found Claude Code entry:
-   {"path": "300.integrations/300.developer-tools/700.claude-code.md",
-    "description": "This guide explains how to use the seekdb plugin with Claude Code..."}
+3. Match query from grep results:
+   → Found: {"path": "300.integrations/300.developer-tools/700.claude-code.md",
+             "description": "This guide explains how to use the seekdb plugin with Claude Code..."}
+   → This matches the query, select this document
 
 4. Read doc:
    Try: /root/.claude/skills/seekdb/seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md
