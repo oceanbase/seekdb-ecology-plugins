@@ -101,13 +101,13 @@ Complete workflow examples for common seekdb documentation queries using **local
    - Query: "macOS", "deploy", "systemd"
    - Found entry:
      ```json
-     {"path": "400.guides/200.deployment/500.deploy-with-systemd.md",
-      "description": "This document provides instructions for deploying and managing the seekdb database using systemd on RPM-based, DEB-based, and macOS systems..."}
+     {"path": "400.guides/400.deploy/700.server-mode/100.deploy-by-systemd.md",
+      "description": "This document provides instructions for deploying and managing the seekdb database using systemd on RPM-based, DEB-based, and macOS systems, covering installation, configuration, connection, and removal procedures."}
      ```
 
 5. **Read document (remote only, since local missing)**
    ```
-   URL: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/400.guides/200.deployment/500.deploy-with-systemd.md
+   URL: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/400.guides/400.deploy/700.server-mode/100.deploy-by-systemd.md
    Fetch and parse
    ```
 
@@ -194,7 +194,7 @@ Complete workflow examples for common seekdb documentation queries using **local
    - Found multiple matches:
      ```json
      {"path": "200.develop/600.search/300.vector-search/200.vector-index/100.vector-index-overview.md", "description": "...vector index types..."}
-     {"path": "200.develop/300.read-and-write-data/200.read-data/300.full-text-index.md", "description": "...full-text indexes..."}
+     {"path": "200.develop/200.design-database-schema/35.multi-model/300.char-and-text/300.full-text-index.md", "description": "This document details the creation and use of full-text indexes in seekdb, covering supported column types, tokenizers, and complex DML operations on indexed tables."}
      {"path": "200.develop/200.design-database-schema/40.create-index-in-develop.md", "description": "...creating indexes..."}
      ```
 
@@ -222,7 +222,7 @@ Complete workflow examples for common seekdb documentation queries using **local
      ```json
      {"path": "100.get-started/50.use-seekdb-with-sdk/25.using-seekdb-in-python-sdk.md",
       "description": "This document provides a step-by-step guide to using OceanBase's pyseekdb Python SDK for embedded seekdb operations..."}
-     {"path": "200.develop/100.connect-to-seekdb/300.sample-program/200.python/...", "description": "..."}
+     {"path": "200.develop/100.connect-to-seekdb/300.sample-program/200.python/100.mysqlclient-connection-to-seekdb-sample-program.md", "description": "This document provides a sample program demonstrating how to connect to seekdb using mysqlclient in Python, including steps for creating tables, inserting data, and querying data."}
      ```
 
 3. **Read documents** (local)
@@ -243,7 +243,7 @@ Complete workflow examples for common seekdb documentation queries using **local
    - Query: "production deployment", "install"
    - Found entries:
      ```json
-     {"path": "400.guides/200.deployment/...", "description": "...deployment instructions..."}
+     {"path": "400.guides/400.deploy/50.deploy-overview.md", "description": "This documentation outlines seekdb's two deployment modes: embedded mode and server mode, and details the specific deployment methods available for each mode."}
      ```
 
 3. **Read deployment guides** (local)
