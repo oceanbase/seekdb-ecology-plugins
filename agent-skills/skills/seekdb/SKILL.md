@@ -44,7 +44,7 @@ Provides comprehensive access to seekdb database documentation through a central
 
 ### Full Catalog
 - **Local**: `<skill directory>references/seekdb-docs-catalog.jsonl` (1015 entries, JSONL format)
-- **Remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl` (fallback)
+- **Remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl` (fallback)
 - **Entries**: 1015 documentation files
 - **Coverage**: Complete seekdb documentation
 - **Format**: JSONL - one JSON object per line with path and description
@@ -110,7 +110,7 @@ Load the complete catalog only when:
 
 ```
 Local: <skill directory>references/seekdb-docs-catalog.jsonl
-Remote: https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl (fallback)
+Remote: https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl (fallback)
 Format: JSONL (one JSON object per line)
 Entries: 1015 documentation files
 ```

@@ -93,7 +93,7 @@ Complete workflow examples for common seekdb documentation queries using **local
 
 3. **Fallback to remote catalog**
    ```
-   Fetch: https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl
+   Fetch: https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl
    Result: Success ✅
    ```
 
@@ -265,7 +265,7 @@ Complete workflow examples for common seekdb documentation queries using **local
 
 ### Catalog Loading (Local-First)
 1. Try local catalog: `<skill directory>references/seekdb-docs-catalog.jsonl`
-2. If missing, fetch remote: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl`
+2. If missing, fetch remote: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl`
 3. Parse JSONL (one JSON object per line)
 
 ### Searching
