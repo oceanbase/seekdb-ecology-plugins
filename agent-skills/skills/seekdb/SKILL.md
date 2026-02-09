@@ -11,7 +11,7 @@ Provides comprehensive access to seekdb database documentation through a central
 ## Quick Start
 
 1. **Locate skill directory** (see Path Resolution below)
-2. **Load full catalog** (951 documentation entries)
+2. **Load full catalog** (1015 documentation entries)
 3. **Match query** to catalog entries semantically
 4. **Read document** from matched entry
 
@@ -36,7 +36,7 @@ Provides comprehensive access to seekdb database documentation through a central
 
 3. **Construct paths** using this directory:
    ```
-   Catalog path =: <skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
+   Catalog path =: <skill directory>references/seekdb-docs-catalog.jsonl
    Docs base =: <skill directory>seekdb-docs/
    ```
 
@@ -45,10 +45,11 @@ Provides comprehensive access to seekdb database documentation through a central
 ## Documentation Sources
 
 ### Full Catalog
-- **Local**: `<skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md` (3969 lines, if local docs exist)
-- **Remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md` (fallback)
-- **Entries**: 951 documentation files
+- **Local**: `<skill directory>references/seekdb-docs-catalog.jsonl` (1015 entries, JSONL format)
+- **Remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl` (fallback)
+- **Entries**: 1015 documentation files
 - **Coverage**: Complete seekdb documentation
+- **Format**: JSONL - one JSON object per line with path and description
 
 ### Complete Documentation (Local-First with Remote Fallback)
 
@@ -63,9 +64,9 @@ Provides comprehensive access to seekdb database documentation through a central
 
 **Strategy**:
 1. **Locate**: Determine `<skill directory>` using path resolution above
-2. **Load**: Load full catalog (3969 lines) with all 951 documentation entries
+2. **Load**: Load full catalog (1015 entries) - try local first, fallback to remote
 3. **Search**: Semantic search through all catalog entries
-4. **Read**: Try local first, fallback to remote URL if missing
+4. **Read**: Try local docs first, fallback to remote URL if missing
 
 ## Workflow
 
@@ -83,25 +84,29 @@ read("SKILL.md")
 
 Load the complete documentation catalog:
 ```
-Local: <skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
-Remote: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md (fallback)
-Size: 3969 lines
-Entries: 951 documentation files
+Local: <skill directory>references/seekdb-docs-catalog.jsonl
+Remote: https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl (fallback)
+Format: JSONL (one JSON object per line)
+Entries: 1015 documentation files
 ```
 
+**Strategy**:
+1. Try local catalog first: `<skill directory>references/seekdb-docs-catalog.jsonl`
+2. If local missing, fetch from remote URL above
+
 **Catalog contents**:
-- All seekdb documentation organized by category
-- Complete metadata: title, path, keywords, topics, summary, description
-- Structured format for easy semantic matching
+- Each line: {"path": "...", "description": "..."}
+- All seekdb documentation indexed
+- Optimized for semantic search and grep queries
 
 ### Step 2: Match Query
 
 Search the full catalog for semantic matches:
-- **Search titles**: Match document titles
-- **Match keywords**: Extracted keywords from each document
-- **Match topics**: Category and topic labels
-- **Match descriptions**: Detailed descriptions for context
+- **Search descriptions**: Match against detailed document descriptions
+- **Extract context**: Description contains topic and feature keywords
 - **Multiple results**: Return all relevant entries for comprehensive answers
+
+Note: The catalog contains `path` and `description` fields. Semantic matching is performed on the description text, which includes relevant keywords and context.
 
 ### Step 3: Read Document
 
@@ -121,12 +126,11 @@ Query: "How to integrate with Claude Code?"
 1. Resolve path: read(SKILL.md) → /root/.claude/skills/seekdb/SKILL.md
    Skill directory =: /root/.claude/skills/seekdb/
 
-2. Load catalog: /root/.claude/skills/seekdb/seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
+2. Load catalog: /root/.claude/skills/seekdb/references/seekdb-docs-catalog.jsonl
 
 3. Search catalog → Found Claude Code entry:
-   Path: 300.integrations/300.developer-tools/700.claude-code.md
-   Keywords: claude, code, integration, mcp
-   Topics: integration, developer-tools
+   {"path": "300.integrations/300.developer-tools/700.claude-code.md",
+    "description": "This guide explains how to use the seekdb plugin with Claude Code..."}
 
 4. Read doc:
    Try: /root/.claude/skills/seekdb/seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md
@@ -136,12 +140,38 @@ Query: "How to integrate with Claude Code?"
 ## Guidelines
 
 - **Always resolve path first**: Use the read-your-SKILL.md trick to get the absolute path
-- **Always use full catalog**: Load complete catalog for comprehensive search (951 entries)
+- **Always use full catalog**: Load complete catalog for comprehensive search (1015 entries)
 - **Semantic matching**: Match by meaning, not just keywords
 - **Multiple matches**: Read all relevant entries for comprehensive answers
-- **Local-first with remote fallback**: Try local docs first, use remote if missing
+- **Local-first with remote fallback**: Try local docs first, use remote URL if missing
 - **Optional local docs**: Run `scripts/update_docs.sh` to download full docs locally (faster)
 - **Offline capable**: With local docs present, works completely offline
+
+## Catalog Search Format
+
+The catalog file is in **JSONL format** (one JSON object per line):
+
+```json
+{"path": "path/to/document.md", "description": "Document description text"}
+```
+
+**Searching the catalog**:
+
+**Preferred method** - Read the full catalog:
+- Read the entire catalog file
+- Parse each line as JSON to extract path and description
+- Perform semantic matching on description text
+
+**Quick keyword search** - Use grep:
+```bash
+grep -i "keyword" references/seekdb-docs-catalog.jsonl
+```
+Each matched line contains both path and description together.
+
+**Why JSONL is better**:
+- ✅ One line per document - grep shows complete information
+- ✅ Structured data - easy to parse with JSON tools
+- ✅ No special flags needed - works naturally with grep, jq, etc.
 
 ## Common Installation Paths
 
