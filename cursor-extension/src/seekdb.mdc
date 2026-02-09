@@ -70,9 +70,9 @@ https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/{File Path}
 ```
 
 **Example:**
-- File Path from catalog: `200.develop/100.vector-search/300.vector-similarity-search.md`
-- Full Raw URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md`
-- Command: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/100.vector-search/300.vector-similarity-search.md"`
+- File Path from catalog: `200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
+- Full Raw URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
+- Command: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/600.search/300.vector-search/300.vector-similarity-search.md"`
 
 ### Step 4: Provide Answer with Citations
 
@@ -108,8 +108,8 @@ From the catalog, identify the `File Path` of relevant documents based on:
 ```
 
 **Example:**
-- File Path from catalog: `200.develop/100.vector-search/300.vector-similarity-search.md`
-- Full local path: `.cursor/rules/seekdb-docs/200.develop/100.vector-search/300.vector-similarity-search.md`
+- File Path from catalog: `200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
+- Full local path: `.cursor/rules/seekdb-docs/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
 
 Use `read_file` to read the documentation file at the constructed path.
 
