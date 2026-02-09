@@ -2,7 +2,7 @@
 name: seekdb-docs
 description: seekdb database documentation lookup. Use when users ask about seekdb features, SQL syntax, vector search, hybrid search, integrations, deployment, or any seekdb-related topics. Automatically locates relevant docs via catalog-based semantic search.
 version: "V1.1.0"
-docs_repo: "https://github.com/davidzhangbj/seekdb-doc.git"
+docs_repo: "https://github.com/oceanbase/seekdb-doc.git"
 ---
 
 # seekdb Documentation
@@ -47,7 +47,7 @@ Provides comprehensive access to seekdb database documentation through a central
 
 ### Full Catalog
 - **Local**: `<skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md` (3969 lines, if local docs exist)
-- **Remote**: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md` (fallback)
+- **Remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md` (fallback)
 - **Entries**: 951 documentation files
 - **Coverage**: Complete seekdb documentation
 
@@ -59,7 +59,7 @@ Provides comprehensive access to seekdb database documentation through a central
 - **Document Path**: Base Path + File Path
 
 **Remote Documentation** (fallback):
-- **Base URL**: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/`
+- **Base URL**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/`
 - **Document URL**: Base URL + File Path
 
 **Strategy**:
@@ -85,7 +85,7 @@ read("SKILL.md")
 Load the complete documentation catalog:
 ```
 Local: <skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
-Remote: https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md (fallback)
+Remote: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md (fallback)
 Size: 3969 lines
 Entries: 951 documentation files
 ```
@@ -112,7 +112,7 @@ Search the full catalog for semantic matches:
    - If file exists → read locally (fast)
    - If file missing → proceed to step 2
 
-2. **Fallback to remote**: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/[File Path]`
+2. **Fallback to remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/[File Path]`
    - Download from GitHub
 
 **Example**:
@@ -131,7 +131,7 @@ Query: "How to integrate with Claude Code?"
 
 4. Read doc:
    Try: /root/.claude/skills/seekdb/seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md
-   If missing: https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/300.integrations/300.developer-tools/700.claude-code.md
+   If missing: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/300.integrations/300.developer-tools/700.claude-code.md
 ```
 
 ## Guidelines

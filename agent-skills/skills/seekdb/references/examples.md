@@ -10,7 +10,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 1. **Fetch remote catalog**
    ```
-   URL: https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md
+   URL: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md
    Result: Success → Mark conversation as "remote mode"
    ```
 
@@ -24,7 +24,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 3. **Fetch relevant document**
    - File Path: `200.develop/100.vector-search/100.vector-search-overview/100.vector-search-intro.md`
-   - Full URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/200.develop/100.vector-search/100.vector-search-overview/100.vector-search-intro.md`
+   - Full URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/100.vector-search/100.vector-search-overview/100.vector-search-intro.md`
 
 4. **Read and extract answer**
 
@@ -38,7 +38,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 1. **Try remote catalog**
    ```
-   URL: https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md
+   URL: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md
    Result: Network error/timeout → Fallback to local
    ```
 
@@ -76,7 +76,7 @@ Complete workflow examples for common seekdb documentation queries.
   3. Search previously fetched catalog for "hybrid search"
   4. Found under "Hybrid Search" section
   5. File Path: `200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`
-  6. Fetch remote: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`
+  6. Fetch remote: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`
 - Answer: Provided from remote docs
 
 **Key**: Once remote succeeds, all subsequent queries in the same conversation use remote without re-checking.
@@ -99,7 +99,7 @@ Complete workflow examples for common seekdb documentation queries.
    - File Path: `300.integrations/200.model-platforms/100.jina.md`
 
 3. **Fetch document**
-   - Remote URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/300.integrations/200.model-platforms/100.jina.md`
+   - Remote URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/300.integrations/200.model-platforms/100.jina.md`
 
 4. **Extract integration steps and code examples**
 
@@ -123,7 +123,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 3. **Read relevant documents**
    - File Path: `450.reference/200.sql/100.sql-syntax/200.data-type/300.vector-type.md`
-   - URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/450.reference/200.sql/100.sql-syntax/200.data-type/300.vector-type.md`
+   - URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/200.sql/100.sql-syntax/200.data-type/300.vector-type.md`
 
 4. **Provide syntax with examples**
 
@@ -148,7 +148,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 3. **Read deployment documentation**
    - File Path: `400.guides/100.deployment/100.production-deployment.md`
-   - URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/400.guides/100.deployment/100.production-deployment.md`
+   - URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/400.guides/100.deployment/100.production-deployment.md`
 
 4. **Extract deployment steps and recommendations**
 
@@ -169,7 +169,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 3. **Read error code documentation**
    - File Path: `450.reference/400.error-code/100.error-code-list.md`
-   - URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/450.reference/400.error-code/100.error-code-list.md`
+   - URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/400.error-code/100.error-code-list.md`
 
 4. **Locate error 4200 and provide explanation**
 
@@ -190,7 +190,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 3. **Read tutorial**
    - File Path: `500.tutorials/100.ai-applications/200.rag-tutorial.md`
-   - URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/500.tutorials/100.ai-applications/200.rag-tutorial.md`
+   - URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/500.tutorials/100.ai-applications/200.rag-tutorial.md`
 
 4. **Extract step-by-step tutorial with code examples**
 
@@ -211,7 +211,7 @@ Complete workflow examples for common seekdb documentation queries.
 
 3. **Read SDK reference**
    - File Path: `450.reference/500.sdk/100.python-sdk/100.api-reference.md`
-   - URL: `https://raw.githubusercontent.com/davidzhangbj/seekdb-doc/V1.1.0/en-US/450.reference/500.sdk/100.python-sdk/100.api-reference.md`
+   - URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/500.sdk/100.python-sdk/100.api-reference.md`
 
 4. **List available SDK methods with signatures**
 
