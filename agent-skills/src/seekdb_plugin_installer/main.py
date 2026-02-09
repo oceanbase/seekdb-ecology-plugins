@@ -27,7 +27,7 @@ TOOL_CONFIGS: Dict[str, str] = {
 
 # Available skills to install
 AVAILABLE_SKILLS = [
-    "seekdb-docs",
+    "seekdb",
     "importing-to-seekdb",
     "querying-from-seekdb",
 ]
