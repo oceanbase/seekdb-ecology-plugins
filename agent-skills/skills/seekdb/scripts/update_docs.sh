@@ -18,9 +18,7 @@ TARGET_DIR="$(dirname "$0")/../seekdb-docs"
 # Extract version from SKILL.md frontmatter
 VERSION=$(grep "^version:" "$SKILL_MD" | cut -d'"' -f2)
 
-# Extract repo URL from SKILL.md frontmatter (if defined), otherwise use default
-REPO_URL=$(grep "^docs_repo:" "$SKILL_MD" | cut -d'"' -f2)
-REPO_URL=${REPO_URL:-"https://github.com/oceanbase/seekdb-doc.git"}  # Fallback to default
+REPO_URL="https://github.com/oceanbase/seekdb-doc.git"
 
 BRANCH="$VERSION"
 TEMP_DIR="/tmp/seekdb-doc-update"
