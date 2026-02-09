@@ -1,145 +1,172 @@
 ---
 name: seekdb-docs
-description: Provides documentation and knowledge for seekdb database. When users ask about seekdb topics, automatically locate relevant documentation through the catalog file (remote-first with local fallback).
+description: seekdb database documentation lookup. Use when users ask about seekdb features, SQL syntax, vector search, hybrid search, integrations, deployment, or any seekdb-related topics. Automatically locates relevant docs via catalog-based semantic search.
+version: "V1.1.0"
+docs_repo: "https://github.com/oceanbase/seekdb-doc.git"
 ---
 
-# seekdb Documentation Skill
+# seekdb Documentation
 
-This skill provides comprehensive documentation for the seekdb database. When users ask about seekdb-related topics, you should use the documentation catalog to locate and read the relevant documentation.
+Provides comprehensive access to seekdb database documentation through a centralized catalog system.
 
-## Documentation Access Strategy
+## Quick Start
 
-This skill supports both remote and local documentation access with the following priority:
+1. **Locate skill directory** (see Path Resolution below)
+2. **Load full catalog** (951 documentation entries)
+3. **Match query** to catalog entries semantically
+4. **Read document** from matched entry
 
-### Remote-First, Local-Fallback
+## Path Resolution (Critical First Step)
 
-1. **First Attempt**: Try to access the remote documentation catalog
-2. **Fallback**: If remote access fails, use the local documentation files
-3. **Consistency**: Once remote access succeeds in a conversation, continue using remote files for that entire conversation
+**Problem**: Relative paths like `./seekdb-docs/` are resolved from the **current working directory**, not from SKILL.md's location. This breaks when the agent's working directory differs from the skill directory.
 
-### Remote Documentation URLs
+**Solution**: Dynamically locate the skill directory before accessing docs.
 
-- **Base URL**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/`
-- **Catalog File**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
-- **Full Document URL**: Base URL + File Path (from catalog)
+### Step-by-Step Resolution
 
-### Local Documentation Paths
+1. **Read SKILL.md itself** to get its absolute path:
+   ```
+   read(SKILL.md)  // or any known file in this skill directory
+   ```
 
-- **Catalog File**: `seekdb-docs/450.reference/1600.seekdb-docs-catalog.md`
-- **Document Files**: `seekdb-docs/` + File Path (from catalog)
+2. **Extract the directory** from the returned path:
+   ```
+   If read returns: /root/test-claudecode-url/.cursor/skills/seekdb/SKILL.md
+   Skill directory =: /root/test-claudecode-url/.cursor/skills/seekdb/
+   ```
 
-## How to Use This Skill
+3. **Construct paths** using this directory:
+   ```
+   Catalog path =: <skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
+   Docs base =: <skill directory>seekdb-docs/
+   ```
 
-When a user asks about seekdb, follow these steps:
+**Why this works**: The `read` tool returns the absolute path, giving you a reliable anchor regardless of where the agent was invoked.
 
-### Step 1: Access the Documentation Catalog
+## Documentation Sources
 
-**Try Remote First:**
-1. Fetch the remote catalog: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
-2. If successful, mark this conversation as "using remote docs"
-3. If failed (network error, timeout, etc.), fall back to local catalog: `seekdb-docs/450.reference/1600.seekdb-docs-catalog.md`
+### Full Catalog
+- **Local**: `<skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md` (3969 lines, if local docs exist)
+- **Remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md` (fallback)
+- **Entries**: 951 documentation files
+- **Coverage**: Complete seekdb documentation
 
-The catalog contains:
-- All documentation entries organized by category
-- File paths for each documentation file
-- Descriptions of what each document covers
-- Quick reference section for common topics
+### Complete Documentation (Local-First with Remote Fallback)
 
-### Step 2: Match the Query to Documentation
+**Local Documentation** (if available):
+- **Base Path**: `<skill directory>seekdb-docs/`
+- **Size**: 7.4M, 952 markdown files
+- **Document Path**: Base Path + File Path
 
-Search through the catalog for entries whose **Description** matches the user's query. Look for:
-- Exact keyword matches (e.g., "jina" → "Jina model integration")
-- Related terms (e.g., "integration" → entries under "Model Platform Integrations", "Framework Integrations", etc.)
-- Category matches (e.g., "vector search" → entries under "Vector Search" section)
+**Remote Documentation** (fallback):
+- **Base URL**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/`
+- **Document URL**: Base URL + File Path
 
-The catalog is organized into these main categories:
-- **Get Started**: Quick start tutorials and basic operations
-- **Development Guide**: Vector search, hybrid search, AI functions, MCP server, multi-model data
-- **Integrations**: Frameworks, model platforms, developer tools, workflows, MCP clients
-- **Guides**: Deployment, management, security, OBShell, performance testing
-- **Reference**: SQL syntax, PL, error codes, SDK APIs
-- **Tutorials**: Step-by-step tutorials and scenarios
+**Strategy**:
+1. **Locate**: Determine `<skill directory>` using path resolution above
+2. **Load**: Load full catalog (3969 lines) with all 951 documentation entries
+3. **Search**: Semantic search through all catalog entries
+4. **Read**: Try local first, fallback to remote URL if missing
 
-### Step 3: Read the Documentation File
+## Workflow
 
-Once you've identified the matching entry, construct the full URL or path based on which source you're using:
+### Step 0: Resolve Path (Do this first!)
 
-**If using remote (preferred):**
-- Full URL = `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/` + File Path
-- Example: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
+```bash
+# Read this file to discover its absolute path
+read("SKILL.md")
 
-**If using local (fallback):**
-- Local path = `seekdb-docs/` + File Path
-- Example: `seekdb-docs/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
+# Extract directory from the path
+# Example: /root/.claude/skills/seekdb/SKILL.md → /root/.claude/skills/seekdb/
+```
 
-## Examples
+### Step 1: Load Full Catalog
 
-### Example 1: Remote Access (Preferred)
-**User**: "How do I use vector search in seekdb?"
+Load the complete documentation catalog:
+```
+Local: <skill directory>seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
+Remote: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md (fallback)
+Size: 3969 lines
+Entries: 951 documentation files
+```
 
-**Process**:
-1. Fetch remote catalog: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
-2. Remote access succeeds → mark conversation as "remote mode"
-3. Find entries under "Vector Search" section
-4. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/300.vector-search/100.vector-search-intro.md`
+**Catalog contents**:
+- All seekdb documentation organized by category
+- Complete metadata: title, path, keywords, topics, summary, description
+- Structured format for easy semantic matching
 
-### Example 2: Local Fallback
-**User**: "What is seekdb?"
+### Step 2: Match Query
 
-**Process**:
-1. Try to fetch remote catalog → fails (network error)
-2. Fall back to local catalog: `seekdb-docs/450.reference/1600.seekdb-docs-catalog.md`
-3. Find entry under "Seekdb Overview"
-4. Read local file: `seekdb-docs/100.get-started/10.overview/10.seekdb-overview.md`
+Search the full catalog for semantic matches:
+- **Search titles**: Match document titles
+- **Match keywords**: Extracted keywords from each document
+- **Match topics**: Category and topic labels
+- **Match descriptions**: Detailed descriptions for context
+- **Multiple results**: Return all relevant entries for comprehensive answers
 
-### Example 3: Subsequent Query in Same Conversation (Remote Mode)
-**User**: "Now tell me about hybrid search"
-(Previous query in this conversation successfully used remote)
+### Step 3: Read Document
 
-**Process**:
-1. Already in "remote mode" for this conversation
-2. No need to re-check catalog source
-3. Find entries under "Hybrid Search" section from previously fetched catalog
-4. Fetch remote doc: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/200.develop/600.search/500.hybrid-search.md`
+**Local-First Strategy**:
 
-### Example 4: Integration Query
-**User**: "I want to integrate seekdb with jina"
+1. **Try local first**: `<skill directory>seekdb-docs/[File Path]`
+   - If file exists → read locally (fast)
+   - If file missing → proceed to step 2
 
-**Process**:
-1. Access catalog (remote first, local fallback)
-2. Find entry under "Model Platform Integrations": "Guide to integrating seekdb vector search with Jina AI..."
-3. Extract file path: `300.integrations/200.model-platforms/100.jina.md`
-4. Fetch/read the document using the appropriate source
+2. **Fallback to remote**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/[File Path]`
+   - Download from GitHub
+
+**Example**:
+```
+Query: "How to integrate with Claude Code?"
+
+1. Resolve path: read(SKILL.md) → /root/.claude/skills/seekdb/SKILL.md
+   Skill directory =: /root/.claude/skills/seekdb/
+
+2. Load catalog: /root/.claude/skills/seekdb/seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
+
+3. Search catalog → Found Claude Code entry:
+   Path: 300.integrations/300.developer-tools/700.claude-code.md
+   Keywords: claude, code, integration, mcp
+   Topics: integration, developer-tools
+
+4. Read doc:
+   Try: /root/.claude/skills/seekdb/seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md
+   If missing: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/300.integrations/300.developer-tools/700.claude-code.md
+```
 
 ## Guidelines
 
-- **Always try remote first** before falling back to local files
-- **Maintain consistency** within a conversation - if remote works, keep using remote
-- **Match descriptions semantically** - don't just look for exact keyword matches
-- **Use the Quick Reference section** at the bottom of the catalog for common topics
-- **If multiple entries match**, read all relevant files to provide comprehensive answers
+- **Always resolve path first**: Use the read-your-SKILL.md trick to get the absolute path
+- **Always use full catalog**: Load complete catalog for comprehensive search (951 entries)
+- **Semantic matching**: Match by meaning, not just keywords
+- **Multiple matches**: Read all relevant entries for comprehensive answers
+- **Local-first with remote fallback**: Try local docs first, use remote if missing
+- **Optional local docs**: Run `scripts/update_docs.sh` to download full docs locally (faster)
+- **Offline capable**: With local docs present, works completely offline
 
-## URL Reference
+## Common Installation Paths
 
-### Remote (Primary)
-- **Catalog**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
-- **Base URL**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/`
+This skill may be installed at:
+- **Cursor**: `.cursor/skills/seekdb/`
+- **Claude Code**: `.claude/skills/seekdb/`
+- **Custom**: Any directory (path resolution handles this automatically)
 
-### Local (Fallback)
-- **Catalog**: `seekdb-docs/450.reference/1600.seekdb-docs-catalog.md`
-- **Base Path**: `seekdb-docs/`
+**Do not hardcode these paths**. Use the dynamic resolution method instead.
 
-## Directory Structure (Local)
+## Detailed Examples
 
-The `seekdb-docs` directory contains all database documentation organized by topic categories:
+See [examples.md](references/examples.md) for complete workflow examples including:
+- Full catalog search scenarios
+- Local-first lookup scenarios
+- Remote fallback scenarios
+- Integration queries
+- Multi-turn conversations
 
-```
-seekdb-docs/
-├── 100.get-started/     # Quick start and basic operations
-├── 200.develop/         # Development guides (vector, hybrid, AI, multi-model)
-├── 300.integrations/    # Framework, model, tool integrations
-├── 400.guides/          # Deployment, management, security
-├── 450.reference/       # SQL, PL, error codes, SDK reference
-├── 500.tutorials/       # Step-by-step tutorials
-└── 600.demos/           # Live demo information
-```
+## Category Overview
+
+- **Get Started**: Quick start, basic operations, overview
+- **Development**: Vector search, hybrid search, AI functions, MCP, multi-model
+- **Integrations**: Frameworks, model platforms, developer tools, workflows
+- **Guides**: Deployment, management, security, OBShell, performance
+- **Reference**: SQL syntax, PL, error codes, SDK APIs
+- **Tutorials**: Step-by-step scenarios

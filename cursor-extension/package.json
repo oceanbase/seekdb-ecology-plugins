@@ -36,7 +36,7 @@
   "publisher": "davidzhang",
   "repository": {
     "type": "git",
-    "url": "https://github.com/davidzhangbj/cursor-extension"
+    "url": "https://github.com/oceanbase/cursor-extension"
   },
   "license": "MIT"
 }
