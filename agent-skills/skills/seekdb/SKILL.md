@@ -204,11 +204,6 @@ grep -i "keyword" references/seekdb-docs-catalog.jsonl
 ```
 Each matched line contains both path and description together.
 
-**Why JSONL is better**:
-- ✅ One line per document - grep shows complete information
-- ✅ Structured data - easy to parse with JSON tools
-- ✅ No special flags needed - works naturally with grep, jq, etc.
-
 ## Common Installation Paths
 
 This skill may be installed at:
