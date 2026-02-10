@@ -16,7 +16,7 @@ SKILL_MD="$(dirname "$0")/../SKILL.md"
 TARGET_DIR="$(dirname "$0")/../seekdb-docs"
 
 # Extract version from SKILL.md frontmatter
-VERSION=$(grep "^version:" "$SKILL_MD" | cut -d'"' -f2)
+VERSION="V1.1.0"
 
 REPO_URL="https://github.com/oceanbase/seekdb-doc.git"
 
