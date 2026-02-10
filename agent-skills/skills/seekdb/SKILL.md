@@ -31,13 +31,13 @@ Provides comprehensive access to seekdb database documentation through a central
 2. **Extract the directory** from the returned path:
    ```
    If read returns: /root/test-claudecode-url/.cursor/skills/seekdb/SKILL.md
-   Skill directory =: /root/test-claudecode-url/.cursor/skills/seekdb/
+   Skill directory: /root/test-claudecode-url/.cursor/skills/seekdb/
    ```
 
 3. **Construct paths** using this directory:
    ```
-   Catalog path =: <skill directory>references/seekdb-docs-catalog.jsonl
-   Docs base =: <skill directory>seekdb-docs/
+   Catalog path: <skill directory>references/seekdb-docs-catalog.jsonl
+   Docs base: <skill directory>seekdb-docs/
    ```
 
 ## Documentation Sources
@@ -158,10 +158,10 @@ Note: The catalog contains `path` and `description` fields. The `description` fi
 Query: "How to integrate with Claude Code?"
 
 1. Resolve path: read(SKILL.md) → /root/.claude/skills/seekdb/SKILL.md
-   Skill directory =: /root/.claude/skills/seekdb/
+   Skill directory : /root/.claude/skills/seekdb/
 
 2. Search catalog with grep:
-   grep -i "claude code" references/seekdb-docs-catalog.jsonl
+   grep -i "claude code" /root/.claude/skills/seekdb/references/seekdb-docs-catalog.jsonl
 
 3. Match query from grep results:
    → Found: {"path": "300.integrations/300.developer-tools/700.claude-code.md",
@@ -176,7 +176,7 @@ Query: "How to integrate with Claude Code?"
 ## Guidelines
 
 - **Always resolve path first**: Use the read-your-SKILL.md trick to get the absolute path
-- **Always use full catalog**: Load complete catalog for comprehensive search (1015 entries)
+- **Prefer grep for keyword queries**: Load full catalog only when grep returns nothing or semantic matching is needed
 - **Semantic matching**: Match by meaning, not just keywords
 - **Multiple matches**: Read all relevant entries for comprehensive answers
 - **Local-first with remote fallback**: Try local docs first, use remote URL if missing
@@ -193,16 +193,8 @@ The catalog file is in **JSONL format** (one JSON object per line):
 
 **Searching the catalog**:
 
-**Preferred method** - Read the full catalog:
-- Read the entire catalog file
-- Parse each line as JSON to extract path and description
-- Perform semantic matching on description text
-
-**Quick keyword search** - Use grep:
-```bash
-grep -i "keyword" references/seekdb-docs-catalog.jsonl
-```
-Each matched line contains both path and description together.
+- **Keyword search**: Use grep (see Step 1 examples). Each matched line contains both path and description.
+- **When grep is insufficient**: Read the full catalog, parse each line as JSON, then do semantic matching on descriptions.
 
 ## Common Installation Paths
 
