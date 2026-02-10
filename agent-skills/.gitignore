@@ -43,3 +43,6 @@ htmlcov/
 Thumbs.db
 
 src/seekdb_plugin_installer/skills/
+
+# Generated intermediate files (from update_docs.sh)
+skills/seekdb/references/_branch_map.tsv

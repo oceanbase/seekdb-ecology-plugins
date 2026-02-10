@@ -20,9 +20,11 @@ Complete workflow examples for common seekdb documentation queries.
    Found matches:
    ```json
    {"path": "200.develop/600.search/300.vector-search/100.vector-search-intro.md",
-    "description": "This document provides an overview of vector search in seekdb, covering core concepts, supported vector data types, indexing methods, and search operations."}
+    "description": "This document provides an overview of vector search in seekdb, covering core concepts, supported vector data types, indexing methods, and search operations.",
+    "branch": "V1.1.0"}
    {"path": "200.develop/600.search/300.vector-search/300.vector-similarity-search.md",
-    "description": "This document explains vector similarity search methods in seekdb..."}
+    "description": "This document explains vector similarity search methods in seekdb...",
+    "branch": "V1.1.0"}
    ```
 
 3. **Read documents (local-first)**
@@ -31,9 +33,9 @@ Complete workflow examples for common seekdb documentation queries.
 
 ---
 
-## Example 2: Remote Fallback Scenario
+## Example 2: Remote Fallback with Branch-Aware URL
 
-**User Query**: "How do I deploy seekdb on macOS?"
+**User Query**: "How to integrate seekdb with Claude Code?"
 
 **Process**:
 
@@ -41,17 +43,19 @@ Complete workflow examples for common seekdb documentation queries.
 
 2. **Grep catalog**
    ```bash
-   grep -i "mac" <skill_dir>references/seekdb-docs-catalog.jsonl
+   grep -i "claude code" <skill_dir>references/seekdb-docs-catalog.jsonl
    ```
    Found:
    ```json
-   {"path": "400.guides/400.deploy/700.server-mode/100.deploy-by-systemd.md",
-    "description": "This document provides instructions for deploying and managing the seekdb database using systemd on RPM-based, DEB-based, and macOS systems..."}
+   {"path": "300.integrations/300.developer-tools/700.claude-code.md",
+    "description": "This guide explains how to use the seekdb plugin with Claude Code...",
+    "branch": "V1.0.0"}
    ```
+   Note: `branch` is `V1.0.0` — this file only exists in the V1.0.0 branch (shared across versions via `showInAllVersions`).
 
 3. **Read document**
-   - Try local: `<skill_dir>seekdb-docs/400.guides/400.deploy/700.server-mode/100.deploy-by-systemd.md`
-   - Local missing → fallback: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/400.guides/400.deploy/700.server-mode/100.deploy-by-systemd.md`
+   - Try local: `<skill_dir>seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md`
+   - Local missing → fallback uses **branch from catalog**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/300.integrations/300.developer-tools/700.claude-code.md`
 
 ---
 
@@ -69,11 +73,11 @@ Complete workflow examples for common seekdb documentation queries.
    ```
    Found multiple matches:
    ```json
-   {"path": "200.develop/600.search/300.vector-search/200.vector-index/100.vector-index-overview.md", "description": "...vector index types..."}
-   {"path": "200.develop/200.design-database-schema/35.multi-model/300.char-and-text/300.full-text-index.md", "description": "...full-text indexes..."}
-   {"path": "200.develop/200.design-database-schema/40.create-index-in-develop.md", "description": "...creating indexes..."}
+   {"path": "200.develop/600.search/300.vector-search/200.vector-index/100.vector-index-overview.md", "description": "...vector index types...", "branch": "V1.1.0"}
+   {"path": "200.develop/200.design-database-schema/35.multi-model/300.char-and-text/300.full-text-index.md", "description": "...full-text indexes...", "branch": "V1.1.0"}
+   {"path": "200.develop/200.design-database-schema/40.create-index-in-develop.md", "description": "...creating indexes...", "branch": "V1.1.0"}
    ```
 
-3. **Read all relevant documents** (local-first for each)
+3. **Read all relevant documents** (local-first for each, fallback uses each entry's `branch`)
 
 4. **Provide comprehensive answer** covering vector indexes, full-text indexes, and index creation syntax
