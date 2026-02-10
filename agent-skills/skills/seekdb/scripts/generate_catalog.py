@@ -87,6 +87,10 @@ logging.basicConfig(
 )
 log = logging.getLogger("generate_catalog")
 
+# Suppress noisy HTTP request logs from openai/httpx
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("openai").setLevel(logging.WARNING)
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -284,17 +288,28 @@ async def process_files(
         log.info("[DRY RUN] Would process %d files total", len(files) - skipped)
         return entries
 
-    # Process files concurrently
+    # Process files concurrently with progress reporting
     if tasks:
-        log.info("Generating descriptions for %d files...", len(tasks))
+        total = len(tasks)
+        log.info("Generating descriptions for %d files...", total)
+
+        completed = 0
+        progress_lock = asyncio.Lock()
 
         async def _process_one(rel_path: str, current_hash: str, content: str):
+            nonlocal completed
             description = await llm.generate_description(
                 rel_path, content, max_chars
             )
             entry = {"path": rel_path, "description": description}
             if rel_path in branch_map:
                 entry["branch"] = branch_map[rel_path]
+
+            async with progress_lock:
+                completed += 1
+                if completed % 10 == 0 or completed == total:
+                    log.info("Progress: %d/%d (%.0f%%)", completed, total, completed / total * 100)
+
             return rel_path, current_hash, entry
 
         results = await asyncio.gather(
