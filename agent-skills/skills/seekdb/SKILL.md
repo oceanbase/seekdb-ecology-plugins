@@ -5,7 +5,7 @@ description: seekdb database documentation lookup. Use when users ask about seek
 
 # seekdb Documentation
 
-Provides access to 1015 seekdb documentation entries through a catalog-based search system.
+Provides access to ~1000 seekdb documentation entries through a catalog-based search system.
 
 ## Path Resolution (Do First)
 
@@ -28,7 +28,7 @@ grep -i "keyword" <skill_dir>references/seekdb-docs-catalog.jsonl
 **Full catalog load** (only when grep returns no results or semantic matching is needed):
 - Local: `<skill_dir>references/seekdb-docs-catalog.jsonl`
 - Remote fallback: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl`
-- Format: JSONL — one `{"path": "...", "description": "..."}` per line (1015 entries)
+- Format: JSONL — one `{"path": "...", "description": "..."}` per line (~1000 entries)
 
 ### Step 2: Match Query
 

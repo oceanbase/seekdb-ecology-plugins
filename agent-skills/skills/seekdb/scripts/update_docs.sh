@@ -12,10 +12,9 @@ NC='\033[0m' # No Color
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILL_MD="$(dirname "$0")/../SKILL.md"
 TARGET_DIR="$(dirname "$0")/../seekdb-docs"
 
-# Extract version from SKILL.md frontmatter
+# seekdb documentation version (update this when upgrading)
 VERSION="V1.1.0"
 
 REPO_URL="https://github.com/oceanbase/seekdb-doc.git"
