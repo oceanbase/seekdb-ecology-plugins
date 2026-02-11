@@ -1,234 +1,116 @@
 ---
-description: seekdb vector search hybrid search AI function database deployment pyseekdb embedding similarity index
-alwaysApply: true
-globs: '**/*'
+description: seekdb database documentation lookup. Use when users ask about seekdb features, SQL syntax, vector search, hybrid search, embeddings, similarity search, AI functions, pyseekdb, integrations, deployment, or any seekdb-related topics. Automatically locates relevant docs via catalog-based semantic search.
+alwaysApply: false
 ---
-# seekdb Documentation Rules
+# seekdb Documentation
 
-## CRITICAL WORKFLOW - Smart Documentation Access
+Provides access to ~1000 seekdb documentation entries through a catalog-based search system.
 
-When ANY question mentions seekdb, vector search, hybrid search, AI functions, embeddings, similarity search, or database operations:
+## Version Info
 
-**Use a TWO-TIER APPROACH with automatic fallback:**
+- **Documentation versions covered**: V1.0.0, V1.1.0 (merged, latest takes priority)
+- **Latest version**: V1.1.0
+- The `branch` field in catalog entries indicates which Git branch hosts the file (used for remote fallback URLs only). It does NOT indicate which seekdb version the content applies to — many docs apply to all versions.
+- If the user asks about a specific seekdb version, note that this documentation set reflects the latest available content and may not distinguish version-specific differences.
 
-### Primary: Remote Mode (GitHub Raw Content)
+## Path Resolution (Do First)
 
-1. **FIRST**: Use `run_terminal_cmd` with `curl` to fetch the catalog directly from GitHub Raw:
-   ```bash
-   curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md
-   ```
+All resource paths are under the `.cursor/rules/` directory:
 
-2. **SUCCESS CRITERIA**: Remote mode is considered successful ONLY when:
-   - The curl command returns HTTP 200 (no error)
-   - The response contains actual markdown content (starts with `---` or `#`)
-   - The response is NOT empty and NOT an error page
+1. Catalog: `.cursor/rules/seekdb-docs/seekdb-docs-catalog.jsonl`
+2. Docs base: `.cursor/rules/seekdb-docs/`
 
-3. **If successful**: Continue fetching specific documentation files using the same curl approach
+## Workflow
 
-### Fallback: Local Mode (When GitHub is unreachable)
+### Step 1: Search Catalog
 
-4. **IMMEDIATELY fallback to local mode when:**
-   - curl command times out (connection timeout)
-   - curl returns an error (HTTP 404, 500, etc.)
-   - curl returns empty content
-   - Network is unreachable
-
-5. When in local mode:
-   - Use `read_file` to read `.cursor/rules/seekdb-docs/` files
-   - NEVER attempt remote access again in the same conversation if it failed once
-
----
-
-## Remote Mode Workflow (Primary)
-
-When GitHub Raw is accessible, use curl to fetch documentation:
-
-### Step 1: Fetch the Catalog (MANDATORY FIRST STEP)
-
-Use `run_terminal_cmd` to execute:
+**Grep search (preferred for ~90% of queries)**:
 ```bash
-curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md
+grep -i "keyword" .cursor/rules/seekdb-docs/seekdb-docs-catalog.jsonl
 ```
 
-**CRITICAL**: Check the output:
-- ✅ If output contains markdown content → Remote mode SUCCESS, continue with remote workflow
-- ❌ If output is empty, error, or timeout → IMMEDIATELY switch to Local Mode
+**Full catalog load** (only when grep returns no results or semantic matching is needed):
+- Local: `.cursor/rules/seekdb-docs/seekdb-docs-catalog.jsonl`
+- Remote fallback: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl`
+- Format: JSONL — one `{"path": "...", "description": "...", "branch": "..."}` per line (~1000 entries)
 
-### Step 2: Find Relevant Documentation
+### Step 2: Match Query
 
-From the catalog content, identify the `File Path` of relevant documents based on:
-- Section headers (Get Started, Development Guide, Integrations, etc.)
-- Document descriptions that match the user's question
+- Extract `path`, `description`, and `branch` from search results
+- Select entries whose descriptions best match the query semantically (match by meaning, not just keywords)
+- Consider multiple matches for comprehensive answers
 
-### Step 3: Fetch Specific Documentation
+### Step 3: Read Document
 
-Construct the GitHub Raw URL and fetch using curl:
+Local-first with remote fallback:
+1. Try local: `.cursor/rules/seekdb-docs/[path]`
+2. Fallback: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/[branch]/en-US/[path]`
+   - `[branch]` comes from the catalog entry's `branch` field (e.g. `V1.0.0`, `V1.1.0`)
+   - Docs span multiple version branches; some files only exist in a specific branch
 
-**GitHub Raw URL Format:**
-```
-https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/{File Path}
-```
+## Examples
 
-**Example:**
-- File Path from catalog: `200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
-- Full Raw URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
-- Command: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/600.search/300.vector-search/300.vector-similarity-search.md"`
-
-### Step 4: Provide Answer with Citations
-
-When citing documentation, use the GitHub web URL format:
-```
-https://github.com/oceanbase/seekdb-doc/blob/V1.1.0/en-US/{File Path}
-```
-
----
-
-## Local Mode Workflow (Fallback)
-
-When GitHub is NOT accessible, use local documentation:
-
-### Step 1: Read the Local Catalog (MANDATORY FIRST STEP)
-
-Use `read_file` to read the catalog file:
-```
-.cursor/rules/seekdb-docs/450.reference/1600.seekdb-docs-catalog.md
-```
-
-### Step 2: Find Relevant Documentation from Catalog
-
-From the catalog, identify the `File Path` of relevant documents based on:
-- Section headers (Get Started, Development Guide, Integrations, etc.)
-- Document descriptions that match the user's question
-
-### Step 3: Construct Full Local Path and Read Files
-
-**Local path format:**
-```
-.cursor/rules/seekdb-docs/ + File Path
-```
-
-**Example:**
-- File Path from catalog: `200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
-- Full local path: `.cursor/rules/seekdb-docs/200.develop/600.search/300.vector-search/300.vector-similarity-search.md`
-
-Use `read_file` to read the documentation file at the constructed path.
-
-### Step 4: Provide Answer with Local Citations
-
-Cite using the local file path format: "According to `.cursor/rules/seekdb-docs/...`"
-
----
-
-## Decision Flow Chart
+### Example 1: Keyword Search (Normal Flow)
 
 ```
-START
-  │
-  ▼
-┌─────────────────────────────────────────────────────────────┐
-│ curl -s --connect-timeout 5 [GitHub Raw Catalog URL]        │
-└─────────────────────────────────────────────────────────────┘
-  │
-  ▼
-┌─────────────────────────────────────────────────────────────┐
-│ Check output: Contains markdown content?                     │
-│ (starts with --- or #, not empty, not error)                │
-└─────────────────────────────────────────────────────────────┘
-  │                                    │
-  ▼ YES                                ▼ NO
-┌──────────────────┐          ┌──────────────────────────────┐
-│ REMOTE MODE      │          │ LOCAL MODE                   │
-│ Continue with    │          │ read_file on                 │
-│ curl for docs    │          │ .cursor/rules/seekdb-docs/   │
-└──────────────────┘          └──────────────────────────────┘
-  │                                    │
-  ▼                                    ▼
-┌──────────────────┐          ┌──────────────────────────────┐
-│ Cite GitHub URLs │          │ Cite local file paths        │
-└──────────────────┘          └──────────────────────────────┘
+Query: "How do I use vector search in seekdb?"
+
+1. grep -i "vector search" .cursor/rules/seekdb-docs/seekdb-docs-catalog.jsonl
+2. Found matches:
+   {"path": "200.develop/600.search/300.vector-search/100.vector-search-intro.md",
+    "description": "This document provides an overview of vector search in seekdb, covering core concepts, supported vector data types, indexing methods, and search operations.",
+    "branch": "V1.1.0"}
+   {"path": "200.develop/600.search/300.vector-search/300.vector-similarity-search.md",
+    "description": "This document explains vector similarity search methods in seekdb...",
+    "branch": "V1.1.0"}
+3. Read: .cursor/rules/seekdb-docs/200.develop/600.search/300.vector-search/100.vector-search-intro.md
+   Success → provide answer
 ```
 
----
+### Example 2: Remote Fallback with Branch-Aware URL
 
-## Example Workflows
+```
+Query: "How to integrate seekdb with Claude Code?"
 
-### Example 1: Remote Mode Success
+1. grep -i "claude code" .cursor/rules/seekdb-docs/seekdb-docs-catalog.jsonl
+2. Match:
+   {"path": "300.integrations/300.developer-tools/700.claude-code.md",
+    "description": "This guide explains how to use the seekdb plugin with Claude Code...",
+    "branch": "V1.0.0"}
+   Note: branch is V1.0.0 — this file only exists in the V1.0.0 branch.
+3. Try local: .cursor/rules/seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md
+   Local missing → fallback uses branch from catalog:
+   https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/300.integrations/300.developer-tools/700.claude-code.md
+```
 
-**User asks**: "How do I deploy seekdb?"
+### Example 3: Multiple Matches
 
-**AI should execute**:
-1. `run_terminal_cmd`: `curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
-2. ✅ Output contains markdown content → Remote mode confirmed
-3. Find in catalog: `100.get-started/100.client-server-mode/10.deploy-seekdb-testing-environment.md`
-4. `run_terminal_cmd`: `curl -s --connect-timeout 5 "https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/100.get-started/100.use-seekdb-with-sql/10.deploy-seekdb-testing-environment.md"`
-5. Provide answer from fetched content
-6. Cite: `https://github.com/oceanbase/seekdb-doc/blob/V1.1.0/en-US/100.get-started/100.use-seekdb-with-sql/10.deploy-seekdb-testing-environment.md`
+```
+Query: "Tell me about seekdb indexes"
 
-### Example 2: Remote Mode Fails → Local Fallback
+1. grep -i "index" .cursor/rules/seekdb-docs/seekdb-docs-catalog.jsonl
+2. Found multiple matches:
+   {"path": "200.develop/600.search/300.vector-search/200.vector-index/100.vector-index-overview.md",
+    "description": "...vector index types...", "branch": "V1.1.0"}
+   {"path": "200.develop/200.design-database-schema/35.multi-model/300.char-and-text/300.full-text-index.md",
+    "description": "...full-text indexes...", "branch": "V1.1.0"}
+   {"path": "200.develop/200.design-database-schema/40.create-index-in-develop.md",
+    "description": "...creating indexes...", "branch": "V1.1.0"}
+3. Read all relevant documents (local-first for each, fallback uses each entry's branch)
+4. Provide comprehensive answer covering vector indexes, full-text indexes, and index creation syntax
+```
 
-**User asks**: "How to use hybrid search?"
+## Notes
 
-**AI should execute**:
-1. `run_terminal_cmd`: `curl -s --connect-timeout 5 https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/450.reference/1600.seekdb-docs-catalog.md`
-2. ❌ Output is empty or error (e.g., "curl: (28) Connection timed out")
-3. **IMMEDIATELY switch to Local Mode**
-4. `read_file` on `.cursor/rules/seekdb-docs/400.guides/1200.reference/1600.seekdb-docs-catalog.md`
-5. Find: `200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`
-6. `read_file` on `.cursor/rules/seekdb-docs/200.develop/200.hybrid-search/100.vector-index-hybrid-search.md`
-7. Provide answer and cite local path
+- **Auto-installed docs**: The seekdb Cursor extension automatically copies documentation to `.cursor/rules/seekdb-docs/`
+- **Multi-version**: Docs span multiple branches; the catalog records each file's source branch
+- **Offline capable**: With local docs and catalog present, works completely offline
 
----
+## Category Overview
 
-## Documentation Structure
-
-The documentation is organized into these main sections (both remote and local):
-
-1. **Get Started** (`100.get-started/`): Quick start tutorials, SDK usage (pyseekdb), SQL deployment guides
-2. **Development Guide** (`200.develop/`): Vector search, hybrid search, AI functions, MCP Server, multi-model data (JSON, Spatial, Text)
-3. **Integrations** (`300.integrations/`): Frameworks (LangChain, LlamaIndex, Spring AI), Model Platforms (Jina, OpenAI, Qwen, Ollama, Gemini), Developer Tools (Cursor, Cline, Continue), Workflows (Dify, n8n), MCP Clients (Augment Code, Claude Code, Kiro)
-4. **Guides** (`400.guides/`): Deployment, Configuration Management, High Availability, Security, OBShell Dashboard, Performance Testing
-5. **Reference** (`450.reference/`): MySQL compatibility, SQL syntax, PL reference, Error codes, SDK API reference, Telemetry
-6. **Tutorials** (`500.tutorials/`): AI application demos (MineKB, Image Search), Scenarios (Vector Search, Full-text Index, Hybrid Search, AI Functions, Vibe Coding)
-7. **Demos** (`600.demos/`): Live demos (AI Knowledge Base, Image Search)
-
-## Quick Reference by Topic
-
-| User Topic | Catalog Section | Key Documents |
-|------------|-----------------|---------------|
-| Getting started | Get Started | `10.seekdb-overview.md`, `10.deploy-seekdb-testing-environment.md` |
-| Python SDK | Reference > SDK | `10.pyseekdb-sdk-get-started.md`, `10.api-overview.md`, SDK samples |
-| Vector search | Development Guide > Vector Search | `100.vector-search-intro.md`, `200.dense-vector-index.md`, `300.vector-similarity-search.md` |
-| Full-text search | Tutorials > Scenarios | `40.experience-full-text-indexing.md`, `300.full-text-index.md` |
-| Hybrid search | Development Guide > Hybrid Search | `100.vector-index-hybrid-search.md`, `50.experience-hybrid-search.md` |
-| AI functions | Development Guide > AI Function | `200.ai-function.md`, `60.experience-ai-function.md` |
-| LangChain/LlamaIndex | Integrations > Frameworks | `100.langchain.md`, `200.llamaindex.md`, `300.springai.md` |
-| MCP/Cursor | Integrations > Developer Tools / MCP | `100.cursor.md`, `400.oceanbase-mcp-server-and-ai-tool-integration-guide.md` |
-| Deployment | Guides > Deployment | `50.deploy-overview.md`, `100.deploy-by-systemd.md`, `200.deploy-by-docker.md` |
-| Security | Guides > Security | `100.security-overview.md`, Access Control, Data Encryption |
-| Performance Testing | Guides > Performance Test | `100.ob-vector-search-bench-test.md`, Sysbench, VectorDBBench |
-| Embedding Functions | Reference > SDK > Embedding | `100.default-embedding-function-of-api.md`, Custom embedding functions |
-
----
-
-## Code Generation Principles
-
-- When generating seekdb-related code, it MUST comply with the API specifications and best practices in the documentation
-- ALWAYS use code examples provided in the documentation as reference templates
-- Ensure code consistency with the versions and features described in the documentation
-- For complex features like vector search and hybrid search, ALWAYS reference detailed explanations in the documentation first
-
-## Problem Solving
-
-- When encountering seekdb-related issues, FIRST consult the FAQ and troubleshooting documents
-- ALWAYS reference example code and configuration instructions from the documentation
-- Ensure solutions align with recommended practices in the documentation
-
-## Important Notes
-
-- **ALWAYS** try remote mode first using curl with GitHub Raw URLs
-- **ONLY** consider remote successful when curl returns actual markdown content
-- **IMMEDIATELY** fallback to local mode if curl fails, times out, or returns empty/error
-- The documentation (whether remote or local) is the ONLY authoritative source for seekdb information
-- NEVER guess or use general database knowledge - ALWAYS reference the actual documentation
-- Pay attention to version compatibility and limitations mentioned in the documentation
-- Follow security recommendations and performance optimization tips in the documentation
+- **Get Started**: Quick start, basic operations, overview
+- **Development**: Vector search, hybrid search, AI functions, MCP, multi-model
+- **Integrations**: Frameworks, model platforms, developer tools, workflows
+- **Guides**: Deployment, management, security, OBShell, performance
+- **Reference**: SQL syntax, PL, error codes, SDK APIs
+- **Tutorials**: Step-by-step scenarios
