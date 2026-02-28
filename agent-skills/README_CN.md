@@ -89,7 +89,7 @@ seekdb-agent-skills
 - Claude Code (`.claude/skills`)
 - OpenClaw (`~/.openclaw/workspace/skills`)
 - Cursor (`.cursor/skills`)
-- Codex (`.codex/skills`)
+- Codex (`.agents/skills`)
 - OpenCode (`.opencode/skills`)
 - GitHub Copilot (`.github/skills`)
 - Qoder (`.qoder/skills`)
