@@ -19,10 +19,7 @@ seekdb --version
 If not installed:
 
 ```bash
-pip install seekdb-cli            # core (SQL + schema)
-pip install seekdb-cli[vector]    # + collection / query support (pyseekdb)
-pip install seekdb-cli[ai]        # + AI completion support (openai)
-pip install seekdb-cli[all]       # everything
+pip install seekdb-cli
 ```
 
 ## Connection Setup
