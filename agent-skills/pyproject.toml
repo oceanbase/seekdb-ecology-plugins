@@ -27,10 +27,18 @@ classifiers = [
 
 dependencies = [
     "questionary>=1.10.0",
+    "click>=8.0",
+    "pymysql>=1.0",
 ]
+
+[project.optional-dependencies]
+cli-vector = ["pyseekdb>=0.1"]
+cli-ai = ["openai>=1.0"]
+cli-all = ["pyseekdb>=0.1", "openai>=1.0"]
 
 [project.scripts]
 seekdb-agent-skills = "seekdb_plugin_installer.main:main"
+seekdb = "seekdb_cli.main:cli"
 
 [project.urls]
 Homepage = "https://github.com/oceanbase/seekdb-ecology-plugins"
@@ -48,3 +56,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 seekdb_plugin_installer = ["skills/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
