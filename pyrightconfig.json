@@ -1,5 +1,6 @@
 {
   "extraPaths": [
+    "agent-skills/src",
     "claudecode-plugin/skills/importing-to-seekdb/scripts",
     "claudecode-plugin/skills/querying-from-seekdb/scripts"
   ],
