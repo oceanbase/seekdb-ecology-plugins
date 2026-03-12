@@ -5,11 +5,15 @@ description: seekdb database documentation lookup. Use when users ask about seek
 
 # seekdb Documentation
 
-Provides access to ~1000 seekdb documentation entries through a catalog-based search system.
+Provides access to ~1000 seekdb documentation entries through a catalog-based search system. **Remote-only mode**: this skill ships only the catalog; doc content is always loaded from public documentation URLs (no local `seekdb-docs/`).
+
+## Scope and behavior
+
+This skill is **documentation-only**. It does not execute code or run scripts. The agent reads the local catalog (one JSONL file) and fetches doc content from public read-only URLs. No credentials, no installs, no subprocess calls.
 
 ## Version Info
 
-<!-- AUTO-UPDATED by update_docs.sh — do not edit manually -->
+<!-- AUTO-UPDATED — do not edit manually -->
 - **Documentation versions covered**: V1.0.0, V1.1.0 (merged, latest takes priority)
 - **Latest version**: V1.1.0
 <!-- END AUTO-UPDATED -->
@@ -18,26 +22,18 @@ Provides access to ~1000 seekdb documentation entries through a catalog-based se
 
 ## Path Resolution (Do First)
 
-All resource paths are relative to this SKILL.md's location. Resolve the skill directory first:
-
-1. Read this SKILL.md to get its absolute path
-2. Extract the parent directory as `<skill_dir>`
-3. Catalog: `<skill_dir>references/seekdb-docs-catalog.jsonl`
-4. Docs base: `<skill_dir>seekdb-docs/`
+1. Read this SKILL.md to get its absolute path and extract the parent directory as `<skill_dir>`
+2. Catalog (required): `<skill_dir>references/seekdb-docs-catalog.jsonl`  
+   If missing locally, load from: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl`
 
 ## Workflow
 
 ### Step 1: Search Catalog
 
-**Grep search (preferred for ~90% of queries)**:
-```bash
-grep -i "keyword" <skill_dir>references/seekdb-docs-catalog.jsonl
-```
+**Keyword search (preferred for most queries)**  
+Search the catalog file for lines containing the query keywords. File: `<skill_dir>references/seekdb-docs-catalog.jsonl`. Each line is one JSON object with `path`, `description`, and `branch`. Match by keyword or meaning.
 
-**Full catalog load** (only when grep returns no results or semantic matching is needed):
-- Local: `<skill_dir>references/seekdb-docs-catalog.jsonl`
-- Remote fallback: `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl`
-- Format: JSONL — one `{"path": "...", "description": "...", "branch": "..."}` per line (~1000 entries)
+**Full catalog** (when needed): same file as above, or fetch `https://raw.githubusercontent.com/oceanbase/seekdb-ecology-plugins/main/agent-skills/skills/seekdb/references/seekdb-docs-catalog.jsonl`. Format: JSONL — one `{"path": "...", "description": "...", "branch": "..."}` per line (~1000 entries).
 
 ### Step 2: Match Query
 
@@ -45,34 +41,30 @@ grep -i "keyword" <skill_dir>references/seekdb-docs-catalog.jsonl
 - Select entries whose descriptions best match the query semantically (match by meaning, not just keywords)
 - Consider multiple matches for comprehensive answers
 
-### Step 3: Read Document
+### Step 3: Read Document (remote)
 
-Local-first with remote fallback:
-1. Try local: `<skill_dir>seekdb-docs/[path]`
-2. Fallback: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/[branch]/en-US/[path]`
-   - `[branch]` comes from the catalog entry's `branch` field (e.g. `V1.0.0`, `V1.1.0`)
-   - Docs span multiple version branches; some files only exist in a specific branch
+Fetch the document from the public docs URL (no local doc files in this package):
+
+- URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/[branch]/en-US/[path]`
+- `[branch]` and `[path]` come from the catalog entry (e.g. `V1.0.0`, `V1.1.0`). Some files exist only on a specific branch.
 
 ## Example
 
 ```
 Query: "How to integrate with Claude Code?"
 
-1. grep -i "claude code" <skill_dir>references/seekdb-docs-catalog.jsonl
+1. Search catalog: look for lines containing "claude code" in <skill_dir>references/seekdb-docs-catalog.jsonl
 2. Match: {"path": "300.integrations/300.developer-tools/700.claude-code.md",
            "description": "This guide explains how to use the seekdb plugin with Claude Code...",
            "branch": "V1.0.0"}
-3. Read: <skill_dir>seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md
-   Fallback: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/300.integrations/300.developer-tools/700.claude-code.md
+3. Fetch doc: https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/300.integrations/300.developer-tools/700.claude-code.md
 ```
 
 See [examples.md](references/examples.md) for more complete workflow examples.
 
 ## Notes
 
-- **Optional local docs**: Run `scripts/update_docs.sh` to download and merge docs from all version branches locally
-- **Multi-version**: Docs span multiple branches; the update script merges them and records each file's source branch in the catalog
-- **Offline capable**: With local docs and catalog present, works completely offline
+- **Multi-version**: Each catalog entry's `branch` field is used in the doc URL; some files exist only on a specific branch.
 
 ## Category Overview
 

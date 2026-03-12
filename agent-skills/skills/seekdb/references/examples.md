@@ -13,10 +13,9 @@ Complete workflow examples for common seekdb documentation queries.
    Read SKILL.md → extract parent directory as <skill_dir>
    ```
 
-2. **Grep catalog**
-   ```bash
-   grep -i "vector search" <skill_dir>references/seekdb-docs-catalog.jsonl
-   ```
+2. **Search catalog**  
+   Search for lines containing "vector search" in `<skill_dir>references/seekdb-docs-catalog.jsonl`.
+
    Found matches:
    ```json
    {"path": "200.develop/600.search/300.vector-search/100.vector-search-intro.md",
@@ -27,9 +26,9 @@ Complete workflow examples for common seekdb documentation queries.
     "branch": "V1.1.0"}
    ```
 
-3. **Read documents (local-first)**
-   - Try: `<skill_dir>seekdb-docs/200.develop/600.search/300.vector-search/100.vector-search-intro.md`
-   - Success → provide answer
+3. **Fetch documents (remote)**
+   - URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.1.0/en-US/200.develop/600.search/300.vector-search/100.vector-search-intro.md` (and other matched paths with their `branch`)
+   - Use content to answer
 
 ---
 
@@ -41,10 +40,9 @@ Complete workflow examples for common seekdb documentation queries.
 
 1. **Resolve skill directory** → `<skill_dir>`
 
-2. **Grep catalog**
-   ```bash
-   grep -i "claude code" <skill_dir>references/seekdb-docs-catalog.jsonl
-   ```
+2. **Search catalog**  
+   Search for lines containing "claude code" in `<skill_dir>references/seekdb-docs-catalog.jsonl`.
+
    Found:
    ```json
    {"path": "300.integrations/300.developer-tools/700.claude-code.md",
@@ -53,9 +51,8 @@ Complete workflow examples for common seekdb documentation queries.
    ```
    Note: `branch` is `V1.0.0` — this file only exists in the V1.0.0 branch (shared across versions via `showInAllVersions`).
 
-3. **Read document**
-   - Try local: `<skill_dir>seekdb-docs/300.integrations/300.developer-tools/700.claude-code.md`
-   - Local missing → fallback uses **branch from catalog**: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/300.integrations/300.developer-tools/700.claude-code.md`
+3. **Fetch document (remote)**
+   - URL: `https://raw.githubusercontent.com/oceanbase/seekdb-doc/V1.0.0/en-US/300.integrations/300.developer-tools/700.claude-code.md`
 
 ---
 
@@ -67,10 +64,9 @@ Complete workflow examples for common seekdb documentation queries.
 
 1. **Resolve skill directory** → `<skill_dir>`
 
-2. **Grep catalog**
-   ```bash
-   grep -i "index" <skill_dir>references/seekdb-docs-catalog.jsonl
-   ```
+2. **Search catalog**  
+   Search for lines containing "index" in `<skill_dir>references/seekdb-docs-catalog.jsonl`.
+
    Found multiple matches:
    ```json
    {"path": "200.develop/600.search/300.vector-search/200.vector-index/100.vector-index-overview.md", "description": "...vector index types...", "branch": "V1.1.0"}
@@ -78,6 +74,6 @@ Complete workflow examples for common seekdb documentation queries.
    {"path": "200.develop/200.design-database-schema/40.create-index-in-develop.md", "description": "...creating indexes...", "branch": "V1.1.0"}
    ```
 
-3. **Read all relevant documents** (local-first for each, fallback uses each entry's `branch`)
+3. **Fetch all relevant documents** from `https://raw.githubusercontent.com/oceanbase/seekdb-doc/[branch]/en-US/[path]` using each entry's `branch` and `path`.
 
-4. **Provide comprehensive answer** covering vector indexes, full-text indexes, and index creation syntax
+4. **Provide comprehensive answer** covering vector indexes, full-text indexes, and index creation syntax.
