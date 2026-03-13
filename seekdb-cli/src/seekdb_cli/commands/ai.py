@@ -1,8 +1,8 @@
-"""seekdb ai command — manage AI models and run completions."""
+"""seekdb ai command — use database AI (DBMS_AI_SERVICE, AI_COMPLETE)."""
 
 from __future__ import annotations
 
-from typing import Any
+import json
 
 import click
 import pymysql
@@ -11,11 +11,14 @@ from seekdb_cli import output
 from seekdb_cli.connection import get_connection
 from seekdb_cli.logger import log_operation
 
+# OceanBase AI model types (for CREATE_AI_MODEL)
+AI_MODEL_TYPES = ("dense_embedding", "completion", "rerank")
+
 
 @click.group("ai")
 @click.pass_context
 def ai_cmd(ctx: click.Context) -> None:
-    """AI model management and completion."""
+    """AI model management and completion (via database DBMS_AI_SERVICE)."""
 
 
 # ---------------------------------------------------------------------------
@@ -25,13 +28,13 @@ def ai_cmd(ctx: click.Context) -> None:
 @ai_cmd.group("model")
 @click.pass_context
 def model_group(ctx: click.Context) -> None:
-    """Manage AI models registered in seekdb."""
+    """Manage AI models registered in the database (DBMS_AI_SERVICE)."""
 
 
 @model_group.command("list")
 @click.pass_context
 def model_list(ctx: click.Context) -> None:
-    """List all registered AI models."""
+    """List all registered AI models (from oceanbase.DBA_OB_AI_MODELS)."""
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
@@ -46,25 +49,30 @@ def model_list(ctx: click.Context) -> None:
     try:
         with timer, conn.cursor() as cur:
             cur.execute(
-                "SELECT model_name, provider, model, created_at "
-                "FROM __seekdb_ai_models ORDER BY created_at"
+                "SELECT MODEL_ID, NAME, TYPE, MODEL_NAME "
+                "FROM oceanbase.DBA_OB_AI_MODELS ORDER BY NAME"
             )
             rows = cur.fetchall()
-            result = [
-                {
-                    "name": r["model_name"],
-                    "provider": r["provider"],
-                    "model": r["model"],
-                    "created_at": str(r.get("created_at", "")),
-                }
-                for r in rows
-            ]
+            # DictCursor: keys may be uppercase from view
+            result = []
+            for r in rows:
+                row = dict(r)
+                result.append({
+                    "name": row.get("NAME") or row.get("name"),
+                    "type": row.get("TYPE") or row.get("type"),
+                    "model_name": row.get("MODEL_NAME") or row.get("model_name"),
+                    "model_id": row.get("MODEL_ID") or row.get("model_id"),
+                })
 
         log_operation("ai model list", ok=True, time_ms=timer.elapsed_ms)
         output.success(result, time_ms=timer.elapsed_ms, fmt=fmt)
-    except pymysql.err.ProgrammingError:
-        log_operation("ai model list", ok=True, time_ms=timer.elapsed_ms)
-        output.success([], time_ms=timer.elapsed_ms, fmt=fmt)
+    except pymysql.err.ProgrammingError as exc:
+        log_operation("ai model list", ok=False, error_code="SQL_ERROR")
+        output.error(
+            "SQL_ERROR",
+            str(exc) + ". Ensure the database supports DBA_OB_AI_MODELS (OceanBase AI).",
+            fmt=fmt,
+        )
     except pymysql.err.Error as exc:
         log_operation("ai model list", ok=False, error_code="SQL_ERROR")
         output.error("SQL_ERROR", str(exc), fmt=fmt)
@@ -74,20 +82,27 @@ def model_list(ctx: click.Context) -> None:
 
 @model_group.command("create")
 @click.argument("name")
-@click.option("--provider", required=True, help="Model provider (openai, ollama, qwen, etc.).")
-@click.option("--model", "model_id", required=True, help="Model identifier at the provider.")
-@click.option("--api-key", default=None, help="API key (stored encrypted). Can also use SEEKDB_AI_API_KEY env var.")
-@click.option("--base-url", default=None, help="Custom API base URL.")
+@click.option(
+    "--type",
+    "model_type",
+    type=click.Choice(AI_MODEL_TYPES),
+    required=True,
+    help="Model type: dense_embedding, completion, or rerank.",
+)
+@click.option(
+    "--model",
+    "provider_model_name",
+    required=True,
+    help="Provider model name (e.g. BAAI/bge-m3, THUDM/GLM-4-9B-0414).",
+)
 @click.pass_context
 def model_create(
     ctx: click.Context,
     name: str,
-    provider: str,
-    model_id: str,
-    api_key: str | None,
-    base_url: str | None,
+    model_type: str,
+    provider_model_name: str,
 ) -> None:
-    """Register a new AI model."""
+    """Register an AI model via DBMS_AI_SERVICE.CREATE_AI_MODEL. Create an endpoint separately to use it."""
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
@@ -98,29 +113,19 @@ def model_create(
         output.error("CONNECTION_ERROR", str(exc), fmt=fmt)
         return
 
+    config = json.dumps({"type": model_type, "model_name": provider_model_name})
     timer = output.Timer()
     try:
         with timer, conn.cursor() as cur:
             cur.execute(
-                "CREATE TABLE IF NOT EXISTS __seekdb_ai_models ("
-                "  model_name VARCHAR(128) PRIMARY KEY,"
-                "  provider VARCHAR(64) NOT NULL,"
-                "  model VARCHAR(128) NOT NULL,"
-                "  api_key VARCHAR(512) DEFAULT '',"
-                "  base_url VARCHAR(512) DEFAULT '',"
-                "  created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
-                ")"
-            )
-            cur.execute(
-                "REPLACE INTO __seekdb_ai_models (model_name, provider, model, api_key, base_url) "
-                "VALUES (%s, %s, %s, %s, %s)",
-                (name, provider, model_id, api_key or "", base_url or ""),
+                "CALL DBMS_AI_SERVICE.CREATE_AI_MODEL(%s, %s)",
+                (name, config),
             )
             conn.commit()
 
         log_operation("ai model create", ok=True, time_ms=timer.elapsed_ms)
         output.success(
-            {"name": name, "provider": provider, "model": model_id},
+            {"name": name, "type": model_type, "model_name": provider_model_name},
             time_ms=timer.elapsed_ms,
             fmt=fmt,
         )
@@ -135,7 +140,7 @@ def model_create(
 @click.argument("name")
 @click.pass_context
 def model_delete(ctx: click.Context, name: str) -> None:
-    """Delete a registered AI model."""
+    """Drop an AI model via DBMS_AI_SERVICE.DROP_AI_MODEL. Drop endpoints first if any."""
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
@@ -149,21 +154,110 @@ def model_delete(ctx: click.Context, name: str) -> None:
     timer = output.Timer()
     try:
         with timer, conn.cursor() as cur:
-            cur.execute(
-                "DELETE FROM __seekdb_ai_models WHERE model_name = %s", (name,)
-            )
+            cur.execute("CALL DBMS_AI_SERVICE.DROP_AI_MODEL(%s)", (name,))
             conn.commit()
-            if cur.rowcount == 0:
-                log_operation("ai model delete", ok=False, error_code="MODEL_NOT_FOUND")
-                output.error("MODEL_NOT_FOUND", f"Model '{name}' does not exist", fmt=fmt)
-                return
 
         log_operation("ai model delete", ok=True, time_ms=timer.elapsed_ms)
         output.success({"deleted": name}, time_ms=timer.elapsed_ms, fmt=fmt)
-    except SystemExit:
-        raise
     except pymysql.err.Error as exc:
         log_operation("ai model delete", ok=False, error_code="SQL_ERROR")
+        output.error("SQL_ERROR", str(exc), fmt=fmt)
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
+# seekdb ai model endpoint ...
+# ---------------------------------------------------------------------------
+
+@model_group.group("endpoint")
+@click.pass_context
+def endpoint_group(ctx: click.Context) -> None:
+    """Create or delete AI model endpoints (DBMS_AI_SERVICE)."""
+
+
+@endpoint_group.command("create")
+@click.argument("endpoint_name")
+@click.argument("ai_model_name")
+@click.option("--url", required=True, help="API URL (e.g. https://api.siliconflow.cn/v1/chat/completions).")
+@click.option("--access-key", required=True, help="API key for the service.")
+@click.option("--provider", default="siliconflow", help="Provider name (siliconflow, openai, dashscope, etc.).")
+@click.pass_context
+def endpoint_create(
+    ctx: click.Context,
+    endpoint_name: str,
+    ai_model_name: str,
+    url: str,
+    access_key: str,
+    provider: str,
+) -> None:
+    """Create an AI model endpoint via DBMS_AI_SERVICE.CREATE_AI_MODEL_ENDPOINT."""
+    fmt: str = ctx.obj["format"]
+    dsn: str | None = ctx.obj["dsn"]
+
+    try:
+        conn = get_connection(dsn)
+    except Exception as exc:
+        log_operation("ai model endpoint create", ok=False, error_code="CONNECTION_ERROR")
+        output.error("CONNECTION_ERROR", str(exc), fmt=fmt)
+        return
+
+    config = json.dumps({
+        "ai_model_name": ai_model_name,
+        "url": url,
+        "access_key": access_key,
+        "provider": provider,
+    })
+    timer = output.Timer()
+    try:
+        with timer, conn.cursor() as cur:
+            cur.execute(
+                "CALL DBMS_AI_SERVICE.CREATE_AI_MODEL_ENDPOINT(%s, %s)",
+                (endpoint_name, config),
+            )
+            conn.commit()
+
+        log_operation("ai model endpoint create", ok=True, time_ms=timer.elapsed_ms)
+        output.success(
+            {"endpoint": endpoint_name, "ai_model": ai_model_name, "provider": provider},
+            time_ms=timer.elapsed_ms,
+            fmt=fmt,
+        )
+    except pymysql.err.Error as exc:
+        log_operation("ai model endpoint create", ok=False, error_code="SQL_ERROR")
+        output.error("SQL_ERROR", str(exc), fmt=fmt)
+    finally:
+        conn.close()
+
+
+@endpoint_group.command("delete")
+@click.argument("endpoint_name")
+@click.pass_context
+def endpoint_delete(ctx: click.Context, endpoint_name: str) -> None:
+    """Drop an AI model endpoint via DBMS_AI_SERVICE.DROP_AI_MODEL_ENDPOINT."""
+    fmt: str = ctx.obj["format"]
+    dsn: str | None = ctx.obj["dsn"]
+
+    try:
+        conn = get_connection(dsn)
+    except Exception as exc:
+        log_operation("ai model endpoint delete", ok=False, error_code="CONNECTION_ERROR")
+        output.error("CONNECTION_ERROR", str(exc), fmt=fmt)
+        return
+
+    timer = output.Timer()
+    try:
+        with timer, conn.cursor() as cur:
+            cur.execute(
+                "CALL DBMS_AI_SERVICE.DROP_AI_MODEL_ENDPOINT(%s)",
+                (endpoint_name,),
+            )
+            conn.commit()
+
+        log_operation("ai model endpoint delete", ok=True, time_ms=timer.elapsed_ms)
+        output.success({"deleted": endpoint_name}, time_ms=timer.elapsed_ms, fmt=fmt)
+    except pymysql.err.Error as exc:
+        log_operation("ai model endpoint delete", ok=False, error_code="SQL_ERROR")
         output.error("SQL_ERROR", str(exc), fmt=fmt)
     finally:
         conn.close()
@@ -175,10 +269,10 @@ def model_delete(ctx: click.Context, name: str) -> None:
 
 @ai_cmd.command("complete")
 @click.argument("prompt")
-@click.option("--model", "model_name", required=True, help="Registered model name.")
+@click.option("--model", "model_name", required=True, help="Registered completion model name (from ai model list).")
 @click.pass_context
 def ai_complete(ctx: click.Context, prompt: str, model_name: str) -> None:
-    """Run a text completion using a registered AI model."""
+    """Run text completion using the database AI_COMPLETE function."""
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
@@ -193,26 +287,11 @@ def ai_complete(ctx: click.Context, prompt: str, model_name: str) -> None:
     try:
         with timer, conn.cursor() as cur:
             cur.execute(
-                "SELECT provider, model, api_key, base_url "
-                "FROM __seekdb_ai_models WHERE model_name = %s",
-                (model_name,),
+                "SELECT AI_COMPLETE(%s, %s) AS response",
+                (model_name, prompt),
             )
-            model_cfg = cur.fetchone()
-            if not model_cfg:
-                log_operation("ai complete", ok=False, error_code="MODEL_NOT_FOUND")
-                output.error("MODEL_NOT_FOUND", f"Model '{model_name}' not registered. Run: seekdb ai model list", fmt=fmt)
-                return
-
-        conn.close()
-
-        import os
-        provider = model_cfg["provider"]
-        model_id = model_cfg["model"]
-        api_key = model_cfg["api_key"] or os.environ.get("SEEKDB_AI_API_KEY", "")
-        base_url = model_cfg["base_url"] or None
-
-        with timer:
-            response_text = _call_provider(provider, model_id, api_key, base_url, prompt)
+            row = cur.fetchone()
+        response_text = (row.get("response") or row.get("RESPONSE") or "") if row else ""
 
         log_operation("ai complete", ok=True, time_ms=timer.elapsed_ms)
         output.success(
@@ -220,34 +299,8 @@ def ai_complete(ctx: click.Context, prompt: str, model_name: str) -> None:
             time_ms=timer.elapsed_ms,
             fmt=fmt,
         )
-    except SystemExit:
-        raise
-    except Exception as exc:
+    except pymysql.err.Error as exc:
         log_operation("ai complete", ok=False, error_code="AI_ERROR")
         output.error("AI_ERROR", str(exc), fmt=fmt)
     finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
-
-
-def _call_provider(provider: str, model: str, api_key: str, base_url: str | None, prompt: str) -> str:
-    """Dispatch to the appropriate LLM provider. Uses OpenAI-compatible API by default."""
-    try:
-        import openai
-    except ImportError:
-        raise ImportError("openai package is required for AI completions. Install it with: pip install openai")
-
-    kwargs: dict[str, Any] = {"api_key": api_key}
-    if base_url:
-        kwargs["base_url"] = base_url
-    elif provider == "ollama":
-        kwargs["base_url"] = "http://localhost:11434/v1"
-
-    client = openai.OpenAI(**kwargs)
-    resp = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return resp.choices[0].message.content or ""
+        conn.close()

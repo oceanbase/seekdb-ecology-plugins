@@ -8,12 +8,15 @@ import click
 import pymysql
 
 from seekdb_cli import __version__, output
-from seekdb_cli.connection import get_connection
+from seekdb_cli.connection import get_connection, is_embedded_dsn, resolve_raw_dsn
 from seekdb_cli.logger import log_operation
 
 
 @click.group(invoke_without_command=True)
-@click.option("--dsn", envvar="SEEKDB_DSN", default=None, help="Connection string (seekdb://user:pass@host:port/db).")
+@click.option(
+    "--dsn", envvar="SEEKDB_DSN", default=None,
+    help="Connection string. Remote: seekdb://user:pass@host:port/db  Embedded: embedded:<path>[?database=<db>]",
+)
 @click.option("--format", "fmt", type=click.Choice(["json", "table", "csv", "jsonl"]), default="json", help="Output format.")
 @click.version_option(__version__, message="version %(version)s")
 @click.pass_context
@@ -34,7 +37,13 @@ def status_cmd(ctx: click.Context) -> None:
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
-    info = {"cli_version": __version__}
+    info: dict = {"cli_version": __version__}
+
+    try:
+        raw_dsn = resolve_raw_dsn(dsn)
+        info["mode"] = "embedded" if is_embedded_dsn(raw_dsn) else "remote"
+    except ValueError:
+        info["mode"] = "unknown"
 
     try:
         conn = get_connection(dsn)
@@ -47,15 +56,19 @@ def status_cmd(ctx: click.Context) -> None:
 
     timer = output.Timer()
     try:
-        with timer, conn.cursor() as cur:
-            cur.execute("SELECT VERSION() AS version")
-            row = cur.fetchone()
-            info["server_version"] = row["version"] if row else "unknown"
-            cur.execute("SELECT DATABASE() AS db")
-            row = cur.fetchone()
-            info["database"] = row["db"] if row else "unknown"
-            info["connected"] = True
-    except pymysql.err.Error as exc:
+        with timer:
+            cur = conn.cursor()
+            try:
+                cur.execute("SELECT VERSION() AS version")
+                row = cur.fetchone()
+                info["server_version"] = row["version"] if row else "unknown"
+                cur.execute("SELECT DATABASE() AS db")
+                row = cur.fetchone()
+                info["database"] = row["db"] if row else "unknown"
+                info["connected"] = True
+            finally:
+                cur.close()
+    except (pymysql.err.Error, RuntimeError) as exc:
         info["connected"] = False
         info["error"] = str(exc)
     finally:
@@ -76,10 +89,15 @@ _AI_GUIDE = {
     "global_options": {
         "order": "Global options --dsn and --format must appear before the subcommand.",
         "usage_pattern": "seekdb [--dsn DSN] [--format json|table|csv|jsonl] <subcommand> [args]",
+        "dsn_formats": {
+            "remote": "seekdb://user:pass@host:port/db",
+            "embedded": "embedded:<path>[?database=<db>]",
+        },
         "examples": [
             "seekdb --format table sql \"SELECT * FROM t LIMIT 5\"",
             "seekdb --dsn \"seekdb://root:@127.0.0.1:2881/test\" status",
-            "seekdb --dsn \"...\" --format csv sql \"SELECT id, name FROM users LIMIT 10\"",
+            "seekdb --dsn \"embedded:./seekdb.db\" status",
+            "seekdb --dsn \"embedded:./data?database=mydb\" sql \"SELECT 1\"",
         ],
     },
     "recommended_workflow": [
@@ -155,9 +173,9 @@ _AI_GUIDE = {
             "description": "Retrieve documents from a collection by IDs or metadata filter.",
         },
         {
-            "name": "import",
-            "usage": "seekdb import <collection> --file <path> [--vectorize-column <col>]",
-            "description": "Import data into a collection from a JSON/JSONL/CSV file.",
+            "name": "add",
+            "usage": "seekdb add <collection> (--file <path> | --stdin | --data '<json>') [--vectorize-column <col>]",
+            "description": "Add data to a collection. Source: file, stdin (JSON/JSONL), or inline JSON.",
         },
         {
             "name": "export",
@@ -167,22 +185,32 @@ _AI_GUIDE = {
         {
             "name": "ai model list",
             "usage": "seekdb ai model list",
-            "description": "List all registered AI models.",
+            "description": "List AI models from database (oceanbase.DBA_OB_AI_MODELS).",
         },
         {
             "name": "ai model create",
-            "usage": "seekdb ai model create <name> --provider <provider> --model <model> [--api-key <key>] [--base-url <url>]",
-            "description": "Register a new AI model (openai, ollama, qwen, etc.).",
+            "usage": "seekdb ai model create <name> --type completion|dense_embedding|rerank --model <provider_model_name>",
+            "description": "Register an AI model via DBMS_AI_SERVICE.CREATE_AI_MODEL. Create endpoint in DB separately to use it.",
         },
         {
             "name": "ai model delete",
             "usage": "seekdb ai model delete <name>",
-            "description": "Delete a registered AI model.",
+            "description": "Drop an AI model via DBMS_AI_SERVICE.DROP_AI_MODEL. Drop endpoints first if any.",
+        },
+        {
+            "name": "ai model endpoint create",
+            "usage": "seekdb ai model endpoint create <endpoint_name> <ai_model_name> --url <url> --access-key <key> [--provider siliconflow]",
+            "description": "Create an AI model endpoint via DBMS_AI_SERVICE.CREATE_AI_MODEL_ENDPOINT.",
+        },
+        {
+            "name": "ai model endpoint delete",
+            "usage": "seekdb ai model endpoint delete <endpoint_name>",
+            "description": "Drop an AI model endpoint via DBMS_AI_SERVICE.DROP_AI_MODEL_ENDPOINT.",
         },
         {
             "name": "ai complete",
             "usage": "seekdb ai complete \"<prompt>\" --model <name>",
-            "description": "Run a text completion using a registered AI model.",
+            "description": "Run text completion using database AI_COMPLETE function (requires registered completion model + endpoint).",
         },
         {
             "name": "ai-guide",
@@ -221,7 +249,7 @@ from seekdb_cli.commands.sql import sql_cmd  # noqa: E402
 from seekdb_cli.commands.schema import schema_cmd  # noqa: E402
 from seekdb_cli.commands.collection import collection_cmd  # noqa: E402
 from seekdb_cli.commands.query import query_cmd, get_cmd  # noqa: E402
-from seekdb_cli.commands.data import import_cmd, export_cmd  # noqa: E402
+from seekdb_cli.commands.data import add_cmd, export_cmd  # noqa: E402
 from seekdb_cli.commands.ai import ai_cmd  # noqa: E402
 from seekdb_cli.commands.profile import table_cmd  # noqa: E402
 from seekdb_cli.commands.relations import relations_cmd  # noqa: E402
@@ -231,7 +259,7 @@ cli.add_command(schema_cmd)
 cli.add_command(collection_cmd)
 cli.add_command(query_cmd)
 cli.add_command(get_cmd)
-cli.add_command(import_cmd)
+cli.add_command(add_cmd)
 cli.add_command(export_cmd)
 cli.add_command(ai_cmd)
 cli.add_command(table_cmd)

@@ -170,6 +170,14 @@ def info_collection(ctx: click.Context, name: str) -> None:
                     "metadatas": preview.get("metadatas", []),
                 },
             }
+            # Dimension and distance come from list_collections() metadata (pyseekdb API)
+            for coll in client.list_collections():
+                if getattr(coll, "name", None) == name:
+                    if getattr(coll, "dimension", None) is not None:
+                        data["dimension"] = coll.dimension
+                    if getattr(coll, "distance", None) is not None:
+                        data["distance"] = coll.distance
+                    break
 
         log_operation("collection info", ok=True, time_ms=timer.elapsed_ms)
         output.success(data, time_ms=timer.elapsed_ms, fmt=fmt)

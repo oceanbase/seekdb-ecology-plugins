@@ -1,4 +1,4 @@
-"""seekdb import / export commands — bulk data transfer for collections."""
+"""seekdb add / export commands — data transfer for collections."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from seekdb_cli.logger import log_operation
 from seekdb_cli.vecconnection import get_vec_client
 
 
-def _read_records(path: str) -> list[dict[str, Any]]:
+def _read_records_from_file(path: str) -> list[dict[str, Any]]:
     """Read records from a JSON array file, JSONL file, or CSV file."""
     p = Path(path)
     suffix = p.suffix.lower()
@@ -41,31 +41,90 @@ def _read_records(path: str) -> list[dict[str, Any]]:
     raise ValueError(f"Expected a JSON array in {path}, got {type(data).__name__}")
 
 
-@click.command("import")
+def _parse_json_text(text: str) -> list[dict[str, Any]]:
+    """Parse a string as either a JSON array or one-per-line JSONL."""
+    text = text.strip()
+    if not text:
+        return []
+
+    if text.startswith("["):
+        data = json.loads(text)
+        if isinstance(data, list):
+            return data
+        raise ValueError(f"Expected a JSON array, got {type(data).__name__}")
+
+    records: list[dict[str, Any]] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if line:
+            records.append(json.loads(line))
+    return records
+
+
+@click.command("add")
 @click.argument("collection")
-@click.option("--file", "filepath", required=True, type=click.Path(exists=True), help="Path to data file (JSON/JSONL/CSV).")
+@click.option("--file", "filepath", type=click.Path(exists=True), default=None, help="Path to data file (JSON/JSONL/CSV).")
+@click.option("--stdin", "use_stdin", is_flag=True, help="Read JSON/JSONL from stdin.")
+@click.option("--data", "inline_data", default=None, help="Inline JSON object or array.")
 @click.option("--vectorize-column", default=None, help="Column to auto-vectorize via collection embedding function.")
 @click.pass_context
-def import_cmd(ctx: click.Context, collection: str, filepath: str, vectorize_column: str | None) -> None:
-    """Import data into a collection from a file."""
+def add_cmd(
+    ctx: click.Context,
+    collection: str,
+    filepath: str | None,
+    use_stdin: bool,
+    inline_data: str | None,
+    vectorize_column: str | None,
+) -> None:
+    """Add data to a collection.
+
+    Data source (exactly one required): --file, --stdin, or --data.
+    """
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
+    sources = sum([filepath is not None, use_stdin, inline_data is not None])
+    if sources == 0:
+        output.error(
+            "MISSING_INPUT",
+            "No data source. Pass --file <path>, --stdin, or --data '<json>'.",
+            fmt=fmt,
+            exit_code=output.EXIT_USAGE_ERROR,
+        )
+        return
+    if sources > 1:
+        output.error(
+            "CONFLICTING_INPUT",
+            "Specify only one of --file, --stdin, or --data.",
+            fmt=fmt,
+            exit_code=output.EXIT_USAGE_ERROR,
+        )
+        return
+
     try:
-        records = _read_records(filepath)
+        if filepath:
+            records = _read_records_from_file(filepath)
+        elif use_stdin:
+            records = _parse_json_text(sys.stdin.read())
+        else:
+            text = inline_data or ""
+            if text.startswith("{"):
+                records = [json.loads(text)]
+            else:
+                records = _parse_json_text(text)
     except Exception as exc:
-        log_operation("import", ok=False, error_code="FILE_ERROR")
-        output.error("FILE_ERROR", f"Cannot read file: {exc}", fmt=fmt)
+        log_operation("add", ok=False, error_code="INPUT_ERROR")
+        output.error("INPUT_ERROR", f"Cannot parse input: {exc}", fmt=fmt)
         return
 
     if not records:
-        output.error("FILE_ERROR", "No records found in file.", fmt=fmt)
+        output.error("INPUT_ERROR", "No records found in input.", fmt=fmt)
         return
 
     try:
         client = get_vec_client(dsn)
     except (ImportError, ValueError) as exc:
-        log_operation("import", ok=False, error_code="CONNECTION_ERROR")
+        log_operation("add", ok=False, error_code="CONNECTION_ERROR")
         output.error("CONNECTION_ERROR", str(exc), fmt=fmt)
         return
 
@@ -124,17 +183,17 @@ def import_cmd(ctx: click.Context, collection: str, filepath: str, vectorize_col
                 col.add(**batch)
                 imported += len(batch["ids"])
 
-        log_operation("import", ok=True, rows=imported, time_ms=timer.elapsed_ms)
+        log_operation("add", ok=True, rows=imported, time_ms=timer.elapsed_ms)
         output.success(
-            {"collection": collection, "imported": imported},
+            {"collection": collection, "added": imported},
             time_ms=timer.elapsed_ms,
             fmt=fmt,
         )
     except SystemExit:
         raise
     except Exception as exc:
-        log_operation("import", ok=False, error_code="IMPORT_ERROR")
-        output.error("IMPORT_ERROR", str(exc), fmt=fmt)
+        log_operation("add", ok=False, error_code="IMPORT_ERROR")
+        output.error("ADD_ERROR", str(exc), fmt=fmt)
 
 
 @click.command("export")
