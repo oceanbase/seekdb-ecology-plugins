@@ -404,7 +404,7 @@ All formats now work with non-row data (e.g., `schema tables`, `collection list`
 
 ## Operation Logging
 
-All commands are logged to `~/.seekdb/history.jsonl` for audit:
+All commands are logged to `~/.seekdb/sql-history.jsonl` (seekdb-cli SQL execution history) for audit:
 
 ```json
 {"ts": "2026-03-12T14:23:01", "command": "sql", "sql": "SELECT id FROM users LIMIT 10", "ok": true, "rows": 10, "time_ms": 12}

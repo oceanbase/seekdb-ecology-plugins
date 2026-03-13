@@ -15,7 +15,7 @@ from seekdb_cli.logger import log_operation
 @click.group(invoke_without_command=True)
 @click.option("--dsn", envvar="SEEKDB_DSN", default=None, help="Connection string (seekdb://user:pass@host:port/db).")
 @click.option("--format", "fmt", type=click.Choice(["json", "table", "csv", "jsonl"]), default="json", help="Output format.")
-@click.version_option(__version__, prog_name="seekdb-cli")
+@click.version_option(__version__, message="version %(version)s")
 @click.pass_context
 def cli(ctx: click.Context, dsn: str | None, fmt: str) -> None:
     """seekdb-cli — AI-Agent-friendly database CLI."""
@@ -73,6 +73,15 @@ _AI_GUIDE = {
     "name": "seekdb-cli",
     "version": __version__,
     "description": "AI-Agent-friendly database CLI for seekdb / OceanBase",
+    "global_options": {
+        "order": "Global options --dsn and --format must appear before the subcommand.",
+        "usage_pattern": "seekdb [--dsn DSN] [--format json|table|csv|jsonl] <subcommand> [args]",
+        "examples": [
+            "seekdb --format table sql \"SELECT * FROM t LIMIT 5\"",
+            "seekdb --dsn \"seekdb://root:@127.0.0.1:2881/test\" status",
+            "seekdb --dsn \"...\" --format csv sql \"SELECT id, name FROM users LIMIT 10\"",
+        ],
+    },
     "recommended_workflow": [
         "seekdb schema tables",
         "seekdb schema describe <table>",

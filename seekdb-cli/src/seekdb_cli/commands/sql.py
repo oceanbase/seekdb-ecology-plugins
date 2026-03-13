@@ -194,7 +194,11 @@ def sql_cmd(
     sql_file: str | None,
     use_stdin: bool,
 ) -> None:
-    """Execute a SQL statement."""
+    """Execute a SQL statement.
+
+    Note: --format and --dsn are global options; put them before the subcommand, e.g.:
+      seekdb --format json sql \"SELECT * FROM t LIMIT 5\"
+    """
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
