@@ -1,8 +1,8 @@
 {
   "extraPaths": [
     "seekdb-cli/src",
-    "claudecode-plugin/skills/importing-to-seekdb/scripts",
-    "claudecode-plugin/skills/querying-from-seekdb/scripts"
+    "agent-skills/skills/importing-to-seekdb/scripts",
+    "agent-skills/skills/querying-from-seekdb/scripts"
   ],
   "reportMissingImports": "warning",
   "reportMissingTypeStubs": false
