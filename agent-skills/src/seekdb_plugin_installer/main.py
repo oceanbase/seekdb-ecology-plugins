@@ -8,9 +8,18 @@ from typing import Dict, List
 
 try:
     import questionary
+    from questionary import Style
 except ImportError:
     print("Error: questionary is not installed. Please install it with: pip install questionary")
     sys.exit(1)
+
+
+# Custom style: no background for selected/highlighted items in checkbox/select.
+# prompt_toolkit's default_ui_style uses ("selected", "reverse"); we override with noreverse.
+_NO_BG_STYLE = Style([
+    ("selected", "noreverse"),
+    ("highlighted", "noreverse"),
+])
 
 
 # Tool configurations: tool name -> skills directory path
@@ -127,7 +136,8 @@ def main():
         try:
             selected_tool = questionary.select(
                 "Select one tool (use ↑↓ to navigate, Enter to confirm, Ctrl+C to cancel):",
-                choices=list(TOOL_CONFIGS.keys())
+                choices=list(TOOL_CONFIGS.keys()),
+                style=_NO_BG_STYLE,
             ).ask()
         except KeyboardInterrupt:
             print("\n\nInstallation cancelled by user.")
@@ -173,7 +183,8 @@ def main():
                 "Select skills (use ↑↓ to navigate, Space to select, Enter to confirm, Ctrl+C to cancel):",
                 choices=AVAILABLE_SKILLS,
                 default="seekdb",  # Select all by default
-                instruction="(Select multiple with Space)"
+                instruction="(Select multiple with Space)",
+                style=_NO_BG_STYLE,
             ).ask()
         except KeyboardInterrupt:
             print("\n\nInstallation cancelled by user.")
