@@ -181,7 +181,11 @@ def endpoint_group(ctx: click.Context) -> None:
 @click.argument("ai_model_name")
 @click.option("--url", required=True, help="API URL (e.g. https://api.siliconflow.cn/v1/chat/completions).")
 @click.option("--access-key", required=True, help="API key for the service.")
-@click.option("--provider", default="siliconflow", help="Provider name (siliconflow, openai, dashscope, etc.).")
+@click.option(
+    "--provider",
+    default="siliconflow",
+    help="Provider identifier. See supported providers and URLs below.",
+)
 @click.pass_context
 def endpoint_create(
     ctx: click.Context,
@@ -191,7 +195,34 @@ def endpoint_create(
     access_key: str,
     provider: str,
 ) -> None:
-    """Create an AI model endpoint via DBMS_AI_SERVICE.CREATE_AI_MODEL_ENDPOINT."""
+    """Create an AI model endpoint via DBMS_AI_SERVICE.CREATE_AI_MODEL_ENDPOINT.
+
+    Supported providers (--provider value):
+      aliyun-openAI     Alibaba Cloud (OpenAI-compatible)
+      aliyun-dashscope  Alibaba Cloud DashScope
+      deepseek          DeepSeek
+      siliconflow       SiliconFlow
+      hunyuan-openAI    Tencent Hunyuan (OpenAI-compatible)
+      openAI            OpenAI
+
+    Provider endpoint URLs (use the specific interface URL for chat/embedding/rerank, not the base URL):
+      Alibaba Cloud (OpenAI-compatible):
+        completion  https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+        embedding   https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings
+      Alibaba Cloud DashScope (native):
+        completion  https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation
+        embedding   https://dashscope.aliyuncs.com/api/v1/services/embeddings/text-embedding/text-embedding
+        rerank     https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank
+      DeepSeek (OpenAI-compatible):
+        completion  https://api.deepseek.com/chat/completions
+      SiliconFlow (OpenAI-compatible):
+        completion  https://api.siliconflow.cn/v1/chat/completions
+        embedding   https://api.siliconflow.cn/v1/embeddings
+        rerank     https://api.siliconflow.cn/v1/rerank
+      Tencent Hunyuan (OpenAI-compatible):
+        completion  https://api.hunyuan.cloud.tencent.com/v1/chat/completions
+        embedding   https://api.hunyuan.cloud.tencent.com/v1/embeddings
+    """
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
 
