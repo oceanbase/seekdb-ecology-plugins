@@ -1,6 +1,6 @@
 ---
 name: seekdb-cli
-description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. seekdb-cli is an AI-Agent-friendly database CLI with JSON-structured output, automatic row protection, write safety guards, and sensitive field masking. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) importing/exporting data, (7) managing AI models, (8) checking database connection status, or (9) performing any database operation via command line. Triggers on: SQL queries, database schema inspection, table exploration, data lookup, vector search, collection management, seekdb operations."
+description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. seekdb-cli is an AI-Agent-friendly database CLI with JSON-structured output, automatic row protection, write safety guards, and sensitive field masking. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) adding/exporting collection data, (7) managing AI models (OceanBase DBMS_AI_SERVICE), (8) checking database connection status, or (9) performing any database operation via command line. Supports remote (seekdb://) and embedded (embedded:<path>) DSN. Triggers on: SQL queries, database schema inspection, table exploration, data lookup, vector search, collection management, seekdb operations."
 license: MIT
 ---
 
@@ -16,31 +16,59 @@ Check if seekdb-cli is installed:
 seekdb --version
 ```
 
-If not installed:
+If not installed, choose the method that matches your environment:
+
+**Recommended — pipx (works globally without polluting system Python):**
+
+```bash
+# Install pipx first if needed (Ubuntu/Debian)
+sudo apt install pipx && pipx ensurepath
+# Then install seekdb-cli
+pipx install seekdb-cli
+```
+
+**Alternative — pip (when inside a project venv or on systems without PEP 668):**
 
 ```bash
 pip install seekdb-cli
 ```
 
+> **Note for Ubuntu 23.04+ / Debian 12+:** Direct `pip install` at the system level is blocked by PEP 668.
+> Use `pipx` instead — it creates an isolated environment while keeping the `seekdb` command globally available on your PATH.
+
 ## Connection Setup
 
-Set the `SEEKDB_DSN` environment variable before running any command:
+Set the `SEEKDB_DSN` environment variable before running any command.
+
+**Remote (seekdb server or OceanBase):**
 
 ```bash
 export SEEKDB_DSN="seekdb://user:password@host:port/database"
+```
+
+**Embedded (local directory, no server; SQL and collections both work):**
+
+```bash
+export SEEKDB_DSN="embedded:./seekdb.db"
+export SEEKDB_DSN="embedded:/path/to/data?database=mydb"   # optional database name
 ```
 
 Or pass `--dsn` on each call (overrides env var):
 
 ```bash
 seekdb --dsn "seekdb://root:@127.0.0.1:2881/test" status
+seekdb --dsn "embedded:./seekdb.db" status
 ```
+
+**Note:** Global options `--dsn` and `--format` must appear **before** the subcommand, e.g. `seekdb --format table sql "SELECT 1"`.
+
+**Embedded vs remote:** Both modes support SQL, vector collections (add, query, get, export), and AI model/complete. Use embedded for local data (no server); use remote to connect to an existing seekdb or OceanBase instance.
 
 Verify connectivity:
 
 ```bash
 seekdb status
-# → {"ok": true, "data": {"cli_version": "0.1.0", "server_version": "...", "database": "test", "connected": true}}
+# → {"ok": true, "data": {"cli_version": "0.1.0", "mode": "remote"|"embedded", "server_version": "...", "database": "test", "connected": true}}
 ```
 
 ## Self-Description for AI Agents
@@ -249,16 +277,25 @@ seekdb get my_docs --ids "doc1,doc2"
 seekdb get my_docs --where '{"category": "tech"}' --limit 20
 ```
 
-### seekdb import
+### seekdb add
 
-Import data into a collection from a JSON, JSONL, or CSV file.
+Add data to a collection. Exactly one source is required: `--file`, `--stdin`, or `--data`.
 
 ```bash
-seekdb import my_docs --file data.jsonl
-seekdb import my_docs --file articles.csv --vectorize-column content
+# From file (JSON array, JSONL, or CSV)
+seekdb add my_docs --file data.jsonl
+seekdb add my_docs --file articles.csv --vectorize-column content
+
+# Inline: single object or array
+seekdb add my_docs --data '{"id":"1","document":"Hello world","metadata":{"source":"cli"}}'
+seekdb add my_docs --data '[{"id":"a","document":"Doc A"},{"id":"b","document":"Doc B"}]'
+
+# From stdin (JSON array or JSONL; use with pipes)
+echo '{"id":"1","document":"from pipe"}' | seekdb add my_docs --stdin
+some_script | seekdb add my_docs --stdin
 ```
 
-**File format**: Each record should have `id` (optional), `document`/`text`/`content` (text to vectorize), and any other fields become metadata. If `embedding` field is present, it is used directly.
+**Record format**: Each record may have `id` (optional), `document`/`text`/`content` (text to vectorize), and any other fields become metadata. If `embedding` is present, it is used directly.
 
 ### seekdb export
 
@@ -271,36 +308,61 @@ seekdb export my_docs --output backup.jsonl --limit 5000
 
 ### seekdb ai model list
 
+List AI models registered in the database (from `DBA_OB_AI_MODELS` / DBMS_AI_SERVICE). Works in both remote and embedded mode.
+
 ```bash
 seekdb ai model list
 ```
 
 ```json
-{"ok": true, "data": [{"name": "gpt4", "provider": "openai", "model": "gpt-4o", "created_at": "2026-03-12"}]}
+{"ok": true, "data": [{"name": "my_llm", "type": "completion", "model_name": "THUDM/GLM-4-9B-0414", "model_id": 1}]}
 ```
 
 ### seekdb ai model create
 
+Register an AI model via `DBMS_AI_SERVICE.CREATE_AI_MODEL`. Create an endpoint separately to use it for completion.
+
 ```bash
-seekdb ai model create gpt4 --provider openai --model gpt-4o --api-key sk-...
-seekdb ai model create local-llm --provider ollama --model llama3
-seekdb ai model create qwen --provider qwen --model qwen-max --base-url https://dashscope.aliyuncs.com/compatible-mode/v1
+seekdb ai model create my_llm --type completion --model "THUDM/GLM-4-9B-0414"
+seekdb ai model create my_embed --type dense_embedding --model "BAAI/bge-m3"
+seekdb ai model create my_rerank --type rerank --model "<rerank_model>"
 ```
+
+Types: `completion`, `dense_embedding`, `rerank`.
 
 ### seekdb ai model delete
 
+Drop an AI model. Drop any endpoints that use it first.
+
 ```bash
-seekdb ai model delete gpt4
+seekdb ai model delete my_llm
+```
+
+### seekdb ai model endpoint create / delete
+
+Create or drop an endpoint that binds an AI model to a URL and API key (so the database can call the model).
+
+> **Reference:** [CREATE_AI_MODEL_ENDPOINT](references/create-ai-model-endpoint.md) — full parameter spec, supported providers, and endpoint URLs.
+
+```bash
+seekdb ai model endpoint create my_ep my_llm \
+  --url "https://api.siliconflow.cn/v1/chat/completions" \
+  --access-key "<YOUR_API_KEY>" \
+  --provider siliconflow
+
+seekdb ai model endpoint delete my_ep
 ```
 
 ### seekdb ai complete
 
+Run text completion using the database `AI_COMPLETE` function. Requires a registered **completion** model and an endpoint. Supported in both remote and embedded mode.
+
 ```bash
-seekdb ai complete "Summarize this table structure" --model gpt4
+seekdb ai complete "Summarize this table structure" --model my_llm
 ```
 
 ```json
-{"ok": true, "data": {"model": "gpt4", "response": "The table has..."}, "time_ms": 1200}
+{"ok": true, "data": {"model": "my_llm", "response": "The table has..."}, "time_ms": 1200}
 ```
 
 ### seekdb ai-guide
