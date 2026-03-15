@@ -228,6 +228,9 @@ _AI_GUIDE = {
         "masking": "Sensitive fields (phone, email, password, id_card) are auto-masked in output.",
     },
     "exit_codes": {"0": "success", "1": "business error", "2": "usage error"},
+    "tips": {
+        "detailed_help": "Run 'seekdb <subcommand> --help' for detailed options. Examples: seekdb sql --help | seekdb schema describe --help | seekdb table profile --help | seekdb ai complete --help | seekdb ai model create --help | seekdb ai model endpoint create --help",
+    },
 }
 
 
