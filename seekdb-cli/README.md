@@ -3,13 +3,19 @@ English | [简体中文](README_CN.md)
 
 Command-line client for seekdb / OceanBase, built for AI agents. Default JSON output, stateless invocations, and a consistent error format make it easy for agents to run SQL, inspect schema, manage vector collections, and use in-database AI models reliably.
 
+## Why seekdb-cli
+
+- **Agent-friendly**: Any agent that can run shell commands can use seekdb-cli via the `seekdb` command; output is JSON by default, and the `seekdb ai-guide` command provides a self-description of seekdb-cli usage for agents.
+- **Safety**: Row limits, write guards, and masking reduce risk when agents or scripts operate on live data.
+- **Unified interface**: One CLI for remote and embedded, SQL and vector collections, plus in-database AI, without interactive prompts or session state.
+
 ## Features
 
 - **JSON by default**: All commands emit structured JSON; use `--format table|csv|jsonl` for human-readable output.
-- **Row limits**: SELECTs without LIMIT are probed with 101 rows; if more than 100 rows are returned, the CLI asks for an explicit LIMIT.
+- **Row limits**: LIMIT required when result exceeds 100 rows.
 - **Write safeguards**: Writes require `--write`; DELETE/UPDATE without WHERE and DROP/TRUNCATE are disallowed.
 - **Sensitive-field masking**: Columns such as phone, email, password, id_card are auto-masked in query results.
-- **SQL history**: Operations are logged to `~/.seekdb/sql-history.jsonl` (sensitive literals in SQL are redacted when logged).
+- **Operation history**: All commands are logged to `~/.seekdb/sql-history.jsonl`; for **SQL execution**, the SQL text is logged with sensitive literals redacted.
 - **Database AI**: Manage models and endpoints via DBMS_AI_SERVICE; use AI_COMPLETE for completion.
 
 ## Requirements

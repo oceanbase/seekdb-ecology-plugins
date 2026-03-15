@@ -3,13 +3,19 @@
 
 面向 AI Agent 的 seekdb / OceanBase 命令行客户端。默认 JSON 输出、无状态调用、统一错误格式，便于 Agent 可靠地执行 SQL、查看 schema、管理向量集合与数据库内 AI 模型。
 
+## 为什么选择 seekdb-cli
+
+- **面向 Agent**：任何能执行 Shell 的 Agent 均可通过 `seekdb` 命令使用 seekdb-cli； 默认输出 JSON 格式，`seekdb ai-guide` 命令给 Agent 提供 seekdb-cli 用法的自描述。
+- **安全可控**：行数限制、写操作保护与敏感字段脱敏，降低 Agent 或脚本操作生产数据的风险。
+- **统一入口**：远程与嵌入式、SQL 与向量集合、数据库内 AI 共用一套 CLI，无需交互式提示或会话状态。
+
 ## 特性
 
 - **默认 JSON**：所有命令输出结构化 JSON，`--format table|csv|jsonl` 可切换人类可读格式
-- **行数保护**：无 LIMIT 的 SELECT 先试探 101 行，超过 100 行则要求补充 LIMIT
+- **行数保护**：超过 100 行要求补充 LIMIT
 - **写操作保护**：写操作需 `--write`；禁止无 WHERE 的 DELETE/UPDATE 及 DROP/TRUNCATE
 - **敏感字段脱敏**：查询结果中 phone、email、password、id_card 等自动掩码
-- **SQL 历史**：操作记录到 `~/.seekdb/sql-history.jsonl`（写入时 SQL 中敏感字面量会脱敏）
+- **操作历史**：所有命令的操作记录到 `~/.seekdb/sql-history.jsonl`；其中 **SQL 执行** 会记录 SQL 文本，并对 SQL 中敏感字面量脱敏
 - **数据库 AI**：通过 DBMS_AI_SERVICE 管理模型与 endpoint，通过 AI_COMPLETE 做补全
 
 ## 环境要求
