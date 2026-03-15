@@ -3,3 +3,8 @@
 .env
 seekdb.db
 __pycache__
+
+# Python / pytest
+.pytest_cache/
+agent-skills/src/*.egg-info/
+seekdb-cli/src/*.egg-info/

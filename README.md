@@ -12,8 +12,9 @@ seekdb is a high-performance vector database that provides powerful capabilities
 
 | Plugin Name                                                                             | Use Case                  | Key Features                                                                           |
 | --------------------------------------------------------------------------------------- | ------------------------- | -------------------------------------------------------------------------------------- |
-| [seekdb Agent Skills](./agent-skills/README.md)                             | Development Tools/Data Analysis         | These agent skills aimed at enhancing AI agent capabilities in seekdb database scenarios. data import (CSV/Excel with vectorization), and hybrid search with export |
+| [seekdb Agent Skills](./agent-skills/README.md)                             | Development Tools/Data Analysis         | Agent skills for seekdb: documentation knowledge base, data import (CSV/Excel with vectorization), hybrid search with export, seekdb-cli command-line skill |
 | [seekdb Cursor Extension](./cursor-extension/README.md)                            | Development Tools         | Adds seekdb database documentation to Cursor's `.cursor/rules` directory for AI assistant integration |
+| [seekdb-cli](./seekdb-cli/README.md)                                                | CLI / AI Agent            | AI-Agent-friendly CLI: default JSON, stateless, SQL/schema/vector collections/database AI management |
 
 ---
 
@@ -25,17 +26,20 @@ seekdb is a high-performance vector database that provides powerful capabilities
   - **seekdb**: Complete official documentation knowledge base with semantic search
   - **importing-to-seekdb**: Import CSV/Excel files with automatic column vectorization for semantic search
   - **querying-from-seekdb**: Hybrid search (fulltext + semantic) with metadata filtering and CSV/Excel export
+  - **seekdb-cli**: Interact with seekdb/OceanBase via the seekdb-cli command line: run SQL, inspect schema/table profile, infer relations, manage vector collections and AI models (JSON output, stateless, for AI Agent invocation)
 
 - **Use Case**: 
   - Query seekdb technical documentation and best practices
   - Import product catalogs, documents, or any tabular data into seekdb with vector embeddings
   - Perform semantic search with metadata filters and export results
+  - Run SQL, inspect table structure, manage vector collections, or use in-database AI via Shell (seekdb-cli skill)
 
 - **Example Workflow**:
   ```
   1. "How to create a vector collection in seekdb?" → Documentation query
   2. "Import sample_products.xlsx, vectorize the Details column" → Data import
   3. "Find phones with rating >= 4.3 and AMOLED screen, export to Excel" → Hybrid search + export
+  4. "Query first 10 rows of test table with seekdb-cli" or "List all tables / describe a table" → seekdb-cli skill
   ```
 
 - **Documentation**: [seekdb Agent Skills](./agent-skills/README.md)
@@ -48,6 +52,14 @@ seekdb is a high-performance vector database that provides powerful capabilities
 
 - **Documentation**: [seekdb Cursor Extension](./cursor-extension/README.md)
 
+### ✅ seekdb-cli
+
+- **Function**: AI-Agent-friendly command-line client for seekdb / OceanBase. Default JSON output, stateless calls, unified error format; supports SQL execution (with row/write safeguards), schema inspection and dump, table profile, relation inference, vector collection management and search, and in-database AI models and completion.
+
+- **Use Case**: Invoked from the terminal or by an AI Agent via Shell to run SQL, inspect table structure, manage vector collections, or use DBMS_AI_SERVICE / AI_COMPLETE; supports remote and embedded local mode.
+
+- **Documentation**: [seekdb-cli](./seekdb-cli/README.md)
+
 ---
 
 ## 📚 Full Documentation Links
@@ -56,6 +68,7 @@ seekdb is a high-performance vector database that provides powerful capabilities
 | ------------------------------------- | --------------------------------------------------------------------------------------- |
 | seekdb Agent Skills             | [seekdb Agent Skills](./agent-skills/README.md)                             |
 | seekdb Cursor Extension          | [seekdb Cursor Extension](./cursor-extension/README.md)                            |
+| seekdb-cli                        | [seekdb-cli](./seekdb-cli/README.md)                                                |
 
 ---
 
