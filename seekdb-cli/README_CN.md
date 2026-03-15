@@ -76,7 +76,3 @@ seekdb --dsn "seekdb://root:@127.0.0.1:2881/test" status
 seekdb --format table sql "SELECT * FROM t LIMIT 5"
 seekdb --dsn "seekdb://root:@127.0.0.1:2881/test" schema tables
 ```
-
-## License
-
-MIT
