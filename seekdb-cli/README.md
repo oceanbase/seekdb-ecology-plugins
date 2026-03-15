@@ -20,11 +20,7 @@ Command-line client for seekdb / OceanBase, built for AI agents. Default JSON ou
 ## Installation
 
 ```bash
-# With uv (recommended)
-cd seekdb-cli && uv sync
-
-# Or with pip
-pip install -e .
+pip install seekdb-cli
 ```
 
 After installation, the `seekdb` command is available.

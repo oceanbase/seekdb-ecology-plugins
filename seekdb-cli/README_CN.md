@@ -20,11 +20,7 @@
 ## 安装
 
 ```bash
-# 使用 uv（推荐）
-cd seekdb-cli && uv sync
-
-# 或 pip
-pip install -e .
+pip install seekdb-cli
 ```
 
 安装后可使用 `seekdb` 命令。
