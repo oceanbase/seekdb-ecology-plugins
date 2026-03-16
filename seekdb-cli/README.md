@@ -33,19 +33,20 @@ After installation, the `seekdb` command is available.
 
 ## Connection
 
-Set the DSN via environment variable or global option (**global options must appear before the subcommand**):
+Works out of the box — with no configuration, seekdb-cli uses a default embedded database at `~/.seekdb/seekdb.db`.
+
+To connect to a remote server or use a different database path, create a global config file:
 
 ```bash
+mkdir -p ~/.seekdb
 # Remote
-export SEEKDB_DSN="seekdb://user:pass@host:port/database"
+echo 'SEEKDB_DSN="seekdb://user:pass@host:port/database"' > ~/.seekdb/config.env
 
-# Embedded (local directory, no separate server)
-export SEEKDB_DSN="embedded:./seekdb.db"
-export SEEKDB_DSN="embedded:./data?database=mydb"
-
-# Or pass per invocation
-seekdb --dsn "seekdb://root:@127.0.0.1:2881/test" status
+# Or embedded with a custom path
+echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 ```
+
+Also supports `--dsn` CLI flag, `SEEKDB_DSN` environment variable, and project `.env` files, in decreasing priority.
 
 ## Common commands
 

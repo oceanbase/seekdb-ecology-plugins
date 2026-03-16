@@ -41,15 +41,25 @@ def tables(ctx: click.Context) -> None:
             result: list[dict[str, Any]] = []
             for row in status_rows:
                 table_name = row.get("Name", "")
-                row_count = row.get("Rows", 0)
 
                 cur.execute(f"SHOW COLUMNS FROM `{table_name}`")
                 col_count = len(cur.fetchall())
 
+                row_count = row.get("Rows", 0) or 0
+                if row_count == 0:
+                    # Stats report 0 — may be stale before compaction.
+                    # Verify with COUNT(*) only for these tables.
+                    try:
+                        cur.execute(f"SELECT COUNT(*) AS cnt FROM `{table_name}`")
+                        cnt_row = cur.fetchone()
+                        row_count = cnt_row["cnt"] if cnt_row else 0
+                    except Exception:
+                        pass
+
                 result.append({
                     "name": table_name,
                     "columns": col_count,
-                    "rows": row_count or 0,
+                    "rows": row_count,
                 })
 
         log_operation("schema tables", ok=True, time_ms=timer.elapsed_ms)

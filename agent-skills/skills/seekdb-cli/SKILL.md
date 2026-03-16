@@ -36,39 +36,14 @@ pip install seekdb-cli
 > **Note for Ubuntu 23.04+ / Debian 12+:** Direct `pip install` at the system level is blocked by PEP 668.
 > Use `pipx` instead — it creates an isolated environment while keeping the `seekdb` command globally available on your PATH.
 
-## Connection Setup
+## Connection
 
-Set the `SEEKDB_DSN` environment variable before running any command.
+seekdb-cli auto-discovers the connection (env var, `.env`, `~/.seekdb/config.env`, or default `~/.seekdb/seekdb.db`). No setup needed — just run commands directly.
 
-**Remote (seekdb server or OceanBase):**
-
-```bash
-export SEEKDB_DSN="seekdb://user:password@host:port/database"
-```
-
-**Embedded (local directory, no server; SQL and collections both work):**
+If the user provides a specific DSN, pass it via `--dsn` (must appear **before** the subcommand):
 
 ```bash
-export SEEKDB_DSN="embedded:./seekdb.db"
-export SEEKDB_DSN="embedded:/path/to/data?database=mydb"   # optional database name
-```
-
-Or pass `--dsn` on each call (overrides env var):
-
-```bash
-seekdb --dsn "seekdb://root:@127.0.0.1:2881/test" status
-seekdb --dsn "embedded:./seekdb.db" status
-```
-
-**Note:** Global options `--dsn` and `--format` must appear **before** the subcommand, e.g. `seekdb --format table sql "SELECT 1"`.
-
-**Embedded vs remote:** Both modes support SQL, vector collections (add, query, get, export), and AI model/complete. Use embedded for local data (no server); use remote to connect to an existing seekdb or OceanBase instance.
-
-Verify connectivity:
-
-```bash
-seekdb status
-# → {"ok": true, "data": {"cli_version": "0.1.0", "mode": "remote"|"embedded", "server_version": "...", "database": "test", "connected": true}}
+seekdb --dsn "seekdb://user:pass@host:port/db" schema tables
 ```
 
 ## Self-Description for AI Agents

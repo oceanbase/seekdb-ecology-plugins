@@ -8,3 +8,4 @@ __pycache__
 .pytest_cache/
 agent-skills/src/*.egg-info/
 seekdb-cli/src/*.egg-info/
+dist/

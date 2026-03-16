@@ -33,19 +33,20 @@ pip install seekdb-cli
 
 ## 连接
 
-通过环境变量或全局选项指定 DSN（**全局选项须写在子命令前**）：
+无需任何配置即可使用——默认使用 `~/.seekdb/seekdb.db` 嵌入式数据库。
+
+如需连接远程服务器或指定其他数据库路径，创建全局配置文件：
 
 ```bash
+mkdir -p ~/.seekdb
 # 远程
-export SEEKDB_DSN="seekdb://user:pass@host:port/database"
+echo 'SEEKDB_DSN="seekdb://user:pass@host:port/database"' > ~/.seekdb/config.env
 
-# 嵌入式（本地目录，无需单独部署服务）
-export SEEKDB_DSN="embedded:./seekdb.db"
-export SEEKDB_DSN="embedded:./data?database=mydb"
-
-# 或每次指定
-seekdb --dsn "seekdb://root:@127.0.0.1:2881/test" status
+# 或嵌入式自定义路径
+echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 ```
+
+也支持 `--dsn` 命令行参数、`SEEKDB_DSN` 环境变量、项目 `.env` 文件等方式，优先级依次递减。
 
 ## 常用命令
 

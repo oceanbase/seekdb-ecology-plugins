@@ -84,7 +84,7 @@ def parse_embedded_dsn(dsn: str) -> EmbeddedDSNConfig:
             "Expected: embedded:<path>[?database=<db>]  e.g. embedded:./seekdb.db"
         )
     cfg = EmbeddedDSNConfig()
-    cfg.path = m.group("path")
+    cfg.path = os.path.expanduser(m.group("path"))
     if m.group("database"):
         cfg.database = m.group("database")
     return cfg
@@ -95,18 +95,12 @@ def is_embedded_dsn(dsn: str) -> bool:
 
 
 def resolve_dsn(cli_dsn: str | None) -> DSNConfig:
-    """Resolve DSN from CLI arg (highest priority) or SEEKDB_DSN env var.
+    """Resolve DSN from CLI arg, env var, or config files.
 
     Only handles remote (seekdb://) DSNs.  For embedded DSNs, callers
     should check ``is_embedded_dsn()`` first.
     """
-    raw = cli_dsn or os.environ.get("SEEKDB_DSN")
-    if not raw:
-        raise ValueError(
-            "No connection info. Set SEEKDB_DSN env var or pass --dsn.\n"
-            "  Example: export SEEKDB_DSN=\"seekdb://root:pass@127.0.0.1:2881/test\"\n"
-            "  Embedded: export SEEKDB_DSN=\"embedded:./seekdb.db\""
-        )
+    raw = resolve_raw_dsn(cli_dsn)
     if is_embedded_dsn(raw):
         raise ValueError(
             "resolve_dsn() does not handle embedded DSNs. Use resolve_raw_dsn() instead."
@@ -114,16 +108,83 @@ def resolve_dsn(cli_dsn: str | None) -> DSNConfig:
     return parse_dsn(raw)
 
 
+def _resolve_embedded_path(dsn: str, base_dir: str) -> str:
+    """Resolve relative embedded paths to absolute, relative to *base_dir*."""
+    if not is_embedded_dsn(dsn):
+        return dsn
+    m = _EMBEDDED_RE.match(dsn)
+    if not m:
+        return dsn
+    path = os.path.expanduser(m.group("path"))
+    if os.path.isabs(path):
+        return f"embedded:{path}" + (f"?database={m.group('database')}" if m.group("database") else "")
+    abs_path = os.path.normpath(os.path.join(base_dir, path))
+    result = f"embedded:{abs_path}"
+    if m.group("database"):
+        result += f"?database={m.group('database')}"
+    return result
+
+
+def _read_dsn_from_env_file(filepath: str) -> str | None:
+    """Extract SEEKDB_DSN value from a .env-style file."""
+    try:
+        with open(filepath) as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if line.startswith("SEEKDB_DSN="):
+                    val = line[len("SEEKDB_DSN="):]
+                    return val.strip().strip("\"'")
+    except OSError:
+        pass
+    return None
+
+
+def _discover_dsn() -> str | None:
+    """Auto-discover DSN from config files.
+
+    Search order:
+      1. .env            in cwd   (SEEKDB_DSN=... line)
+      2. ~/.seekdb/config          (SEEKDB_DSN=... line)
+    Relative embedded paths are resolved relative to the config file's
+    directory so the DSN works from any working directory.
+    """
+    cwd = os.getcwd()
+
+    env_file = os.path.join(cwd, ".env")
+    dsn = _read_dsn_from_env_file(env_file)
+    if dsn:
+        return _resolve_embedded_path(dsn, cwd)
+
+    config_file = os.path.expanduser("~/.seekdb/config.env")
+    dsn = _read_dsn_from_env_file(config_file)
+    if dsn:
+        return _resolve_embedded_path(dsn, os.path.dirname(config_file))
+
+    return None
+
+
+_DEFAULT_EMBEDDED_DSN = "embedded:" + os.path.join(
+    os.path.expanduser("~"), ".seekdb", "seekdb.db"
+)
+
+
 def resolve_raw_dsn(cli_dsn: str | None) -> str:
-    """Return the raw DSN string from CLI arg or env var."""
-    raw = cli_dsn or os.environ.get("SEEKDB_DSN")
-    if not raw:
-        raise ValueError(
-            "No connection info. Set SEEKDB_DSN env var or pass --dsn.\n"
-            "  Example: export SEEKDB_DSN=\"seekdb://root:pass@127.0.0.1:2881/test\"\n"
-            "  Embedded: export SEEKDB_DSN=\"embedded:./seekdb.db\""
-        )
-    return raw
+    """Return the raw DSN string.
+
+    Resolution order:
+      1. ``--dsn`` CLI argument
+      2. ``SEEKDB_DSN`` environment variable
+      3. Auto-discover from config files (see ``_discover_dsn``)
+      4. Default embedded database at ``~/.seekdb/seekdb.db``
+    """
+    return (
+        cli_dsn
+        or os.environ.get("SEEKDB_DSN")
+        or _discover_dsn()
+        or _DEFAULT_EMBEDDED_DSN
+    )
 
 
 # ---------------------------------------------------------------------------
