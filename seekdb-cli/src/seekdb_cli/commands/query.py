@@ -37,7 +37,8 @@ def _flatten_results(results: dict[str, Any]) -> list[dict[str, Any]]:
     for i, doc_id in enumerate(ids):
         item: dict[str, Any] = {"id": doc_id}
         if dists and i < len(dists):
-            item["score"] = round(1.0 - dists[i], 4) if dists[i] is not None else None
+            d = dists[i]
+            item["score"] = round(1.0 - float(d), 4) if d is not None else None
         if docs and i < len(docs):
             item["document"] = docs[i]
         if metas and i < len(metas):

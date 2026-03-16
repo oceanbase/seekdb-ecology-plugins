@@ -276,7 +276,8 @@ def _execute(
         with conn.cursor() as cur:
             cur.execute(exec_sql)
 
-            if is_select:
+            # Any statement that returns a result set (SELECT, SHOW TABLES, DESCRIBE, etc.)
+            if cur.description is not None:
                 rows_raw = cur.fetchall()
                 description = cur.description or ()
 

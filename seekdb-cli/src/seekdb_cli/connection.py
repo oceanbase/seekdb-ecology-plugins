@@ -59,7 +59,15 @@ def parse_dsn(dsn: str) -> DSNConfig:
     """Parse ``seekdb://user:pass@host:port/db`` into a DSNConfig."""
     m = _DSN_RE.match(dsn)
     if not m:
-        raise ValueError(f"Invalid DSN format: {dsn!r}. Expected: seekdb://user:pass@host:port/db")
+        hint = ""
+        if not dsn.startswith("embedded:") and not dsn.startswith("seekdb://"):
+            if dsn.startswith("/") or dsn.startswith("./") or ".db" in dsn:
+                hint = f" For a local DB file use: embedded:{dsn}"
+        raise ValueError(
+            f"Invalid DSN format: {dsn!r}. "
+            "Remote: seekdb://user:pass@host:port/db ; "
+            f"Embedded: embedded:<path>[?database=<db>] e.g. embedded:~/.seekdb/seekdb.db.{hint}"
+        )
 
     cfg = DSNConfig()
     if m.group("host"):

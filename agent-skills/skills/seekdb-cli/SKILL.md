@@ -1,6 +1,6 @@
 ---
 name: seekdb-cli
-description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. seekdb-cli is an AI-Agent-friendly database CLI with JSON-structured output, automatic row protection, write safety guards, and sensitive field masking. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) adding/exporting collection data, (7) managing AI models (OceanBase DBMS_AI_SERVICE), (8) checking database connection status, or (9) performing any database operation via command line. Supports remote (seekdb://) and embedded (embedded:<path>) DSN. Triggers on: SQL queries, database schema inspection, table exploration, data lookup, vector search, collection management, seekdb operations."
+description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. seekdb-cli is an AI-Agent-friendly database CLI with JSON-structured output, automatic row protection, write safety guards, and sensitive field masking. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) adding/exporting collection data, (7) managing AI models (OceanBase DBMS_AI_SERVICE), (8) checking database connection status, or (9) performing any database operation via command line. Supports remote (seekdb://user:pass@host:port/db) and embedded (embedded:<path>[?database=<db>]) DSN. Triggers on: SQL queries, database schema inspection, table exploration, data lookup, vector search, collection management, seekdb operations."
 license: MIT
 ---
 
@@ -43,8 +43,17 @@ seekdb-cli auto-discovers the connection (env var, `.env`, `~/.seekdb/config.env
 If the user provides a specific DSN, pass it via `--dsn` (must appear **before** the subcommand):
 
 ```bash
+# Remote mode
 seekdb --dsn "seekdb://user:pass@host:port/db" schema tables
+
+# Embedded mode (local database file)
+seekdb --dsn "embedded:./seekdb.db" status
+seekdb --dsn "embedded:~/.seekdb/seekdb.db?database=mydb" sql "SELECT 1"
 ```
+
+DSN formats:
+- **Remote:** `seekdb://user:pass@host:port/db`
+- **Embedded:** `embedded:<path>[?database=<db>]` (default database: `test`)
 
 ## Self-Description for AI Agents
 
@@ -194,7 +203,10 @@ seekdb collection list
 
 ```bash
 seekdb collection create my_docs --dimension 384 --distance cosine
+seekdb collection create my_docs -d 768 --distance l2
 ```
+
+Options: `--dimension` / `-d` (default: 384), `--distance` cosine | l2 | ip (default: cosine).
 
 ### seekdb collection delete
 
@@ -209,8 +221,10 @@ seekdb collection info my_docs
 ```
 
 ```json
-{"ok": true, "data": {"name": "my_docs", "count": 1500, "preview": {"ids": ["doc1", "doc2"], "documents": ["Hello world", "Test doc"], "metadatas": [{"category": "test"}, {}]}}}
+{"ok": true, "data": {"name": "my_docs", "count": 1500, "dimension": 384, "distance": "cosine", "preview": {"ids": ["doc1", "doc2"], "documents": ["Hello world", "Test doc"], "metadatas": [{"category": "test"}, {}]}}}
 ```
+
+`dimension` and `distance` are included when available from the collection metadata.
 
 ### seekdb query
 
@@ -229,8 +243,8 @@ seekdb query my_docs --text "deploy seekdb" --mode hybrid
 # With metadata filter
 seekdb query my_docs --text "performance tuning" --where '{"category": "tech"}'
 
-# Limit results
-seekdb query my_docs --text "seekdb" --limit 5
+# Limit results (--limit or -n, default: 10)
+seekdb query my_docs --text "seekdb" -n 5
 ```
 
 ```json
@@ -248,13 +262,13 @@ Retrieve documents from a collection by IDs or metadata filter.
 # Get by IDs
 seekdb get my_docs --ids "doc1,doc2"
 
-# Get by metadata filter
-seekdb get my_docs --where '{"category": "tech"}' --limit 20
+# Get by metadata filter (--limit or -n, default: 10)
+seekdb get my_docs --where '{"category": "tech"}' -n 20
 ```
 
 ### seekdb add
 
-Add data to a collection. Exactly one source is required: `--file`, `--stdin`, or `--data`.
+Add data to a collection. Exactly one source is required: `--file`, `--stdin`, or `--data`. The collection is auto-created if it does not exist.
 
 ```bash
 # From file (JSON array, JSONL, or CSV)
@@ -278,8 +292,10 @@ Export collection data to a file.
 
 ```bash
 seekdb export my_docs --output backup.json
-seekdb export my_docs --output backup.jsonl --limit 5000
+seekdb export my_docs --output backup.jsonl -n 5000
 ```
+
+Options: `--output` (required), `--limit` / `-n` (default: 10000).
 
 ### seekdb ai model list
 
@@ -317,8 +333,6 @@ seekdb ai model delete my_llm
 
 Create or drop an endpoint that binds an AI model to a URL and API key (so the database can call the model).
 
-> **Reference:** [CREATE_AI_MODEL_ENDPOINT](references/create-ai-model-endpoint.md) — full parameter spec, supported providers, and endpoint URLs.
-
 ```bash
 seekdb ai model endpoint create my_ep my_llm \
   --url "https://api.siliconflow.cn/v1/chat/completions" \
@@ -327,6 +341,28 @@ seekdb ai model endpoint create my_ep my_llm \
 
 seekdb ai model endpoint delete my_ep
 ```
+
+**Supported `--provider` values:**
+
+| Provider | Vendor |
+|----------|--------|
+| `siliconflow` | SiliconFlow (OpenAI-compatible) |
+| `openAI` | OpenAI |
+| `deepseek` | DeepSeek (OpenAI-compatible) |
+| `aliyun-openAI` | Alibaba Cloud (OpenAI-compatible) |
+| `aliyun-dashscope` | Alibaba Cloud DashScope |
+| `hunyuan-openAI` | Tencent Hunyuan (OpenAI-compatible) |
+
+**Common `--url` values (use the specific interface URL, not the base URL):**
+
+| Vendor | completion | embedding | rerank |
+|--------|-----------|-----------|--------|
+| SiliconFlow | `https://api.siliconflow.cn/v1/chat/completions` | `https://api.siliconflow.cn/v1/embeddings` | `https://api.siliconflow.cn/v1/rerank` |
+| DeepSeek | `https://api.deepseek.com/chat/completions` | — | — |
+| Alibaba (OpenAI) | `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions` | `https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings` | — |
+| Tencent Hunyuan | `https://api.hunyuan.cloud.tencent.com/v1/chat/completions` | `https://api.hunyuan.cloud.tencent.com/v1/embeddings` | — |
+
+> Full parameter spec: [CREATE_AI_MODEL_ENDPOINT](references/create-ai-model-endpoint.md)
 
 ### seekdb ai complete
 
@@ -421,12 +457,12 @@ Columns matching sensitive patterns are automatically masked:
 
 ## Output Formats
 
-Default is JSON. Switch with `--format`:
+Default is JSON. Switch with `--format` / `-f`:
 
 ```bash
-seekdb --format table sql "SELECT id, name FROM users LIMIT 5"
+seekdb -f table sql "SELECT id, name FROM users LIMIT 5"
 seekdb --format csv sql "SELECT id, name FROM users LIMIT 5"
-seekdb --format jsonl sql "SELECT id, name FROM users LIMIT 5"
+seekdb -f jsonl sql "SELECT id, name FROM users LIMIT 5"
 ```
 
 All formats now work with non-row data (e.g., `schema tables`, `collection list`). CSV and JSONL will auto-detect list-of-dict data in the `data` field.
