@@ -1,25 +1,20 @@
 ---
 name: seekdb
-description: "seekdb database operations with built-in documentation lookup. Use when: (1) querying databases with SQL, (2) exploring table schemas, (3) managing vector collections, (4) AI model management, OR (5) looking up seekdb documentation (vector search, hybrid search, deployment, integrations). Triggers on: SQL queries, database operations, 'how to use seekdb', seekdb features documentation, vector/semantic search questions. Supports remote (seekdb://user:pass@host:port/db) and embedded (embedded:<path>[?database=<db>]) DSN."
+description: "Operate seekdb via CLI commands and look up seekdb documentation. Use when: executing SQL, exploring table schemas, managing vector collections, registering AI models, answering user questions about seekdb, or looking up seekdb concepts and syntax. Triggers on: SQL queries, database operations, seekdb features, vector/semantic search questions, or any user question about seekdb. Supports both embedded mode and remote server mode."
 license: MIT
 ---
 
 # seekdb — AI-Agent Database CLI with Documentation
 
-A unified skill for **operating seekdb** via CLI commands and **learning seekdb** via documentation lookup.
+This skill lets AI Agents **operate seekdb** via `seekdb-cli` commands and **look up seekdb documentation** when needed.
 
-## Two Modes
-
-| Mode | When | Action |
-|------|------|--------|
-| **Operation** | Execute SQL, query data, manage collections | Run `seekdb` CLI commands |
-| **Documentation** | "how to", concepts, syntax reference | Search catalog → fetch docs |
+> **Quick orientation**: Start with `seekdb ai-guide` to get a full JSON self-description of the CLI. Then run commands directly — no setup needed.
 
 ---
 
 # Part 1: seekdb-cli Operations
 
-A command-line client designed for AI Agents. All output is JSON-structured, stateless, with built-in safety guardrails.
+`seekdb-cli` is purpose-built for AI Agents. All output is structured JSON, all operations are stateless, and built-in safety guardrails prevent accidental data loss.
 
 ## Prerequisites
 
@@ -68,22 +63,22 @@ DSN formats:
 - **Remote:** `seekdb://user:pass@host:port/db`
 - **Embedded:** `embedded:<path>[?database=<db>]` (default database: `test`)
 
-## Self-Description for AI Agents
-
-Run `seekdb ai-guide` to get a structured JSON guide of all commands, recommended workflow, safety features, and output format. Execute this once to learn the full CLI.
+## Get a Full CLI Guide (run first)
 
 ```bash
 seekdb ai-guide
 ```
 
-## Recommended Workflow
+Returns a structured JSON document with every command, parameter, workflow, safety rules, and output format. **Run this once at the start of any seekdb task** to orient yourself.
+
+## Recommended Workflows
 
 ### SQL Database Exploration
 
 ```
 1. seekdb schema tables              → list all tables (name, column count, row count)
 2. seekdb schema describe <table>    → get column names, types, indexes, comments
-3. seekdb table profile <table>      → get data statistics (null ratios, distinct, min/max, top values)
+3. seekdb table profile <table>      → data statistics (null ratios, distinct, min/max, top values)
 4. seekdb relations infer            → infer JOIN relationships between tables
 5. seekdb sql "SELECT ... LIMIT N"   → execute SQL with explicit LIMIT
 ```
@@ -92,8 +87,18 @@ seekdb ai-guide
 
 ```
 1. seekdb collection list            → list all collections
-2. seekdb collection info <name>     → get collection details and preview
-3. seekdb query <collection> --text "..." → search by semantic similarity
+2. seekdb collection info <name>     → collection details and document preview
+3. seekdb query <collection> --text "..." → semantic/hybrid search
+4. seekdb add <collection> --data '...'  → add new documents
+```
+
+### AI Model Setup Workflow
+
+```
+1. seekdb ai model list                                    → check registered models
+2. seekdb ai model create <name> --type <type> --model <model_name>
+3. seekdb ai model endpoint create <ep> <model> --url <url> --access-key <key>
+4. seekdb ai complete "<prompt>" --model <name>           → test completion
 ```
 
 ## Command Reference
@@ -375,8 +380,6 @@ seekdb ai model endpoint delete my_ep
 | Alibaba (OpenAI) | `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions` | `https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings` | — |
 | Tencent Hunyuan | `https://api.hunyuan.cloud.tencent.com/v1/chat/completions` | `https://api.hunyuan.cloud.tencent.com/v1/embeddings` | — |
 
-> Full parameter spec: [references/create-ai-model-endpoint.md](references/create-ai-model-endpoint.md)
-
 ### seekdb ai complete
 
 Run text completion using the database `AI_COMPLETE` function. Requires a registered **completion** model and an endpoint. Supported in both remote and embedded mode.
@@ -500,14 +503,16 @@ All commands are logged to `~/.seekdb/sql-history.jsonl` (seekdb-cli SQL executi
 
 # Part 2: Documentation Lookup
 
-When users ask conceptual questions or need reference information, search the documentation catalog.
+Use documentation lookup when you need to understand a seekdb concept, look up SQL syntax, find configuration details, or answer user questions about seekdb.
+
+> **Tip**: For live database state (tables, schemas, data), run CLI commands directly. For concepts, syntax, and how-to guidance, search the docs.
 
 ## When to Use Documentation Lookup
 
-- User asks "how to" questions about seekdb features
-- User needs SQL syntax reference
-- User wants to understand concepts (vector search, hybrid search, etc.)
-- User asks about integrations, deployment, or configuration
+- Need to understand a seekdb concept (vector search, hybrid search, HNSW index, etc.)
+- Need SQL or PL syntax reference not answerable by `seekdb schema` commands
+- Need deployment, configuration, or integration guidance
+- CLI returned an error and you need to understand why from the docs
 
 ## Path Resolution
 
@@ -552,54 +557,3 @@ Query: "How to integrate with Claude Code?"
 ```
 
 See [references/doc-examples.md](references/doc-examples.md) for more workflow examples.
-
-## Version Info
-
-<!-- AUTO-UPDATED — do not edit manually -->
-- **Documentation versions covered**: V1.0.0, V1.1.0 (merged, latest takes priority)
-- **Latest version**: V1.1.0
-<!-- END AUTO-UPDATED -->
-- The `branch` field indicates which Git branch hosts the file (used for remote URLs only)
-
-## Documentation Categories
-
-- **Get Started**: Quick start, basic operations, overview
-- **Development**: Vector search, hybrid search, AI functions, MCP, multi-model
-- **Integrations**: Frameworks, model platforms, developer tools, workflows
-- **Guides**: Deployment, management, security, OBShell, performance
-- **Reference**: SQL syntax, PL, error codes, SDK APIs
-- **Tutorials**: Step-by-step scenarios
-
----
-
-# Combined Workflow Examples
-
-## Example 1: Learn then Execute
-
-```
-User: "How do I create a vector index?"
-
-1. Search docs for "vector index" → fetch documentation
-2. Learn syntax: CREATE VECTOR INDEX ... USING HNSW
-3. Execute: seekdb sql --write "CREATE VECTOR INDEX ..."
-```
-
-## Example 2: Troubleshoot with Docs
-
-```
-User runs: seekdb sql "SELECT * FROM large_table"
-Error: LIMIT_REQUIRED
-
-1. Agent checks docs for query best practices
-2. Corrects: seekdb sql "SELECT * FROM large_table LIMIT 100"
-```
-
-## Example 3: Explore New Feature
-
-```
-User: "What's hybrid search and how do I use it?"
-
-1. Search docs for "hybrid search" → learn concept
-2. Check collections: seekdb collection list
-3. Run search: seekdb query my_docs --text "..." --mode hybrid
-```
