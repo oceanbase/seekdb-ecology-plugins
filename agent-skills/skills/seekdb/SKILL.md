@@ -16,6 +16,46 @@ This skill lets AI Agents **operate seekdb** via `seekdb-cli` commands and **loo
 
 `seekdb-cli` is purpose-built for AI Agents. All output is structured JSON, all operations are stateless, and built-in safety guardrails prevent accidental data loss.
 
+## seekdb Deployment
+
+seekdb supports two modes. Use this section to guide users to the right deployment path based on their OS and scenario.
+
+### Embedded Mode
+
+seekdb runs as a library inside the application — **no server process required**. Install via `pyseekdb`:
+
+```bash
+pip install -U pyseekdb
+```
+
+**Supported platforms**: Linux (glibc ≥ 2.28), macOS 15+ · **Architectures**: x86_64, aarch64
+
+> Windows and older macOS versions **do not support embedded mode**. Use server mode instead.
+
+### Server Mode
+
+A persistent seekdb process, connectable via MySQL client or seekdb-cli (remote DSN). Choose by OS:
+
+| OS | Recommended method | Quick start |
+|----|--------------------|-------------|
+| Linux (CentOS/RHEL/Anolis/openEuler) | Package manager (RPM) | `curl -fsSL https://obportal.s3.ap-southeast-1.amazonaws.com/download-center/opensource/seekdb/seekdb_install.sh \| sudo bash` |
+| Linux (Debian/Ubuntu) | Package manager (DEB) | `sudo apt update && sudo apt install seekdb` |
+| macOS 15+ | Homebrew | `brew tap oceanbase/seekdb && brew install seekdb` |
+| Any OS with Docker | Docker | `docker run -d -p 2881:2881 oceanbase/seekdb` |
+| Windows / macOS (GUI) | OceanBase Desktop | Download from [oceanbase.ai/download](https://www.oceanbase.ai/download) |
+
+**Connect after server mode deployment** (default port 2881, user `root`, empty password):
+
+```bash
+mysql -h127.0.0.1 -uroot -P2881 -A -Dtest
+# or via seekdb-cli:
+seekdb --dsn "seekdb://root:@127.0.0.1:2881/test" status
+```
+
+**Minimum requirements**: 1 CPU core, 2 GB RAM, SSD storage.
+
+For full deployment details, see the [deployment docs](https://github.com/oceanbase/seekdb-ecology-plugins/tree/main/agent-skills/skills/seekdb/seekdb-docs/400.guides/400.deploy).
+
 ## Prerequisites
 
 Check if seekdb-cli is installed:
@@ -557,3 +597,7 @@ Query: "How to integrate with Claude Code?"
 ```
 
 See [references/doc-examples.md](references/doc-examples.md) for more workflow examples.
+
+---
+
+> If the information you need cannot be found in the catalog or the CLI output, visit the official seekdb documentation at **[oceanbase.ai/docs](https://www.oceanbase.ai/docs/)** for the most complete and up-to-date reference.
