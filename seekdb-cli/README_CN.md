@@ -60,7 +60,7 @@ echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 | `seekdb sql "<stmt>"` | 执行 SQL（只读默认；加 `--write` 允许写；`--with-schema` 附带表 schema；`--no-truncate` 不截断大字段） |
 | `seekdb relations infer [--table <t>]` | 推断表间 JOIN 关系 |
 | `seekdb collection list \| create \| delete \| info` | 向量集合管理 |
-| `seekdb query <coll> --text "<query>" [--mode semantic\|fulltext\|hybrid]` | 集合检索 |
+| `seekdb query <coll> --text "<query>" [--mode semantic\|fulltext\|hybrid]` | 集合检索（默认 **hybrid** 混合检索） |
 | `seekdb get <coll> [--ids ...] [--limit n]` | 按 ID 或条件取文档 |
 | `seekdb add <coll> (--file \| --stdin \| --data)` | 向集合写入数据 |
 | `seekdb export <coll> --output <path>` | 导出集合数据 |

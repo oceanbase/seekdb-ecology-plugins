@@ -60,7 +60,7 @@ Also supports `--dsn` CLI flag, `SEEKDB_DSN` environment variable, and project `
 | `seekdb sql "<stmt>"` | Execute SQL (read-only by default; use `--write` for writes; `--with-schema` adds table schema; `--no-truncate` keeps large fields intact) |
 | `seekdb relations infer [--table <t>]` | Infer JOIN relationships between tables |
 | `seekdb collection list \| create \| delete \| info` | Vector collection management |
-| `seekdb query <coll> --text "<query>" [--mode semantic\|fulltext\|hybrid]` | Search a collection |
+| `seekdb query <coll> --text "<query>" [--mode semantic\|fulltext\|hybrid]` | Search a collection (default: **hybrid**) |
 | `seekdb get <coll> [--ids ...] [--limit n]` | Get documents by ID or condition |
 | `seekdb add <coll> (--file \| --stdin \| --data)` | Add data to a collection |
 | `seekdb export <coll> --output <path>` | Export collection data |

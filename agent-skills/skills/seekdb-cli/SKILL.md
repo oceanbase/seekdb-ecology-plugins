@@ -80,7 +80,7 @@ seekdb ai-guide
 ```
 1. seekdb collection list            → list all collections
 2. seekdb collection info <name>     → get collection details and preview
-3. seekdb query <collection> --text "..." → search by semantic similarity
+3. seekdb query <collection> --text "..." → search (default: hybrid = semantic + fulltext)
 ```
 
 ## Command Reference
@@ -228,17 +228,17 @@ seekdb collection info my_docs
 
 ### seekdb query
 
-Search a collection using semantic (vector), fulltext, or hybrid mode.
+Search a collection using hybrid (default), semantic (vector), or fulltext mode.
 
 ```bash
-# Semantic search (default)
+# Hybrid search (default: semantic + fulltext, RRF ranking)
 seekdb query my_docs --text "how to deploy seekdb"
+
+# Semantic (vector) only
+seekdb query my_docs --text "how to deploy seekdb" --mode semantic
 
 # Fulltext search
 seekdb query my_docs --text "deployment guide" --mode fulltext
-
-# Hybrid search (semantic + fulltext, RRF ranking)
-seekdb query my_docs --text "deploy seekdb" --mode hybrid
 
 # With metadata filter
 seekdb query my_docs --text "performance tuning" --where '{"category": "tech"}'

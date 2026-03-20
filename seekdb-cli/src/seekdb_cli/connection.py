@@ -465,8 +465,10 @@ class EmbeddedConnection:
             import pylibseekdb
         except ImportError:
             raise ImportError(
-                "pylibseekdb is required for embedded mode. "
-                "Install it with: pip install pyseekdb   (Linux only)"
+                "Embedded mode is only supported on Linux (glibc >= 2.28) and macOS 15+. "
+                "On other systems, please use Server Mode instead: "
+                "deploy seekdb via Docker or OceanBase Desktop, then connect with "
+                "--dsn seekdb://user:pass@host:port/db"
             )
 
         abs_path = os.path.abspath(path)

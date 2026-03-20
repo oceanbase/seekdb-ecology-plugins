@@ -50,7 +50,12 @@ def _flatten_results(results: dict[str, Any]) -> list[dict[str, Any]]:
 @click.command("query")
 @click.argument("collection")
 @click.option("--text", required=True, help="Query text for semantic/fulltext search.")
-@click.option("--mode", type=click.Choice(["semantic", "fulltext", "hybrid"]), default="semantic", help="Search mode.")
+@click.option(
+    "--mode",
+    type=click.Choice(["semantic", "fulltext", "hybrid"]),
+    default="hybrid",
+    help="Search mode (default: hybrid = semantic + fulltext, RRF).",
+)
 @click.option("--limit", "-n", type=int, default=10, help="Max results to return.")
 @click.option("--where", "where_json", default=None, help="Metadata filter as JSON.")
 @click.pass_context

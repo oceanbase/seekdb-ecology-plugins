@@ -165,7 +165,7 @@ _AI_GUIDE = {
         {
             "name": "query",
             "usage": "seekdb query <collection> --text \"<query>\" [--mode semantic|fulltext|hybrid] [--limit <n>] [--where '<json>']",
-            "description": "Search a collection using semantic, fulltext, or hybrid mode.",
+            "description": "Search a collection (default mode: hybrid). Use --mode semantic or fulltext to override.",
         },
         {
             "name": "get",

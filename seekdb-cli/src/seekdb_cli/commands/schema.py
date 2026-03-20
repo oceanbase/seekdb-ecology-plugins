@@ -12,6 +12,20 @@ from seekdb_cli.connection import get_connection
 from seekdb_cli.logger import log_operation
 
 
+def _is_hidden_schema_table(table_name: str) -> bool:
+    """True for internal/SDK tables omitted from ``schema tables`` and ``schema dump``."""
+    t = table_name.strip()
+    if not t:
+        return False
+    lower = t.lower()
+    if lower == "sdk_collections":
+        return True
+    # pyseekdb / vector internal backing tables (e.g. c$v_...)
+    if lower.startswith("c$v"):
+        return True
+    return False
+
+
 @click.group("schema")
 @click.pass_context
 def schema_cmd(ctx: click.Context) -> None:
@@ -41,6 +55,8 @@ def tables(ctx: click.Context) -> None:
             result: list[dict[str, Any]] = []
             for row in status_rows:
                 table_name = row.get("Name", "")
+                if _is_hidden_schema_table(table_name):
+                    continue
 
                 cur.execute(f"SHOW COLUMNS FROM `{table_name}`")
                 col_count = len(cur.fetchall())
@@ -164,7 +180,8 @@ def dump(ctx: click.Context) -> None:
     try:
         with timer, conn.cursor() as cur:
             cur.execute("SHOW TABLES")
-            table_names = [list(r.values())[0] for r in cur.fetchall()]
+            all_names = [list(r.values())[0] for r in cur.fetchall()]
+            table_names = [n for n in all_names if not _is_hidden_schema_table(n)]
 
             ddl_list: list[dict[str, str]] = []
             for tbl in table_names:
