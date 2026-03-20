@@ -1,6 +1,6 @@
 ---
 name: seekdb
-description: "Operate seekdb via CLI commands and look up seekdb documentation. Use when: executing SQL, exploring table schemas, managing vector collections, registering AI models, answering user questions about seekdb, or looking up seekdb concepts and syntax. Triggers on: SQL queries, database operations, seekdb features, vector/semantic search questions, or any user question about seekdb. Supports both embedded mode and remote server mode."
+description: "Operate seekdb via CLI commands and look up seekdb documentation. Use when: executing SQL, exploring table schemas, managing vector collections, registering AI models, answering user questions about seekdb, or looking up seekdb concepts and syntax. Triggers on: SQL queries, database operations, seekdb features, vector/hybrid/semantic search questions, or any user question about seekdb. Supports both embedded mode and remote server mode."
 license: MIT
 ---
 
@@ -128,7 +128,7 @@ Returns a structured JSON document with every command, parameter, workflow, safe
 ```
 1. seekdb collection list            → list all collections
 2. seekdb collection info <name>     → collection details and document preview
-3. seekdb query <collection> --text "..." → semantic/hybrid search
+3. seekdb query <collection> --text "..." → hybrid search (default: semantic + fulltext)
 4. seekdb add <collection> --data '...'  → add new documents
 ```
 
@@ -286,17 +286,17 @@ seekdb collection info my_docs
 
 ### seekdb query
 
-Search a collection using semantic (vector), fulltext, or hybrid mode.
+Search a collection using hybrid (default), semantic (vector), or fulltext mode.
 
 ```bash
-# Semantic search (default)
+# Hybrid search (default: semantic + fulltext, RRF ranking)
 seekdb query my_docs --text "how to deploy seekdb"
+
+# Semantic (vector) only
+seekdb query my_docs --text "how to deploy seekdb" --mode semantic
 
 # Fulltext search
 seekdb query my_docs --text "deployment guide" --mode fulltext
-
-# Hybrid search (semantic + fulltext, RRF ranking)
-seekdb query my_docs --text "deploy seekdb" --mode hybrid
 
 # With metadata filter
 seekdb query my_docs --text "performance tuning" --where '{"category": "tech"}'
