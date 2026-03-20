@@ -3,6 +3,12 @@
 Supports two connection modes:
   - Remote:   seekdb://user:pass@host:port/db   → pymysql
   - Embedded: embedded:./path[/database]         → pylibseekdb
+
+Remote DSNs: if the username contains ``@`` (e.g. ``u@sys``), use
+``seekdb://u@sys:password@host:port/db``.  The parser takes the *rightmost*
+``@`` whose suffix is ``host[:port]``, then splits the credential prefix on
+the *first* ``:`` into user and password.  Usernames containing ``:`` must
+still be percent-encoded.
 """
 
 from __future__ import annotations
@@ -41,24 +47,72 @@ class EmbeddedDSNConfig:
 # DSN parsing
 # ---------------------------------------------------------------------------
 
-_DSN_RE = re.compile(
-    r"^seekdb://"
-    r"(?:(?P<user>[^:@]+)(?::(?P<password>[^@]*))?@)?"
-    r"(?P<host>[^:/?]+)"
-    r"(?::(?P<port>\d+))?"
-    r"(?:/(?P<database>[^?]*))?"
-    r"$"
-)
+# Tail after the last "@" that separates credentials from host must look like host[:port].
+_SEEKDB_HOST_PORT_RE = re.compile(r"^(?P<host>[^@/:]+)(?::(?P<port>\d+))?$")
 
 _EMBEDDED_RE = re.compile(
     r"^embedded:(?P<path>[^?]+?)(?:\?database=(?P<database>[^&]+))?$"
 )
 
 
+def _parse_seekdb_remote_dsn(dsn: str) -> DSNConfig | None:
+    """Parse ``seekdb://[user[:password]@]host[:port][/database]``.
+
+    The ``@`` before *host* may be ambiguous when the username contains ``@``
+    (e.g. ``u@sys:secret@10.0.0.1:2881/db``).  We pick the **rightmost** ``@``
+    whose suffix matches ``host:port``; credentials are the prefix, split on
+    the **first** ``:`` into user and password (password may contain ``:`` and
+    ``@``).  Usernames containing an unencoded ``:`` are not supported.
+    """
+    prefix = "seekdb://"
+    if not dsn.startswith(prefix):
+        return None
+    body = dsn[len(prefix) :]
+    database = ""
+    if "/" in body:
+        slash = body.index("/")
+        database = unquote(body[slash + 1 :])
+        body = body[:slash]
+
+    cfg = DSNConfig()
+    if database:
+        cfg.database = database
+
+    def apply_host_port(hostpart: str) -> bool:
+        m = _SEEKDB_HOST_PORT_RE.match(hostpart)
+        if not m:
+            return False
+        cfg.host = m.group("host")
+        if m.group("port"):
+            cfg.port = int(m.group("port"))
+        return True
+
+    if "@" not in body:
+        if not apply_host_port(body):
+            return None
+        return cfg
+
+    for at_idx in range(len(body) - 1, -1, -1):
+        if body[at_idx] != "@":
+            continue
+        userinfo, hostpart = body[:at_idx], body[at_idx + 1 :]
+        if not apply_host_port(hostpart):
+            continue
+        if ":" in userinfo:
+            c = userinfo.index(":")
+            cfg.user = unquote(userinfo[:c])
+            cfg.password = unquote(userinfo[c + 1 :])
+        else:
+            cfg.user = unquote(userinfo)
+        return cfg
+
+    return None
+
+
 def parse_dsn(dsn: str) -> DSNConfig:
     """Parse ``seekdb://user:pass@host:port/db`` into a DSNConfig."""
-    m = _DSN_RE.match(dsn)
-    if not m:
+    cfg = _parse_seekdb_remote_dsn(dsn)
+    if cfg is None:
         hint = ""
         if not dsn.startswith("embedded:") and not dsn.startswith("seekdb://"):
             if dsn.startswith("/") or dsn.startswith("./") or ".db" in dsn:
@@ -68,18 +122,6 @@ def parse_dsn(dsn: str) -> DSNConfig:
             "Remote: seekdb://user:pass@host:port/db ; "
             f"Embedded: embedded:<path>[?database=<db>] e.g. embedded:~/.seekdb/seekdb.db.{hint}"
         )
-
-    cfg = DSNConfig()
-    if m.group("host"):
-        cfg.host = m.group("host")
-    if m.group("port"):
-        cfg.port = int(m.group("port"))
-    if m.group("user"):
-        cfg.user = unquote(m.group("user"))
-    if m.group("password") is not None:
-        cfg.password = unquote(m.group("password"))
-    if m.group("database"):
-        cfg.database = unquote(m.group("database"))
     return cfg
 
 

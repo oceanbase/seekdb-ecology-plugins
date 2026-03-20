@@ -13,7 +13,7 @@
 
 - **默认 JSON**：所有命令输出结构化 JSON，`--format table|csv|jsonl` 可切换人类可读格式
 - **行数保护**：超过 100 行要求补充 LIMIT
-- **写操作保护**：写操作需 `--write`；禁止无 WHERE 的 DELETE/UPDATE 及 DROP/TRUNCATE
+- **写操作保护**：写操作需 `--write`；禁止无 WHERE 的 DELETE/UPDATE
 - **敏感字段脱敏**：查询结果中 phone、email、password、id_card 等自动掩码
 - **操作历史**：所有命令的操作记录到 `~/.seekdb/sql-history.jsonl`；其中 **SQL 执行** 会记录 SQL 文本，并对 SQL 中敏感字面量脱敏
 - **数据库 AI**：通过 DBMS_AI_SERVICE 管理模型与 endpoint，通过 AI_COMPLETE 做补全

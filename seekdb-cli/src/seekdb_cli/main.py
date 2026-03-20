@@ -114,8 +114,8 @@ _AI_GUIDE = {
         },
         {
             "name": "sql",
-            "usage": "seekdb sql \"<statement>\" [--write] [--with-schema] [--no-truncate] [--file <path>] [--stdin]",
-            "description": "Execute SQL. Read-only by default; add --write for mutations. Row protection auto-enforces LIMIT.",
+            "usage": "seekdb sql [<statement>] [--write] [--with-schema] [--no-truncate] [--file <path>] [--stdin] (or pipe SQL on stdin)",
+            "description": "Execute SQL. Read-only by default; add --write for mutations. Row protection auto-enforces LIMIT. Piped stdin is accepted without --stdin.",
         },
         {
             "name": "schema tables",
@@ -224,7 +224,7 @@ _AI_GUIDE = {
     },
     "safety": {
         "row_protection": "Queries without LIMIT are probed at 101 rows; if exceeded, LIMIT_REQUIRED error is returned.",
-        "write_protection": "Write operations require --write flag. DELETE/UPDATE without WHERE and DROP/TRUNCATE are always blocked.",
+        "write_protection": "Write operations require --write flag. DELETE/UPDATE without WHERE are blocked.",
         "masking": "Sensitive fields (phone, email, password, id_card) are auto-masked in output.",
     },
     "exit_codes": {"0": "success", "1": "business error", "2": "usage error"},

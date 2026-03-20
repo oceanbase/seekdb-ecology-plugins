@@ -35,6 +35,10 @@ class TestIsWrite:
         assert _is_write("insert into users values (1)")
         assert _is_write("  DELETE FROM t")
 
+    def test_fork_table(self):
+        assert _is_write("FORK TABLE source_table TO destination_table;")
+        assert _is_write("  fork TABLE t1 TO t1_fork")
+
 
 class TestIsSelect:
     def test_select(self):

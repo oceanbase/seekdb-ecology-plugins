@@ -24,7 +24,7 @@ _LARGE_FIELD_TYPES = frozenset({
 })
 
 _WRITE_RE = re.compile(
-    r"^\s*(INSERT|UPDATE|DELETE|REPLACE|ALTER|CREATE|DROP|TRUNCATE|RENAME)\b",
+    r"^\s*(INSERT|UPDATE|DELETE|REPLACE|ALTER|CREATE|DROP|TRUNCATE|RENAME|FORK)\b",
     re.I,
 )
 _SELECT_RE = re.compile(r"^\s*SELECT\b", re.I)
@@ -35,7 +35,6 @@ _DANGEROUS_DELETE_RE = re.compile(
 _DANGEROUS_UPDATE_RE = re.compile(
     r"^\s*UPDATE\s+\S+\s+SET\s+.+$", re.I
 )
-_DROP_TRUNCATE_RE = re.compile(r"^\s*(DROP|TRUNCATE)\b", re.I)
 
 _TABLE_NOT_FOUND_RE = re.compile(r"Table '.*?\.(\w+)' doesn't exist", re.I)
 _COLUMN_NOT_FOUND_RE = re.compile(r"Unknown column '(\w+)'", re.I)
@@ -64,13 +63,7 @@ def _has_where(sql: str) -> bool:
 
 
 def _check_dangerous_write(sql: str, fmt: str) -> None:
-    """Reject DELETE/UPDATE without WHERE, and DROP/TRUNCATE entirely."""
-    if _DROP_TRUNCATE_RE.match(sql):
-        output.error(
-            "DANGEROUS_WRITE",
-            "DROP/TRUNCATE operations are not allowed.",
-            fmt=fmt,
-        )
+    """Reject DELETE/UPDATE without WHERE."""
     stripped = sql.strip().rstrip(";")
     if re.match(r"^\s*DELETE\b", stripped, re.I) and not _has_where(stripped):
         output.error(
@@ -177,13 +170,25 @@ def _fetch_table_schema(
         return None
 
 
-@click.command("sql")
+@click.command(
+    "sql",
+    epilog=(
+        "Shell (bash): double-quoted SQL containing '!' is expanded by history before "
+        "seekdb runs (event not found). Use single quotes around the SQL, pipe or redirect "
+        "into this command (stdin is read automatically when piped), --file, or run: set +H"
+    ),
+)
 @click.argument("statement", required=False)
 @click.option("--write", is_flag=True, help="Allow write operations (INSERT/UPDATE/DELETE).")
 @click.option("--with-schema", is_flag=True, help="Include related table schema in output.")
 @click.option("--no-truncate", is_flag=True, help="Do not truncate large fields.")
 @click.option("--file", "sql_file", type=click.Path(exists=True), help="Read SQL from file.")
-@click.option("--stdin", "use_stdin", is_flag=True, help="Read SQL from stdin.")
+@click.option(
+    "--stdin",
+    "use_stdin",
+    is_flag=True,
+    help="Read SQL from stdin (also implied when stdin is a pipe/redirect and no statement).",
+)
 @click.pass_context
 def sql_cmd(
     ctx: click.Context,
@@ -198,6 +203,9 @@ def sql_cmd(
 
     Note: --format and --dsn are global options; put them before the subcommand, e.g.:
       seekdb --format json sql \"SELECT * FROM t LIMIT 5\"
+
+    If you omit STATEMENT and stdin is not a terminal (pipe or redirect), SQL is read
+    from stdin so literals with '!' are not mangled by the shell.
     """
     fmt: str = ctx.obj["format"]
     dsn: str | None = ctx.obj["dsn"]
@@ -248,9 +256,15 @@ def _resolve_sql(
         return sys.stdin.read().strip()
     if statement:
         return statement.strip()
+    # Piped/redirected stdin (not a TTY): read SQL without requiring --stdin, avoiding
+    # bash history expansion on '!' that breaks inline double-quoted arguments.
+    if not sys.stdin.isatty():
+        piped = sys.stdin.read().strip()
+        if piped:
+            return piped
     output.error(
         "MISSING_SQL",
-        "No SQL provided. Pass a statement, --file, or --stdin.",
+        "No SQL provided. Pass a statement, --file, --stdin, or pipe SQL on stdin.",
         fmt=fmt,
         exit_code=output.EXIT_USAGE_ERROR,
     )

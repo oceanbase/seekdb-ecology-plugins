@@ -38,6 +38,23 @@ class TestParseDSN:
         cfg = parse_dsn("seekdb://root:p%40ss%3Aword@host:2881/db")
         assert cfg.password == "p@ss:word"
 
+    def test_dsn_at_in_username_before_sys_password(self):
+        """Usernames like u@sys:secret@host — use rightmost @ before host."""
+        cfg = parse_dsn(
+            "seekdb://u_b0d763c7@sys:xxxx@6.12.233.85:2881/db_b0d763c7"
+        )
+        assert cfg.user == "u_b0d763c7@sys"
+        assert cfg.password == "xxxx"
+        assert cfg.host == "6.12.233.85"
+        assert cfg.port == 2881
+        assert cfg.database == "db_b0d763c7"
+
+    def test_dsn_at_in_username_no_password(self):
+        cfg = parse_dsn("seekdb://u@sys@10.0.0.2:2881/db")
+        assert cfg.user == "u@sys"
+        assert cfg.password == ""
+        assert cfg.host == "10.0.0.2"
+
     def test_invalid_dsn(self):
         with pytest.raises(ValueError, match="Invalid DSN format"):
             parse_dsn("mysql://user:pass@host/db")

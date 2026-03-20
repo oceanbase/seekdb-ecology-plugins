@@ -414,9 +414,7 @@ Write operations (INSERT/UPDATE/DELETE) are blocked by default:
 
 **Action**: Add `--write` flag to enable write operations.
 
-Even with `--write`, these are always blocked:
-- `DELETE` / `UPDATE` without `WHERE` clause
-- `DROP` / `TRUNCATE` statements
+Even with `--write`, `DELETE` / `UPDATE` without a `WHERE` clause are blocked.
 
 ### Error Auto-Correction
 
