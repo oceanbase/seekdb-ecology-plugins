@@ -7,7 +7,7 @@ from typing import Any
 
 _PHONE_PATTERNS = re.compile(r"(phone|mobile|tel|cellphone)", re.I)
 _EMAIL_PATTERNS = re.compile(r"(email|e_mail)", re.I)
-_PASSWORD_PATTERNS = re.compile(r"(password|passwd|secret|token|api_key|apikey)", re.I)
+_PASSWORD_PATTERNS = re.compile(r"(password|passwd|secret|api_key|apikey)", re.I)
 _IDCARD_PATTERNS = re.compile(r"(id_card|idcard|id_number|identity|ssn|national_id)", re.I)
 
 

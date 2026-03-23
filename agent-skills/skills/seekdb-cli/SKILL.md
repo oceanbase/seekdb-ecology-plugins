@@ -450,7 +450,7 @@ Columns matching sensitive patterns are automatically masked:
 |---------|---------------|
 | phone/mobile/tel | `138****5678` |
 | email | `z***@gmail.com` |
-| password/secret/token | `******` |
+| password/secret | `******` |
 | id_card/ssn | `110***********1234` |
 
 ## Output Formats

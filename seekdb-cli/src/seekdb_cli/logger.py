@@ -17,7 +17,7 @@ _RE_QUOTED = re.compile(r"'([^']*)'")
 _RE_PHONE = re.compile(r"^1[3-9]\d{9}$")
 _RE_IDCARD = re.compile(r"^\d{17}[\dXx]?$")
 _RE_SENSITIVE_COL = re.compile(
-    r"(password|passwd|secret|token|api_key|apikey|phone|mobile|id_card|idcard|email)\s*[,)]",
+    r"(password|passwd|secret|api_key|apikey|phone|mobile|id_card|idcard|email)\s*[,)]",
     re.I,
 )
 

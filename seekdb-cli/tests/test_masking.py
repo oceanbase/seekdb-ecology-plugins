@@ -19,6 +19,12 @@ class TestMaskRows:
         result = mask_rows(["password"], rows)
         assert result[0]["password"] == "******"
 
+    def test_tokenize_expression_column_not_masked(self):
+        col = "TOKENIZE('x', 'space')"
+        rows = [{col: '["a","b"]'}]
+        result = mask_rows([col], rows)
+        assert result[0][col] == '["a","b"]'
+
     def test_idcard_masking(self):
         rows = [{"id_card": "110101199001011234"}]
         result = mask_rows(["id_card"], rows)
