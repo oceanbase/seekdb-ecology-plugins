@@ -43,7 +43,73 @@ _TABLE_FROM_SQL_RE = re.compile(
 )
 
 ROW_PROBE_LIMIT = 101
-DEFAULT_TRUNCATE_LEN = 200
+DEFAULT_TRUNCATE_LEN = 3000
+
+
+def _split_sql_statements(sql: str) -> list[str]:
+    """Split *sql* on semicolons outside '...', \"...\", and `...` (MySQL-style).
+
+    Enables ``SET @x = 1; SELECT @x`` on one connection, similar to the mysql client.
+    """
+    text = sql.strip()
+    if not text:
+        return []
+    parts: list[str] = []
+    buf: list[str] = []
+    n = len(text)
+    i = 0
+    in_single = in_double = in_backtick = False
+
+    def flush() -> None:
+        s = "".join(buf).strip()
+        buf.clear()
+        if s:
+            parts.append(s)
+
+    while i < n:
+        c = text[i]
+        if in_backtick:
+            buf.append(c)
+            if c == "`":
+                in_backtick = False
+            i += 1
+            continue
+        if in_single:
+            buf.append(c)
+            if c == "'":
+                if i + 1 < n and text[i + 1] == "'":
+                    buf.append(text[i + 1])
+                    i += 2
+                    continue
+                in_single = False
+            i += 1
+            continue
+        if in_double:
+            buf.append(c)
+            if c == '"':
+                in_double = False
+            elif c == "\\" and i + 1 < n:
+                buf.append(text[i + 1])
+                i += 2
+                continue
+            i += 1
+            continue
+        if c == "'":
+            in_single = True
+            buf.append(c)
+        elif c == '"':
+            in_double = True
+            buf.append(c)
+        elif c == "`":
+            in_backtick = True
+            buf.append(c)
+        elif c == ";":
+            flush()
+        else:
+            buf.append(c)
+        i += 1
+    flush()
+    return parts if parts else [text]
 
 
 def _is_write(sql: str) -> bool:
@@ -175,7 +241,9 @@ def _fetch_table_schema(
     epilog=(
         "Shell (bash): double-quoted SQL containing '!' is expanded by history before "
         "seekdb runs (event not found). Use single quotes around the SQL, pipe or redirect "
-        "into this command (stdin is read automatically when piped), --file, or run: set +H"
+        "into this command (stdin is read automatically when piped), --file, or run: set +H\n\n"
+        "Multiple statements separated by ';' run on one connection (like mysql -e). "
+        "Output shows the last statement that returns a result set (e.g. SET ...; SELECT ...)."
     ),
 )
 @click.argument("statement", required=False)
@@ -279,21 +347,35 @@ def _execute(
     with_schema: bool,
     timer: output.Timer,
 ) -> None:
+    statements = _split_sql_statements(sql_text)
+    multi_stmt = len(statements) > 1
     is_select = _is_select(sql_text)
-    needs_probe = is_select and not _has_limit(sql_text)
-
-    exec_sql = sql_text
-    if needs_probe:
-        exec_sql = sql_text.rstrip(";") + f" LIMIT {ROW_PROBE_LIMIT}"
+    needs_probe = is_select and not _has_limit(sql_text) and not multi_stmt
 
     try:
         with conn.cursor() as cur:
-            cur.execute(exec_sql)
+            last_description: tuple | None = None
+            rows_raw: list[Any] = []
+            total_affected = 0
 
-            # Any statement that returns a result set (SELECT, SHOW TABLES, DESCRIBE, etc.)
-            if cur.description is not None:
-                rows_raw = cur.fetchall()
-                description = cur.description or ()
+            for stmt in statements:
+                exec_stmt = stmt
+                if len(statements) == 1 and needs_probe:
+                    exec_stmt = stmt.rstrip(";") + f" LIMIT {ROW_PROBE_LIMIT}"
+
+                cur.execute(exec_stmt)
+
+                if cur.description is not None:
+                    last_description = cur.description
+                    rows_raw = list(cur.fetchall())
+                else:
+                    conn.commit()
+                    rc = cur.rowcount
+                    if rc is not None and rc >= 0:
+                        total_affected += rc
+
+            if last_description is not None:
+                description = last_description
 
                 if needs_probe and len(rows_raw) > ROW_PROBE_LIMIT - 1:
                     tables = _extract_tables_from_sql(sql_text)
@@ -314,7 +396,7 @@ def _execute(
                     )
 
                 columns = [d[0] for d in description]
-                rows = list(rows_raw)
+                rows = rows_raw
 
                 if not no_truncate and description:
                     rows = _truncate_large_fields(rows, description, DEFAULT_TRUNCATE_LEN)
@@ -335,19 +417,18 @@ def _execute(
                 )
                 output.success_rows(
                     columns, rows,
+                    affected=total_affected,
                     time_ms=timer.elapsed_ms,
                     fmt=fmt,
                     extra=extra_out or None,
                 )
             else:
-                conn.commit()
-                affected = cur.rowcount
                 log_operation(
-                    "sql", sql=sql_text, ok=True, affected=affected,
+                    "sql", sql=sql_text, ok=True, affected=total_affected,
                     time_ms=timer.elapsed_ms,
                 )
                 output.success(
-                    {"affected": affected},
+                    {"affected": total_affected},
                     time_ms=timer.elapsed_ms,
                     fmt=fmt,
                 )

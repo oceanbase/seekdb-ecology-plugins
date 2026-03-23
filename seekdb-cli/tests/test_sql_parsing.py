@@ -6,6 +6,7 @@ from seekdb_cli.commands.sql import (
     _has_limit,
     _has_where,
     _extract_tables_from_sql,
+    _split_sql_statements,
 )
 
 
@@ -86,3 +87,33 @@ class TestExtractTables:
     def test_backtick_table(self):
         tables = _extract_tables_from_sql("SELECT * FROM `my_table`")
         assert "my_table" in tables
+
+
+class TestSplitSqlStatements:
+    def test_single_select(self):
+        assert _split_sql_statements("SELECT 1") == ["SELECT 1"]
+
+    def test_trailing_semicolon(self):
+        assert _split_sql_statements("SELECT 1;") == ["SELECT 1"]
+
+    def test_set_then_select(self):
+        s = "SET @a = 1; SELECT @a AS v"
+        assert _split_sql_statements(s) == ["SET @a = 1", "SELECT @a AS v"]
+
+    def test_semicolon_inside_single_quoted_string(self):
+        s = "SELECT 'a;b' AS x; SELECT 2"
+        assert _split_sql_statements(s) == ["SELECT 'a;b' AS x", "SELECT 2"]
+
+    def test_json_in_set_single_quoted(self):
+        s = (
+            "SET @p = '{\"k\":1}'; "
+            "SELECT json_pretty(DBMS_HYBRID_SEARCH.SEARCH('t', @p))"
+        )
+        parts = _split_sql_statements(s)
+        assert len(parts) == 2
+        assert parts[0].startswith("SET @p")
+        assert "SELECT json_pretty" in parts[1]
+
+    def test_doubled_quote_in_string(self):
+        s = "SELECT '''' AS q; SELECT 1"
+        assert _split_sql_statements(s) == ["SELECT '''' AS q", "SELECT 1"]
