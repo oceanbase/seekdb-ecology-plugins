@@ -5,7 +5,7 @@ Command-line client for seekdb / OceanBase, built for AI agents. Default JSON ou
 
 ## Why seekdb-cli
 
-- **Agent-friendly**: Any agent that can run shell commands can use seekdb-cli via the `seekdb` command; output is JSON by default, and the `seekdb ai-guide` command provides a self-description of seekdb-cli usage for agents.
+- **Agent-friendly**: Any agent that can run shell commands can use seekdb-cli via the `seekdb` command (the `seekdb-cli` command is the same entry point, useful for `which seekdb-cli`–style checks); output is JSON by default, and the `seekdb ai-guide` command provides a self-description of seekdb-cli usage for agents.
 - **Safety**: Row limits, write guards, and masking reduce risk when agents or scripts operate on live data.
 - **Unified interface**: One CLI for remote and embedded, SQL and vector collections, plus in-database AI, without interactive prompts or session state.
 
@@ -29,7 +29,7 @@ Command-line client for seekdb / OceanBase, built for AI agents. Default JSON ou
 pip install seekdb-cli
 ```
 
-After installation, the `seekdb` command is available.
+After installation, the `seekdb` command is available. The same program is also installed as `seekdb-cli` (e.g. for tooling that probes the binary name matching the PyPI package).
 
 ## Connection
 

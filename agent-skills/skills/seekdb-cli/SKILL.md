@@ -1,6 +1,6 @@
 ---
 name: seekdb-cli
-description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. seekdb-cli is an AI-Agent-friendly database CLI with JSON-structured output, automatic row protection, write safety guards, and sensitive field masking. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) adding/exporting collection data, (7) managing AI models (OceanBase DBMS_AI_SERVICE), (8) checking database connection status, or (9) performing any database operation via command line. Supports remote (seekdb://user:pass@host:port/db) and embedded (embedded:<path>[?database=<db>]) DSN. Triggers on: SQL queries, database schema inspection, table exploration, data lookup, vector search, collection management, seekdb operations."
+description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. The PyPI package is seekdb-cli; the installed binaries are seekdb and seekdb-cli (same program—use seekdb-cli for which/package-name checks). seekdb-cli is an AI-Agent-friendly database CLI with JSON-structured output, automatic row protection, write safety guards, and sensitive field masking. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) adding/exporting collection data, (7) managing AI models (OceanBase DBMS_AI_SERVICE), (8) checking database connection status, or (9) performing any database operation via command line. Supports remote (seekdb://user:pass@host:port/db) and embedded (embedded:<path>[?database=<db>]) DSN. Triggers on: SQL queries, database schema inspection, table exploration, data lookup, vector search, collection management, seekdb operations."
 license: MIT
 ---
 
@@ -10,10 +10,13 @@ A command-line client designed for AI Agents. All output is JSON-structured, sta
 
 ## Prerequisites
 
-Check if seekdb-cli is installed:
+Check if seekdb-cli is installed (either command works—they share the same entry point):
+
 
 ```bash
 seekdb --version
+# or, aligned with PyPI package name / for `which`-style checks:
+seekdb-cli --version
 ```
 
 If not installed, choose the method that matches your environment:
@@ -34,7 +37,9 @@ pip install seekdb-cli
 ```
 
 > **Note for Ubuntu 23.04+ / Debian 12+:** Direct `pip install` at the system level is blocked by PEP 668.
-> Use `pipx` instead — it creates an isolated environment while keeping the `seekdb` command globally available on your PATH.
+> Use `pipx` instead — it creates an isolated environment while keeping **`seekdb`** and **`seekdb-cli`** on your PATH (same program).
+
+Throughout this skill, examples use `seekdb`; you may substitute `seekdb-cli` everywhere.
 
 ## Connection
 

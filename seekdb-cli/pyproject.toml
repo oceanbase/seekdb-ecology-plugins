@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seekdb-cli"
-version = "0.1.5"
+version = "0.1.6"
 description = "AI-Agent-friendly database CLI for seekdb / OceanBase"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -32,6 +32,7 @@ dependencies = [
 
 [project.scripts]
 seekdb = "seekdb_cli.main:cli"
+seekdb-cli = "seekdb_cli.main:cli"
 
 [project.urls]
 Homepage = "https://github.com/oceanbase/seekdb-ecology-plugins"

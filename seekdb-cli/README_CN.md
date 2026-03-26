@@ -5,7 +5,7 @@
 
 ## 为什么选择 seekdb-cli
 
-- **面向 Agent**：任何能执行 Shell 的 Agent 均可通过 `seekdb` 命令使用 seekdb-cli； 默认输出 JSON 格式，`seekdb ai-guide` 命令给 Agent 提供 seekdb-cli 用法的自描述。
+- **面向 Agent**：任何能执行 Shell 的 Agent 均可通过 `seekdb` 命令使用 seekdb-cli；同时提供同名入口 `seekdb-cli`（与 `seekdb` 等价，便于 `which seekdb-cli` 等探测）。默认输出 JSON 格式，`seekdb ai-guide` 命令给 Agent 提供 seekdb-cli 用法的自描述。
 - **安全可控**：行数限制、写操作保护与敏感字段脱敏，降低 Agent 或脚本操作生产数据的风险。
 - **统一入口**：远程与嵌入式、SQL 与向量集合、数据库内 AI 共用一套 CLI，无需交互式提示或会话状态。
 
@@ -29,7 +29,7 @@
 pip install seekdb-cli
 ```
 
-安装后可使用 `seekdb` 命令。
+安装后可使用 `seekdb` 命令；亦提供 `seekdb-cli` 作为同一程序的别名（例如与 PyPI 包名一致、供脚本或工具探测）。
 
 ## 连接
 

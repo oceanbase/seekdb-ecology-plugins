@@ -502,13 +502,13 @@ This project is packaged as a Python package and can be published to PyPI for ea
 Use the provided build script to package the project:
 
 ```bash
-# Run the build script (syncs skills, builds wheel, cleans up)
-python upload_to_pypi.py
+# From agent-skills/ — requires uv (https://docs.astral.sh/uv/)
+uv run upload_to_pypi.py
 ```
 
 This script will:
 1. Sync the `skills/` directory to `src/seekdb_plugin_installer/skills/`
-2. Build the wheel package using `python -m build`
+2. Build the wheel package using `uv build`
 3. Clean up by removing the skills from the package directory
 4. Output the built artifacts in the `dist/` directory
 
@@ -521,7 +521,7 @@ If you prefer to build manually:
 cp -r skills src/seekdb_plugin_installer/
 
 # 2. Build the package
-python -m build
+uv build
 
 # 3. Clean up (optional)
 rm -rf src/seekdb_plugin_installer/skills

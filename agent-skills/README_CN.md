@@ -495,13 +495,13 @@ seekdb-docs 的文档内容位于 `./skills/seekdb-docs/official-docs` 目录，
 使用提供的构建脚本进行打包：
 
 ```bash
-# 运行构建脚本（同步 skills、构建 wheel、清理）
-python upload_to_pypi.py
+# 在 agent-skills/ 目录下执行，需已安装 uv（https://docs.astral.sh/uv/）
+uv run upload_to_pypi.py
 ```
 
 该脚本将：
 1. 将 `skills/` 同步到 `src/seekdb_plugin_installer/skills/`
-2. 使用 `python -m build` 构建 wheel 包
+2. 使用 `uv build` 构建 wheel 包
 3. 从包目录中移除 skills 以完成清理
 4. 在 `dist/` 目录输出构建产物
 
@@ -514,7 +514,7 @@ python upload_to_pypi.py
 cp -r skills src/seekdb_plugin_installer/
 
 # 2. 构建包
-python -m build
+uv build
 
 # 3. 清理（可选）
 rm -rf src/seekdb_plugin_installer/skills
