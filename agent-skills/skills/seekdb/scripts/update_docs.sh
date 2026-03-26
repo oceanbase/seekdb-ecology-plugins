@@ -14,6 +14,8 @@ NC='\033[0m' # No Color
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# agent-skills/ (pyproject.toml) — used so `uv run python` resolves the project env
+AGENT_SKILLS_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 SKILL_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 TARGET_DIR="$SKILL_DIR/seekdb-docs"
 REFERENCES_DIR="$SKILL_DIR/references"
@@ -84,7 +86,7 @@ echo "  Mapped $MAPPED_COUNT files to their source branches"
 echo -e "${YELLOW}[4/5] Updating catalog with branch info...${NC}"
 if [ -f "$CATALOG_FILE" ]; then
     export BRANCH_MAP_FILE CATALOG_FILE
-    python3 << 'PYEOF'
+    uv run --project "$AGENT_SKILLS_ROOT" python << 'PYEOF'
 import json, os
 
 branch_map_file = os.environ["BRANCH_MAP_FILE"]
@@ -134,7 +136,7 @@ SKILL_FILE="$SKILL_DIR/SKILL.md"
 if [ -f "$SKILL_FILE" ]; then
     export SKILL_FILE
     export VERSIONS_STR="${VERSIONS[*]}"
-    python3 << 'PYEOF'
+    uv run --project "$AGENT_SKILLS_ROOT" python << 'PYEOF'
 import os, re
 
 skill_file = os.environ["SKILL_FILE"]
@@ -187,7 +189,7 @@ echo ""
 echo -e "${GREEN}✓ Documentation updated successfully${NC}"
 echo ""
 echo "Next step: regenerate the catalog with LLM-generated descriptions:"
-echo "  python3 $SCRIPT_DIR/generate_catalog.py --incremental"
+echo "  cd \"$AGENT_SKILLS_ROOT\" && uv run python \"$SCRIPT_DIR/generate_catalog.py\" --incremental"
 echo ""
 echo "Or full regeneration (ignore cache):"
-echo "  python3 $SCRIPT_DIR/generate_catalog.py"
+echo "  cd \"$AGENT_SKILLS_ROOT\" && uv run python \"$SCRIPT_DIR/generate_catalog.py\""

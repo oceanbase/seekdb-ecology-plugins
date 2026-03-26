@@ -27,6 +27,7 @@ classifiers = [
 
 dependencies = [
     "questionary>=1.10.0",
+    "openai>=1.0.0",
 ]
 
 [project.scripts]
