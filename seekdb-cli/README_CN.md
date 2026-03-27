@@ -48,6 +48,8 @@ echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 
 也支持 `--dsn` 命令行参数、`SEEKDB_DSN` 环境变量、项目 `.env` 文件等方式，优先级依次递减。
 
+**TLS（仅远程 DSN）：** 在 URL 查询串里写明即可，例如 `seekdb://user:pass@host:2881/db?tls=skip-verify`（加密且不校验证书，常见于自签名）或 `?tls=required`（加密并按系统 CA 校验）。PEM：`ssl_ca`、`ssl_cert`、`ssl_key`。仅此即可确定 TLS 行为，不必再依赖单独的环境变量。
+
 ## 常用命令
 
 | 命令 | 说明 |

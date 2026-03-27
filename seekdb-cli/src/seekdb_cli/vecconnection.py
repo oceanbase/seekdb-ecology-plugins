@@ -9,6 +9,7 @@ from seekdb_cli.connection import (
     is_embedded_dsn,
     parse_embedded_dsn,
     parse_dsn,
+    pymysql_ssl_kwargs,
 )
 
 
@@ -48,4 +49,5 @@ def get_vec_client(cli_dsn: str | None) -> Any:
         database=cfg.database,
         user=cfg.user,
         password=cfg.password,
+        **pymysql_ssl_kwargs(cfg),
     )

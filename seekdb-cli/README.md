@@ -48,6 +48,8 @@ echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 
 Also supports `--dsn` CLI flag, `SEEKDB_DSN` environment variable, and project `.env` files, in decreasing priority.
 
+**TLS (remote DSN only):** set it in the URL query string — for example `seekdb://user:pass@host:2881/db?tls=skip-verify` (encrypted, no cert verification — typical for self-signed) or `?tls=required` (encrypted with default CA verification). PEM paths: `ssl_ca`, `ssl_cert`, `ssl_key`. That is enough to define the connection; no separate TLS env vars are required.
+
 ## Common commands
 
 | Command | Description |

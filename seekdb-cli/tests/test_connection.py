@@ -1,7 +1,7 @@
 """Tests for DSN parsing."""
 
 import pytest
-from seekdb_cli.connection import parse_dsn, DSNConfig
+from seekdb_cli.connection import parse_dsn, DSNConfig, pymysql_ssl_kwargs
 
 
 class TestParseDSN:
@@ -62,3 +62,36 @@ class TestParseDSN:
     def test_invalid_dsn_no_scheme(self):
         with pytest.raises(ValueError, match="Invalid DSN format"):
             parse_dsn("user:pass@host:3306/db")
+
+    def test_dsn_tls_skip_verify(self):
+        cfg = parse_dsn(
+            "seekdb://root:pw@10.0.0.1:2881/mydb?tls=skip-verify"
+        )
+        assert cfg.ssl_mode == "skip_verify"
+        sk = pymysql_ssl_kwargs(cfg)
+        assert "ssl" in sk
+        assert sk["ssl"].verify_mode.name == "CERT_NONE"
+
+    def test_dsn_sslmode_required(self):
+        cfg = parse_dsn("seekdb://root@host:3306/db?sslmode=REQUIRED")
+        assert cfg.ssl_mode == "required"
+        sk = pymysql_ssl_kwargs(cfg)
+        assert "ssl" in sk
+
+    def test_dsn_tls_alias(self):
+        cfg = parse_dsn("seekdb://h/db?tls=require")
+        assert cfg.ssl_mode == "required"
+
+    def test_dsn_ssl_pem_paths(self):
+        cfg = parse_dsn(
+            "seekdb://u:p@h:1/db?ssl_ca=/tmp/ca.pem&ssl_cert=/c.pem&ssl_key=/k.pem"
+        )
+        assert cfg.ssl_ca == "/tmp/ca.pem"
+        sk = pymysql_ssl_kwargs(cfg)
+        assert sk["ssl_ca"] == "/tmp/ca.pem"
+        assert sk["ssl_cert"] == "/c.pem"
+        assert sk["ssl_key"] == "/k.pem"
+
+    def test_invalid_tls_value(self):
+        with pytest.raises(ValueError, match="Invalid tls"):
+            parse_dsn("seekdb://h/db?tls=not-a-mode")

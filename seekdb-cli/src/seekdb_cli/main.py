@@ -15,7 +15,10 @@ from seekdb_cli.logger import log_operation
 @click.group(invoke_without_command=True)
 @click.option(
     "--dsn", envvar="SEEKDB_DSN", default=None,
-    help="Connection string. Remote: seekdb://user:pass@host:port/db  Embedded: embedded:<path>[?database=<db>]",
+    help=(
+        "Connection string. Remote: seekdb://user:pass@host:port/db[?tls=skip-verify|required|…]  "
+        "Embedded: embedded:<path>[?database=<db>]"
+    ),
 )
 @click.option("--format", "fmt", type=click.Choice(["json", "table", "csv", "jsonl"]), default="json", help="Output format.")
 @click.version_option(__version__, message="version %(version)s")
@@ -91,11 +94,16 @@ _AI_GUIDE = {
         "usage_pattern": "seekdb [--dsn DSN] [--format json|table|csv|jsonl] <subcommand> [args]",
         "dsn_formats": {
             "remote": "seekdb://user:pass@host:port/db",
+            "remote_tls": (
+                "seekdb://user:pass@host:port/db?tls=skip-verify|required|verify-ca|verify-identity "
+                "(optional: ssl_ca, ssl_cert, ssl_key as query params; use skip-verify for self-signed)"
+            ),
             "embedded": "embedded:<path>[?database=<db>]",
         },
         "examples": [
             "seekdb --format table sql \"SELECT * FROM t LIMIT 5\"",
             "seekdb --dsn \"seekdb://root:@127.0.0.1:2881/test\" status",
+            "seekdb --dsn \"seekdb://root:@host:2881/db?tls=skip-verify\" status",
             "seekdb --dsn \"embedded:./seekdb.db\" status",
             "seekdb --dsn \"embedded:./data?database=mydb\" sql \"SELECT 1\"",
         ],

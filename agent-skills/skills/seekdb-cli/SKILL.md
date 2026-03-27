@@ -1,6 +1,6 @@
 ---
 name: seekdb-cli
-description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. The PyPI package is seekdb-cli; the installed binaries are seekdb and seekdb-cli (same program—use seekdb-cli for which/package-name checks). seekdb-cli is an AI-Agent-friendly database CLI with JSON-structured output, automatic row protection, write safety guards, and sensitive field masking. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) adding/exporting collection data, (7) managing AI models (OceanBase DBMS_AI_SERVICE), (8) checking database connection status, or (9) performing any database operation via command line. Supports remote (seekdb://user:pass@host:port/db) and embedded (embedded:<path>[?database=<db>]) DSN. Triggers on: SQL queries, database schema inspection, table exploration, data lookup, vector search, collection management, seekdb operations."
+description: "Use seekdb-cli to interact with seekdb/OceanBase databases via shell commands. Use when: (1) querying databases with SQL, (2) exploring table schemas and structure, (3) profiling table data distributions, (4) inferring table relationships, (5) managing vector collections and semantic search, (6) adding/exporting collection data, (7) managing AI models , (8) checking database connection status, or (9) performing any database operation via command line."
 license: MIT
 ---
 
@@ -51,6 +51,12 @@ If the user provides a specific DSN, pass it via `--dsn` (must appear **before**
 # Remote mode
 seekdb --dsn "seekdb://user:pass@host:port/db" schema tables
 
+# Remote with TLS (query string on the URL; encode special characters in user/password)
+# tls=skip-verify — encrypted, no certificate verification (common for self-signed servers)
+seekdb --dsn "seekdb://user:pass@host:2881/db?tls=skip-verify" status
+# tls=required — encrypted with default OS CA verification
+seekdb --dsn "seekdb://user:pass@host:2881/db?tls=required" sql "SELECT 1"
+
 # Embedded mode (local database file)
 seekdb --dsn "embedded:./seekdb.db" status
 seekdb --dsn "embedded:~/.seekdb/seekdb.db?database=mydb" sql "SELECT 1"
@@ -58,6 +64,7 @@ seekdb --dsn "embedded:~/.seekdb/seekdb.db?database=mydb" sql "SELECT 1"
 
 DSN formats:
 - **Remote:** `seekdb://user:pass@host:port/db`
+- **Remote + TLS:** append `?tls=skip-verify|required|verify-ca|verify-identity` and optionally `ssl_ca`, `ssl_cert`, `ssl_key` as query parameters. 
 - **Embedded:** `embedded:<path>[?database=<db>]` (default database: `test`)
 
 ## Self-Description for AI Agents
