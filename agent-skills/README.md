@@ -1,15 +1,16 @@
 English | [简体中文](README_CN.md)  
 # seekdb Agent Skills
 
-> Contains seekdb Agent Skills, providing seekdb database documentation support and Excel/CSV import and export.
+> Contains seekdb Agent Skills: official documentation, seekdb-cli usage for AI agents, and Excel/CSV import and export.
 
 ## 📖 Project Overview
 
-This repository provides seekdb-related Agent Skills to enhance the capabilities of various AI assistants (e.g., Claude Code, OpenClaw) in seekdb database scenarios. Through documentation, import, and query skills, assistants can access seekdb official documentation, import Excel/CSV into seekdb, and perform scalar/hybrid search with result export.
+This repository provides seekdb-related Agent Skills to enhance the capabilities of various AI assistants (e.g., Claude Code, OpenClaw) in seekdb database scenarios. Through documentation, seekdb-cli, import, and query skills, assistants can access seekdb official documentation, run SQL and manage data via the command-line client, import Excel/CSV into seekdb, and perform scalar/hybrid search with result export.
 
 ## ✨ Key Features
 
 - **Complete Documentation Support**: Built-in seekdb official documentation knowledge base covering comprehensive technical documentation
+- **seekdb-cli skill**: Guides agents on installing and using the `seekdb` CLI (DSN resolution, safety rules, schema/SQL/collections/AI commands — details in the skill, kept in sync with the CLI)
 - **Ready to Use**: Simple configuration to use in supported AI tools
 
 ## 📦 Included Skills
@@ -61,6 +62,18 @@ Query and export data from seekdb vector database with support for scalar search
 
 **Related Documentation:**
 - [SKILL.md](skills/querying-from-seekdb/SKILL.md)
+
+### 4. seekdb-cli
+
+Teaches AI agents how to use the **seekdb-cli** package (`seekdb` and `seekdb-cli` entry points): JSON-first output, connection string resolution, SQL with row/write guardrails, schema and table profiling, vector collections, and in-database AI (DBMS_AI_SERVICE / AI_COMPLETE).
+
+**Features:**
+- Installation via `pipx` or `pip` (`seekdb-cli` on PyPI)
+- Full DSN order, embedded vs remote, TLS, and platform notes (see skill — matches the current CLI)
+- Command reference, `seekdb ai-guide`, safety and output formats
+
+**Related Documentation:**
+- [SKILL.md](skills/seekdb-cli/SKILL.md)
 
 ## 🚀 Quick Start
 
@@ -331,7 +344,7 @@ Exported 2 records to: amoled_phones.xlsx
 
 ### Complete Workflow Example
 
-Here's a complete workflow demonstrating all three skills together:
+Here's a complete workflow demonstrating the skills together:
 
 1. **Ask about seekdb** (seekdb skill):
    ```
@@ -346,6 +359,11 @@ Here's a complete workflow demonstrating all three skills together:
 3. **Query and export** (querying-from-seekdb skill):
    ```
    Find all Samsung phones with rating >= 4.4, export to CSV
+   ```
+
+4. **Use the CLI** (seekdb-cli skill), for example:
+   ```
+   Use seekdb to show connection status, then list all tables in the current database
    ```
 
 ## 📖 Detailed Usage Guide
@@ -450,6 +468,11 @@ agent-skills/
 │   │       ├── 450.reference/          # Reference documentation
 │   │       ├── 500.tutorials/          # Practice tutorials
 │   │       └── 600.demos/              # Demo projects
+│   │
+│   ├── seekdb-cli/                     # seekdb CLI skill (agents / shell)
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       └── create-ai-model-endpoint.md
 │   │
 │   ├── importing-to-seekdb/            # Data import skill
 │   │   ├── SKILL.md                    # Skill documentation

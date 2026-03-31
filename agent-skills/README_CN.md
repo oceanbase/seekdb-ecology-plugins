@@ -1,15 +1,16 @@
 [English](README.md) | 简体中文
 # seekdb Agent Skills
 
-> 包含 seekdb 的 Agent Skills，提供 seekdb 数据库相关文档支持和 Excel/CSV 文件的导入导出。
+> 包含 seekdb 的 Agent Skills：官方文档、面向 AI 的 seekdb-cli 用法，以及 Excel/CSV 导入导出。
 
 ## 📖 项目概述
 
-本仓库提供 seekdb 相关的 Agent Skills，用于增强各类 AI 助手（如 Claude Code、OpenClaw 等）在 seekdb 数据库场景下的能力。通过文档、导入与查询等技能，助手可查阅 seekdb 官方文档、将 Excel/CSV 导入 seekdb，以及进行标量/混合搜索并导出结果。
+本仓库提供 seekdb 相关的 Agent Skills，用于增强各类 AI 助手（如 Claude Code、OpenClaw 等）在 seekdb 数据库场景下的能力。通过文档、seekdb-cli、导入与查询等技能，助手可查阅 seekdb 官方文档、通过命令行客户端执行 SQL 与管理数据、将 Excel/CSV 导入 seekdb，以及进行标量/混合搜索并导出结果。
 
 ## ✨ 核心功能
 
 - **完整文档支持**：内置 seekdb 官方文档知识库，涵盖全面的技术文档
+- **seekdb-cli 技能**：指导 Agent 安装与使用 `seekdb` 命令行（DSN 解析、安全策略、schema/SQL/集合/AI 等，细节见技能文档并与 CLI 版本对齐）
 - **开箱即用**：简单配置即可在支持的 AI 工具中使用
 
 ## 📦 包含的技能
@@ -61,6 +62,18 @@
 
 **相关文档：**
 - [SKILL.md](skills/querying-from-seekdb/SKILL.md)
+
+### 4. seekdb-cli
+
+指导 AI Agent 使用 **seekdb-cli** 包（`seekdb` 与 `seekdb-cli` 入口）：默认 JSON 输出、连接串解析、带行数/写保护的 SQL、schema 与表画像、向量集合、数据库内 AI（DBMS_AI_SERVICE / AI_COMPLETE）。
+
+**功能特性：**
+- 通过 `pipx` 或 `pip` 安装（PyPI 包名 `seekdb-cli`）
+- 完整 DSN 顺序、嵌入式与远程、TLS 与平台说明（见技能文档，与当前 CLI 一致）
+- 命令说明、`seekdb ai-guide`、安全与输出格式
+
+**相关文档：**
+- [SKILL.md](skills/seekdb-cli/SKILL.md)
 
 ## 🚀 快速开始
 
@@ -330,7 +343,7 @@ Claude Code 会执行搜索并将指定字段导出到 Excel 文件：
 
 ### 完整工作流程示例
 
-以下是一个展示三个技能协同工作的完整流程：
+以下是一个展示各技能协同工作的完整流程：
 
 1. **询问 seekdb 相关问题**（seekdb 技能）：
    ```
@@ -345,6 +358,11 @@ Claude Code 会执行搜索并将指定字段导出到 Excel 文件：
 3. **查询并导出**（querying-from-seekdb 技能）：
    ```
    找出所有三星手机，评分 >= 4.4，导出为 CSV
+   ```
+
+4. **使用 CLI**（seekdb-cli 技能），例如：
+   ```
+   用 seekdb 查看连接状态，然后列出当前库中的所有表
    ```
 
 ## 📖 详细使用指南
@@ -443,6 +461,11 @@ agent-skills/
 │   │       ├── 450.reference/          # 参考文档
 │   │       ├── 500.tutorials/          # 实践教程
 │   │       └── 600.demos/              # 演示项目
+│   │
+│   ├── seekdb-cli/                     # seekdb CLI 技能（Agent / Shell）
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       └── create-ai-model-endpoint.md
 │   │
 │   ├── importing-to-seekdb/            # 数据导入技能
 │   │   ├── SKILL.md                    # 技能文档

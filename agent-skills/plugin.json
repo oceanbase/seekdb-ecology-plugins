@@ -1,6 +1,6 @@
 {
   "name": "seekdb-plugin",
-  "description": "An Agent Skill plugin for seekdb vector database. Provides three skills: (1) Documentation - access seekdb best practices, SQL syntax, Python SDK patterns, vector search and hybrid search guidelines; (2) Import - import CSV/Excel files into seekdb with automatic vectorization; (3) Query - perform semantic search, hybrid search, metadata filtering, and export results to CSV/Excel.",
+  "description": "An Agent Skill plugin for seekdb. Provides four skills: (1) Documentation - seekdb best practices, SQL, Python SDK, vector and hybrid search; (2) seekdb-cli - AI-agent-friendly CLI usage (DSN, SQL, schema, collections, DB AI); (3) Import - CSV/Excel into seekdb with optional vectorization; (4) Query - semantic/hybrid search, metadata filters, export to CSV/Excel.",
   "version": "0.0.1",
   "author": {
     "name": "David Zhang"

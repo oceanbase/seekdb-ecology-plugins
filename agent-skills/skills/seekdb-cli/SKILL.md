@@ -41,11 +41,19 @@ pip install seekdb-cli
 
 Throughout this skill, examples use `seekdb`; you may substitute `seekdb-cli` everywhere.
 
+**Embedded vs remote:** The default local store uses **embedded** mode (pyseekdb). That requires **Linux (glibc ≥ 2.28) or macOS 15+**; on other OSes, connect with a remote DSN: `seekdb --dsn "seekdb://user:pass@host:port/db" ...`.
+
 ## Connection
 
-seekdb-cli auto-discovers the connection (env var, `.env`, `~/.seekdb/config.env`, or default `~/.seekdb/seekdb.db`). No setup needed — just run commands directly.
+**DSN resolution** (highest priority wins):
 
-If the user provides a specific DSN, pass it via `--dsn` (must appear **before** the subcommand):
+1. `--dsn` on the CLI (must appear **before** the subcommand)
+2. `SEEKDB_DSN` environment variable
+3. `.env` in the **current working directory** (`SEEKDB_DSN=...` line)
+4. `~/.seekdb/config.env`
+5. Default `embedded:~/.seekdb/seekdb.db`
+
+With no config, the default embedded path applies — you can run commands directly. If the user gives a specific DSN, pass it with `--dsn`:
 
 ```bash
 # Remote mode
@@ -57,15 +65,15 @@ seekdb --dsn "seekdb://user:pass@host:2881/db?tls=skip-verify" status
 # tls=required — encrypted with default OS CA verification
 seekdb --dsn "seekdb://user:pass@host:2881/db?tls=required" sql "SELECT 1"
 
-# Embedded mode (local database file)
+# Embedded mode (path is a data directory, created if missing; not a single SQLite file)
 seekdb --dsn "embedded:./seekdb.db" status
 seekdb --dsn "embedded:~/.seekdb/seekdb.db?database=mydb" sql "SELECT 1"
 ```
 
 DSN formats:
 - **Remote:** `seekdb://user:pass@host:port/db`
-- **Remote + TLS:** append `?tls=skip-verify|required|verify-ca|verify-identity` and optionally `ssl_ca`, `ssl_cert`, `ssl_key` as query parameters. 
-- **Embedded:** `embedded:<path>[?database=<db>]` (default database: `test`)
+- **Remote + TLS:** append `?tls=skip-verify|required|verify-ca|verify-identity` (or the same values via MySQL-style `sslmode=`, e.g. `REQUIRED`, `VERIFY_CA`). Optional query params: `ssl_ca`, `ssl_cert`, `ssl_key`, `ssl_key_password`.
+- **Embedded:** `embedded:<path>[?database=<db>]` (default logical database name: `test`)
 
 ## Self-Description for AI Agents
 
@@ -108,8 +116,10 @@ seekdb sql "SELECT id, name FROM users LIMIT 10"
 # Read from file
 seekdb sql --file query.sql
 
-# Read from stdin
-echo "SELECT 1" | seekdb sql --stdin
+# Pipe or redirect (stdin read automatically when not a TTY; --stdin is optional)
+echo "SELECT 1" | seekdb sql
+# Explicit stdin (e.g. redirect into the command)
+seekdb sql --stdin < query.sql
 
 # Include table schema in output
 seekdb sql "SELECT * FROM orders LIMIT 5" --with-schema
@@ -462,17 +472,17 @@ Columns matching sensitive patterns are automatically masked:
 |---------|---------------|
 | phone/mobile/tel | `138****5678` |
 | email | `z***@gmail.com` |
-| password/secret | `******` |
-| id_card/ssn | `110***********1234` |
+| password/secret/api_key | `******` |
+| id_card / national_id / similar | `110***********1234` |
 
 ## Output Formats
 
-Default is JSON. Switch with `--format` / `-f`:
+Default is JSON. Switch with `--format` (global option; must appear **before** the subcommand):
 
 ```bash
-seekdb -f table sql "SELECT id, name FROM users LIMIT 5"
+seekdb --format table sql "SELECT id, name FROM users LIMIT 5"
 seekdb --format csv sql "SELECT id, name FROM users LIMIT 5"
-seekdb -f jsonl sql "SELECT id, name FROM users LIMIT 5"
+seekdb --format jsonl sql "SELECT id, name FROM users LIMIT 5"
 ```
 
 All formats now work with non-row data (e.g., `schema tables`, `collection list`). CSV and JSONL will auto-detect list-of-dict data in the `data` field.
@@ -487,7 +497,7 @@ All formats now work with non-row data (e.g., `schema tables`, `collection list`
 
 ## Operation Logging
 
-All commands are logged to `~/.seekdb/sql-history.jsonl` (seekdb-cli SQL execution history) for audit:
+All commands are logged to `~/.seekdb/sql-history.jsonl` for audit (SQL invocations include a redacted `sql` field when applicable):
 
 ```json
 {"ts": "2026-03-12T14:23:01", "command": "sql", "sql": "SELECT id FROM users LIMIT 10", "ok": true, "rows": 10, "time_ms": 12}

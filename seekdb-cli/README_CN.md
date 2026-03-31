@@ -14,14 +14,15 @@
 - **默认 JSON**：所有命令输出结构化 JSON，`--format table|csv|jsonl` 可切换人类可读格式
 - **行数保护**：超过 100 行要求补充 LIMIT
 - **写操作保护**：写操作需 `--write`；禁止无 WHERE 的 DELETE/UPDATE
-- **敏感字段脱敏**：查询结果中 phone、email、password、id_card 等自动掩码
+- **敏感字段脱敏**：列名匹配常见敏感模式（如 phone/mobile、email、password/secret/api key、证件号/SSN 等）时自动掩码
 - **操作历史**：所有命令的操作记录到 `~/.seekdb/sql-history.jsonl`；其中 **SQL 执行** 会记录 SQL 文本，并对 SQL 中敏感字面量脱敏
 - **数据库 AI**：通过 DBMS_AI_SERVICE 管理模型与 endpoint，通过 AI_COMPLETE 做补全
 
 ## 环境要求
 
 - Python 3.11+
-- seekdb / OceanBase 服务（或兼容 MySQL 协议）
+- **远程**：可通过 `seekdb://...` 访问的 seekdb / OceanBase（或兼容 MySQL 协议的服务）
+- **嵌入式**（默认本地存储）：Linux（glibc ≥ 2.28）或 macOS 15+，且需 `pyseekdb`；其他平台请改用远程 DSN
 
 ## 安装
 
@@ -33,22 +34,30 @@ pip install seekdb-cli
 
 ## 连接
 
-无需任何配置即可使用——默认使用 `~/.seekdb/seekdb.db` 嵌入式数据库。
+无需任何配置即可使用——默认使用 `~/.seekdb/seekdb.db` 嵌入式存储。
 
-如需连接远程服务器或指定其他数据库路径，创建全局配置文件：
+**嵌入式路径**表示**数据目录**（不存在时会创建），不是单个 SQLite 文件。可选逻辑库名：`embedded:/path/to/dir?database=mydb`。
+
+如需连接远程服务器或指定其他嵌入式目录，创建全局配置文件：
 
 ```bash
 mkdir -p ~/.seekdb
 # 远程
 echo 'SEEKDB_DSN="seekdb://user:pass@host:port/database"' > ~/.seekdb/config.env
 
-# 或嵌入式自定义路径
+# 或嵌入式自定义数据目录
 echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 ```
 
-也支持 `--dsn` 命令行参数、`SEEKDB_DSN` 环境变量、项目 `.env` 文件等方式，优先级依次递减。
+**DSN 解析顺序**（前者覆盖后者）：
 
-**TLS（仅远程 DSN）：** 在 URL 查询串里写明即可，例如 `seekdb://user:pass@host:2881/db?tls=skip-verify`（加密且不校验证书，常见于自签名）或 `?tls=required`（加密并按系统 CA 校验）。PEM：`ssl_ca`、`ssl_cert`、`ssl_key`。仅此即可确定 TLS 行为，不必再依赖单独的环境变量。
+1. 命令行 `--dsn`  
+2. 环境变量 `SEEKDB_DSN`  
+3. **当前工作目录**下的 `.env`（含 `SEEKDB_DSN=...` 行）  
+4. `~/.seekdb/config.env`  
+5. 默认 `embedded:~/.seekdb/seekdb.db`
+
+**TLS（仅远程 DSN）：** 写在 URL 查询串即可，例如 `seekdb://user:pass@host:2881/db?tls=skip-verify`（加密且不校验证书，常见于自签名）或 `?tls=required`（加密并按系统 CA 校验）。`tls=` 与 MySQL 风格 `sslmode=` 等价，例如 `REQUIRED`、`VERIFY_CA`、`VERIFY_IDENTITY`、`skip-verify`。PEM：`ssl_ca`、`ssl_cert`、`ssl_key`，可选 `ssl_key_password`。仅此即可确定 TLS，不必再设单独 TLS 环境变量。
 
 ## 常用命令
 
@@ -59,7 +68,7 @@ echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 | `seekdb schema describe <table>` | 表结构（列、类型、索引） |
 | `seekdb schema dump` | 输出所有表的 DDL |
 | `seekdb table profile <table>` | 表数据画像（行数、空值、distinct、min/max、候选 JOIN 键与时间列） |
-| `seekdb sql "<stmt>"` | 执行 SQL（只读默认；加 `--write` 允许写；`--with-schema` 附带表 schema；`--no-truncate` 不截断大字段） |
+| `seekdb sql "<stmt>"` | 执行 SQL（只读默认；`--write` 允许写；`--with-schema` / `--no-truncate`；`--file` / `--stdin` 或**管道 stdin** 输入） |
 | `seekdb relations infer [--table <t>]` | 推断表间 JOIN 关系 |
 | `seekdb collection list \| create \| delete \| info` | 向量集合管理 |
 | `seekdb query <coll> --text "<query>" [--mode semantic\|fulltext\|hybrid]` | 集合检索（默认 **hybrid** 混合检索） |
@@ -67,7 +76,7 @@ echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 | `seekdb add <coll> (--file \| --stdin \| --data)` | 向集合写入数据 |
 | `seekdb export <coll> --output <path>` | 导出集合数据 |
 | `seekdb ai model list \| create \| delete` | AI 模型管理（DBMS_AI_SERVICE） |
-| `seekdb ai model endpoint create \| delete` | AI 模型 endpoint 创建/删除 |
+| `seekdb ai model endpoint create \| delete` | `create <endpoint> <ai_model> --url <url> --access-key <key>` [`--provider` …]；`delete <endpoint>` |
 | `seekdb ai complete "<prompt>" --model <name>` | 数据库内 AI 补全（AI_COMPLETE） |
 | `seekdb ai-guide` | 输出 AI Agent 用结构化指南（JSON） |
 

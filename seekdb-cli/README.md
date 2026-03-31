@@ -14,14 +14,15 @@ Command-line client for seekdb / OceanBase, built for AI agents. Default JSON ou
 - **JSON by default**: All commands emit structured JSON; use `--format table|csv|jsonl` for human-readable output.
 - **Row limits**: LIMIT required when result exceeds 100 rows.
 - **Write safeguards**: Writes require `--write`; DELETE/UPDATE without WHERE are disallowed.
-- **Sensitive-field masking**: Columns such as phone, email, password, id_card are auto-masked in query results.
+- **Sensitive-field masking**: Column names matching common patterns (e.g. phone/mobile, email, password/secret/api keys, national ID / SSN–style fields) are auto-masked in query results.
 - **Operation history**: All commands are logged to `~/.seekdb/sql-history.jsonl`; for **SQL execution**, the SQL text is logged with sensitive literals redacted.
 - **Database AI**: Manage models and endpoints via DBMS_AI_SERVICE; use AI_COMPLETE for completion.
 
 ## Requirements
 
 - Python 3.11+
-- seekdb / OceanBase (or any MySQL-protocol–compatible server)
+- **Remote**: seekdb / OceanBase (or any MySQL-protocol–compatible server) reachable via `seekdb://...`
+- **Embedded** (default local store): Linux (glibc ≥ 2.28) or macOS 15+ with `pyseekdb`; on other platforms use a remote DSN instead
 
 ## Installation
 
@@ -33,22 +34,30 @@ After installation, the `seekdb` command is available. The same program is also 
 
 ## Connection
 
-Works out of the box — with no configuration, seekdb-cli uses a default embedded database at `~/.seekdb/seekdb.db`.
+Works out of the box — with no configuration, seekdb-cli uses a default embedded store at `~/.seekdb/seekdb.db`.
 
-To connect to a remote server or use a different database path, create a global config file:
+**Embedded paths** are **data directories** (created if missing), not a single SQLite-style file. Optional logical database: `embedded:/path/to/dir?database=mydb`.
+
+To connect to a remote server or use a different embedded directory, create a global config file:
 
 ```bash
 mkdir -p ~/.seekdb
 # Remote
 echo 'SEEKDB_DSN="seekdb://user:pass@host:port/database"' > ~/.seekdb/config.env
 
-# Or embedded with a custom path
+# Or embedded with a custom data directory
 echo 'SEEKDB_DSN="embedded:/path/to/data"' > ~/.seekdb/config.env
 ```
 
-Also supports `--dsn` CLI flag, `SEEKDB_DSN` environment variable, and project `.env` files, in decreasing priority.
+**DSN resolution** (highest priority wins):
 
-**TLS (remote DSN only):** set it in the URL query string — for example `seekdb://user:pass@host:2881/db?tls=skip-verify` (encrypted, no cert verification — typical for self-signed) or `?tls=required` (encrypted with default CA verification). PEM paths: `ssl_ca`, `ssl_cert`, `ssl_key`. That is enough to define the connection; no separate TLS env vars are required.
+1. `--dsn` on the CLI  
+2. `SEEKDB_DSN` environment variable  
+3. `.env` in the **current working directory** (line `SEEKDB_DSN=...`)  
+4. `~/.seekdb/config.env`  
+5. Default `embedded:~/.seekdb/seekdb.db`
+
+**TLS (remote DSN only):** set it in the URL query string — for example `seekdb://user:pass@host:2881/db?tls=skip-verify` (encrypted, no cert verification — typical for self-signed) or `?tls=required` (encrypted with default CA verification). The same modes work as `tls=` or MySQL-style `sslmode=` (e.g. `REQUIRED`, `VERIFY_CA`, `VERIFY_IDENTITY`, `skip-verify`). PEM paths: `ssl_ca`, `ssl_cert`, `ssl_key`, optional `ssl_key_password`. That is enough to define the connection; no separate TLS env vars are required.
 
 ## Common commands
 
@@ -59,7 +68,7 @@ Also supports `--dsn` CLI flag, `SEEKDB_DSN` environment variable, and project `
 | `seekdb schema describe <table>` | Table structure (columns, types, indexes) |
 | `seekdb schema dump` | Output DDL for all tables (to stdout) |
 | `seekdb table profile <table>` | Table data profile (row count, nulls, distinct, min/max, candidate JOIN keys and time columns) |
-| `seekdb sql "<stmt>"` | Execute SQL (read-only by default; use `--write` for writes; `--with-schema` adds table schema; `--no-truncate` keeps large fields intact) |
+| `seekdb sql "<stmt>"` | Execute SQL (read-only by default; `--write` for writes; `--with-schema` / `--no-truncate`; `--file` / `--stdin` or **piped stdin** for input) |
 | `seekdb relations infer [--table <t>]` | Infer JOIN relationships between tables |
 | `seekdb collection list \| create \| delete \| info` | Vector collection management |
 | `seekdb query <coll> --text "<query>" [--mode semantic\|fulltext\|hybrid]` | Search a collection (default: **hybrid**) |
@@ -67,7 +76,7 @@ Also supports `--dsn` CLI flag, `SEEKDB_DSN` environment variable, and project `
 | `seekdb add <coll> (--file \| --stdin \| --data)` | Add data to a collection |
 | `seekdb export <coll> --output <path>` | Export collection data |
 | `seekdb ai model list \| create \| delete` | AI model management (DBMS_AI_SERVICE) |
-| `seekdb ai model endpoint create \| delete` | Create or delete AI model endpoints |
+| `seekdb ai model endpoint create \| delete` | `create <endpoint> <ai_model> --url <url> --access-key <key>` [`--provider` …]; `delete <endpoint>` |
 | `seekdb ai complete "<prompt>" --model <name>` | In-database AI completion (AI_COMPLETE) |
 | `seekdb ai-guide` | Print structured guide for AI agents (JSON) |
 
